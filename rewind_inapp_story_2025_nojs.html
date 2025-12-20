@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
+    <title>Rewind Đối tác Nhà hàng 2025 (No JS)</title>
+    <style>
+      :root{
+        --bg0:#0b1020;
+        --bg1:#1a0f2e;
+        --bg2:#0d2b2a;
+        --text:rgba(255,255,255,.94);
+        --muted:rgba(255,255,255,.72);
+        --muted2:rgba(255,255,255,.56);
+        --accent:#7cf7d2;
+        --accent2:#ffcf66;
+        --shadow: 0 18px 60px rgba(0,0,0,.42);
+        --radius: 18px;
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-right: env(safe-area-inset-right, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left: env(safe-area-inset-left, 0px);
+        --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      }
+      *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+      html,body{ height:100%; }
+      body{
+        margin:0;
+        font-family: var(--font);
+        color: var(--text);
+        background: radial-gradient(1200px 800px at 20% 15%, rgba(124,247,210,.18), transparent 50%),
+                    radial-gradient(900px 700px at 85% 20%, rgba(255,207,102,.18), transparent 48%),
+                    radial-gradient(900px 700px at 50% 80%, rgba(160,120,255,.16), transparent 55%),
+                    linear-gradient(160deg, var(--bg0), var(--bg1) 50%, var(--bg2));
+        overflow:hidden;
+      }
+
+      /* Layout */
+      .frame{
+        height:100%;
+        padding: calc(12px + var(--safe-top)) calc(14px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(14px + var(--safe-left));
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+      }
+
+      .top{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+      }
+      .brand{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:8px 10px;
+        border-radius:999px;
+        background: rgba(255,255,255,.09);
+        border:1px solid rgba(255,255,255,.10);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .dot{
+        width:8px; height:8px; border-radius:50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 6px rgba(124,247,210,.15);
+      }
+      .hint{
+        font-size: 12px;
+        color: var(--muted2);
+        white-space:nowrap;
+        user-select:none;
+      }
+
+      .stage{
+        position:relative;
+        flex:1;
+        border-radius: calc(var(--radius) + 8px);
+        background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+        border: 1px solid rgba(255,255,255,.10);
+        box-shadow: var(--shadow);
+        overflow:hidden;
+      }
+      .bgfx{
+        position:absolute; inset:-2px;
+        background:
+          radial-gradient(540px 340px at 10% 20%, rgba(124,247,210,.22), transparent 55%),
+          radial-gradient(540px 340px at 90% 35%, rgba(255,207,102,.20), transparent 58%),
+          radial-gradient(520px 420px at 50% 110%, rgba(160,120,255,.18), transparent 55%);
+        opacity:.9;
+        pointer-events:none;
+      }
+
+      /* Scroll-snap "story" */
+      .slides{
+        position:relative;
+        height:100%;
+        display:flex;
+        overflow-x:auto;
+        overflow-y:hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+      }
+      .slides::-webkit-scrollbar{ display:none; }
+      .slide{
+        scroll-snap-align: start;
+        flex: 0 0 100%;
+        width:100%;
+        height:100%;
+        padding: 18px 18px calc(18px + 44px);
+        display:flex;
+        flex-direction:column;
+        justify-content:space-between;
+        gap:14px;
+      }
+      .kicker{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+      }
+      .tag{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:7px 10px;
+        border-radius: 999px;
+        background: rgba(0,0,0,.18);
+        border: 1px solid rgba(255,255,255,.14);
+        color: rgba(255,255,255,.92);
+        font-size: 12px;
+        letter-spacing:.2px;
+      }
+      .tag b{ color: var(--accent2); }
+      .badge{
+        display:inline-flex;
+        align-items:center;
+        padding:7px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.12);
+        font-size: 12px;
+        color: rgba(255,255,255,.86);
+      }
+      h1{
+        margin:0;
+        font-size: 26px;
+        line-height:1.15;
+        letter-spacing:-0.2px;
+      }
+      p{
+        margin:0;
+        font-size: 14px;
+        line-height:1.5;
+        color: var(--muted);
+        white-space: pre-line;
+      }
+      .stat{
+        padding: 14px 14px;
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+        border:1px solid rgba(255,255,255,.12);
+      }
+      .label{
+        font-size: 12px;
+        letter-spacing:.3px;
+        text-transform: uppercase;
+        color: var(--muted2);
+      }
+      .value{
+        margin-top:8px;
+        font-size: 34px;
+        line-height: 1.1;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+      }
+      .hl{ color: var(--accent); }
+      .hl2{ color: var(--accent2); }
+
+      /* Bottom nav (no JS) */
+      .nav{
+        position:absolute;
+        left:12px;
+        right:12px;
+        bottom: calc(12px + var(--safe-bottom));
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        pointer-events:auto;
+      }
+      .nav .dots{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+      }
+      .dotlink{
+        width:10px;
+        height:10px;
+        border-radius:999px;
+        display:inline-block;
+        background: rgba(255,255,255,.20);
+        border: 1px solid rgba(255,255,255,.18);
+        text-decoration:none;
+      }
+      .dotlink:active{ transform: scale(.95); }
+      .nav .actions{
+        display:flex;
+        gap:8px;
+      }
+      .btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        padding:10px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.16);
+        background: rgba(0,0,0,.14);
+        color: rgba(255,255,255,.92);
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration:none;
+        user-select:none;
+        white-space:nowrap;
+      }
+      .btn:active{ transform: scale(.98); }
+
+      /* Simple top "segments" (static, no progress without JS) */
+      .segments{
+        display:flex;
+        gap:6px;
+        width:100%;
+      }
+      .seg{
+        flex:1;
+        height:3px;
+        border-radius:999px;
+        background: rgba(255,255,255,.18);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <div class="segments" aria-hidden="true">
+        <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+        <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+
+      <div class="top">
+        <div class="brand"><span class="dot" aria-hidden="true"></span>Rewind Đối tác Nhà hàng 2025</div>
+        <div class="hint">Lướt ngang để xem • Bấm chấm để nhảy slide</div>
+      </div>
+
+      <div class="stage" role="group" aria-label="Rewind story (No JS)">
+        <div class="bgfx" aria-hidden="true"></div>
+
+        <div class="slides" id="slides">
+          <section class="slide" id="s1">
+            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Mở đầu</b></span><span class="badge">2025</span></div>
+            <div>
+              <h1>Cửa hàng <strong>{{ merchant_name }}</strong> ơi,</h1>
+              <p>2025 là một năm bận rộn tại Cửa hàng đấy! Mỗi cột mốc đều kể lại hành trình rất riêng, đều là dấu ấn của sự bền bỉ và tăng trưởng không ngừng trong năm.
+
+Cùng nhìn lại một năm đáng nhớ nhé 👇</p>
+            </div>
+            <div class="stat">
+              <div class="label">Tip</div>
+              <div class="value"><span class="hl2">Lướt</span> để tiếp tục</div>
+            </div>
+          </section>
+
+          <section class="slide" id="s2">
+            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Danh xưng</b></span><span class="badge">2025</span></div>
+            <div>
+              <h1>Cửa hàng xịn mới nhập hội</h1>
+              <p>tại <strong>{{ province }}</strong></p>
+            </div>
+            <div class="stat">
+              <div class="label">Merchant naming</div>
+              <div class="value"><span class="hl2">{{ province }}</span></div>
+            </div>
+          </section>
+
+          <section class="slide" id="s3">
+            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 01</b></span><span class="badge">2025</span></div>
+            <div>
+              <h1>Tổng số sản phẩm bán ra trong năm</h1>
+              <p>Đã có</p>
+            </div>
+            <div class="stat">
+              <div class="label">Sản phẩm đã bán</div>
+              <div class="value"><span class="hl">{{ item_quantity }}</span> sản phẩm</div>
+              <p style="margin-top:8px;color:var(--muted)">tại Cửa hàng đã được trao đến Người dùng trong năm qua</p>
+            </div>
+          </section>
+
+          <section class="slide" id="s4">
+            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 02</b></span><span class="badge">2025</span></div>
+            <div>
+              <h1>"Nàng thơ" của Cửa hàng</h1>
+              <p>&nbsp;</p>
+            </div>
+            <div class="stat">
+              <div class="label">Sản phẩm bán chạy nhất</div>
+              <div class="value"><span class="hl2">{{ item_name }}</span></div>
+              <p style="margin-top:8px;color:var(--muted)">chính là sản phẩm gây thương nhớ nhất và được Người dùng đặt nhiều nhất năm qua</p>
+            </div>
+          </section>
+
+          <section class="slide" id="s5">
+            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 03</b></span><span class="badge">2025</span></div>
+            <div>
+              <h1>Chiến dịch mang lại nhiều đơn nhất</h1>
+              <p>Chiến dịch</p>
+            </div>
+            <div class="stat">
+              <div class="label">Top campaign</div>
+              <div class="value"><span class="hl">{{ campaign_name }}</span></div>
+              <p style="margin-top:8px;color:var(--muted)">đã góp 1 phần giúp Cửa hàng "lên hương" và thu hút về nhiều đơn hàng</p>
+            </div>
+          </section>
+
+          <section class="slide" id="s6">
+            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 04</b></span><span class="badge">2025</span></div>
+            <div>
+              <h1>Tháng tăng trưởng nhanh nhất trong năm</h1>
+              <p>Tháng bứt tốc của Cửa hàng là</p>
+            </div>
+            <div class="stat">
+              <div class="label">Tháng tăng trưởng nhanh nhất</div>
+              <div class="value"><span class="hl2">{{ fastest_growth_month }}</span></div>
+              <p style="margin-top:8px;color:var(--muted)">Giữ nhịp tăng trưởng này để 2026 còn rực rỡ hơn nhé!</p>
+            </div>
+          </section>
+
+          <section class="slide" id="s7">
+            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 05</b></span><span class="badge">2025</span></div>
+            <div>
+              <h1>Khung giờ nhiều đơn nhất</h1>
+              <p>Giờ vàng Cửa hàng nổ đơn là</p>
+            </div>
+            <div class="stat">
+              <div class="label">Giờ vàng</div>
+              <div class="value"><span class="hl">{{ time }}</span></div>
+              <p style="margin-top:8px;color:var(--muted)">Đối tác hãy ghi sổ lại khung giờ này để có chuẩn bị vận hành thật tốt và đón đơn về nhé!</p>
+            </div>
+          </section>
+
+          <section class="slide" id="s8">
+            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Kết</b></span><span class="badge">2025</span></div>
+            <div>
+              <h1>Cảm ơn <strong>{{ merchant_name }}</strong>!</h1>
+              <p>Một năm bền bỉ đã qua — và hành trình vẫn đang tiếp tục.
+
+Chúc Cửa hàng 2026 bùng nổ đơn đều, vận hành mượt và tăng trưởng mạnh.</p>
+            </div>
+            <div class="stat">
+              <div class="label">Hẹn gặp lại</div>
+              <div class="value"><span class="hl2">Rewind 2026</span></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="nav" aria-label="Điều hướng">
+          <div class="dots" aria-label="Chọn slide">
+            <a class="dotlink" href="#s1" aria-label="Slide 1"></a>
+            <a class="dotlink" href="#s2" aria-label="Slide 2"></a>
+            <a class="dotlink" href="#s3" aria-label="Slide 3"></a>
+            <a class="dotlink" href="#s4" aria-label="Slide 4"></a>
+            <a class="dotlink" href="#s5" aria-label="Slide 5"></a>
+            <a class="dotlink" href="#s6" aria-label="Slide 6"></a>
+            <a class="dotlink" href="#s7" aria-label="Slide 7"></a>
+            <a class="dotlink" href="#s8" aria-label="Slide 8"></a>
+          </div>
+          <div class="actions" aria-label="Hành động nhanh">
+            <a class="btn" href="#s1">Về đầu</a>
+            <a class="btn" href="#s8">Kết</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
