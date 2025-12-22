@@ -311,12 +311,12 @@
         var HOLD_TO_PAUSE = true;
 
         // 8 slides: 1 mở đầu + 6 rewind + 1 kết
-        // Placeholder dùng moustache style: {{ merchant_name }}, {{ province }}, ...
+        // Tokens là text thường để bạn tự thay (không dùng {{ }}): MERCHANT_NAME, PROVINCE, ...
         var slides = [
           {
             key: "intro",
             tag: "Mở đầu",
-            title: "Cửa hàng <strong>{{ merchant_name }}</strong> ơi,",
+            title: "Cửa hàng <strong>MERCHANT_NAME</strong> ơi,",
             body:
               "2025 là một năm bận rộn tại Cửa hàng đấy! Mỗi cột mốc đều kể lại hành trình rất riêng, đều là dấu ấn của sự bền bỉ và tăng trưởng không ngừng trong năm.\n\nCùng nhìn lại một năm đáng nhớ nhé 👇",
             statLabel: null,
@@ -328,9 +328,9 @@
             key: "naming",
             tag: "Danh xưng",
             title: "Cửa hàng xịn mới nhập hội",
-            body: "tại <strong>{{ province }}</strong>",
+            body: "tại <strong>PROVINCE</strong>",
             statLabel: "Merchant naming",
-            statValue: "<span class='hl2'>{{ province }}</span>",
+            statValue: "<span class='hl2'>PROVINCE</span>",
             note: "Chào mừng bạn đến với Rewind 2025.",
             cta: "Tiếp"
           },
@@ -340,7 +340,7 @@
             title: "Tổng số sản phẩm bán ra trong năm",
             body: "Đã có",
             statLabel: "Sản phẩm đã bán",
-            statValue: "<span class='hl'>{{ item_quantity }}</span> sản phẩm",
+            statValue: "<span class='hl'>ITEM_QUANTITY</span> sản phẩm",
             note: "tại Cửa hàng đã được trao đến Người dùng trong năm qua",
             cta: "Tiếp"
           },
@@ -350,7 +350,7 @@
             title: "\"Nàng thơ\" của Cửa hàng",
             body: "",
             statLabel: "Sản phẩm bán chạy nhất",
-            statValue: "<span class='hl2'>{{ item_name }}</span>",
+            statValue: "<span class='hl2'>ITEM_NAME</span>",
             note: "chính là sản phẩm gây thương nhớ nhất và được Người dùng đặt nhiều nhất năm qua",
             cta: "Tiếp"
           },
@@ -360,7 +360,7 @@
             title: "Chiến dịch mang lại nhiều đơn nhất",
             body: "Chiến dịch",
             statLabel: "Top campaign",
-            statValue: "<span class='hl'>{{ campaign_name }}</span>",
+            statValue: "<span class='hl'>CAMPAIGN_NAME</span>",
             note: "đã góp 1 phần giúp Cửa hàng \"lên hương\" và thu hút về nhiều đơn hàng",
             cta: "Tiếp"
           },
@@ -370,7 +370,7 @@
             title: "Tháng tăng trưởng nhanh nhất trong năm",
             body: "Tháng bứt tốc của Cửa hàng là",
             statLabel: "Tháng tăng trưởng nhanh nhất",
-            statValue: "<span class='hl2'>{{ fastest_growth_month }}</span>",
+            statValue: "<span class='hl2'>FASTEST_GROWTH_MONTH</span>",
             note: "Giữ nhịp tăng trưởng này để 2026 còn rực rỡ hơn nhé!",
             cta: "Tiếp"
           },
@@ -380,14 +380,14 @@
             title: "Khung giờ nhiều đơn nhất",
             body: "Giờ vàng Cửa hàng nổ đơn là",
             statLabel: "Giờ vàng",
-            statValue: "<span class='hl'>{{ time }}</span>",
+            statValue: "<span class='hl'>PEAK_TIME</span>",
             note: "Đối tác hãy ghi sổ lại khung giờ này để có chuẩn bị vận hành thật tốt và đón đơn về nhé!",
             cta: "Tiếp"
           },
           {
             key: "end",
             tag: "Kết",
-            title: "Cảm ơn <strong>{{ merchant_name }}</strong>!",
+            title: "Cảm ơn <strong>MERCHANT_NAME</strong>!",
             body:
               "Một năm bền bỉ đã qua — và hành trình vẫn đang tiếp tục.\n\nChúc Cửa hàng 2026 bùng nổ đơn đều, vận hành mượt và tăng trưởng mạnh.",
             statLabel: "Hẹn gặp lại",
