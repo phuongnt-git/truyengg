@@ -4,39 +4,48 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="format-detection" content="telephone=no,date=no,address=no,email=no" />
-    <title>Rewind Đối tác Nhà hàng 2025 (No JS)</title>
+    <title>Rewind Đối tác Nhà hàng 2025</title>
     <style>
       :root{
         --bg0:#0b1020;
         --bg1:#1a0f2e;
         --bg2:#0d2b2a;
+
         --text:rgba(255,255,255,.94);
         --muted:rgba(255,255,255,.72);
         --muted2:rgba(255,255,255,.56);
+
         --accent:#7cf7d2;
         --accent2:#ffcf66;
+        --violet:#a78bfa;
+        --blue:#60a5fa;
+        --pink:#ff79c6;
+
         --shadow: 0 18px 60px rgba(0,0,0,.42);
         --radius: 18px;
+
         --safe-top: env(safe-area-inset-top, 0px);
         --safe-right: env(safe-area-inset-right, 0px);
         --safe-bottom: env(safe-area-inset-bottom, 0px);
         --safe-left: env(safe-area-inset-left, 0px);
+
         --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
       }
+
       *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
       html,body{ height:100%; }
       body{
         margin:0;
         font-family: var(--font);
         color: var(--text);
-        background: radial-gradient(1200px 800px at 20% 15%, rgba(124,247,210,.18), transparent 50%),
-                    radial-gradient(900px 700px at 85% 20%, rgba(255,207,102,.18), transparent 48%),
-                    radial-gradient(900px 700px at 50% 80%, rgba(160,120,255,.16), transparent 55%),
-                    linear-gradient(160deg, var(--bg0), var(--bg1) 50%, var(--bg2));
         overflow:hidden;
+        background:
+          radial-gradient(1200px 800px at 20% 15%, rgba(124,247,210,.18), transparent 50%),
+          radial-gradient(900px 700px at 85% 20%, rgba(255,207,102,.18), transparent 48%),
+          radial-gradient(900px 700px at 50% 80%, rgba(160,120,255,.16), transparent 55%),
+          linear-gradient(160deg, var(--bg0), var(--bg1) 50%, var(--bg2));
       }
 
-      /* Layout */
       .frame{
         height:100%;
         padding: calc(12px + var(--safe-top)) calc(14px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(14px + var(--safe-left));
@@ -45,7 +54,24 @@
         gap:12px;
       }
 
-      .top{
+      /* Top */
+      .topbar{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+      }
+      .segments{
+        display:flex;
+        gap:6px;
+        width:100%;
+      }
+      .seg{
+        flex:1;
+        height:3px;
+        border-radius:999px;
+        background: rgba(255,255,255,.18);
+      }
+      .meta{
         display:flex;
         align-items:center;
         justify-content:space-between;
@@ -61,8 +87,9 @@
         border:1px solid rgba(255,255,255,.10);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        font-weight: 700;
+        font-weight: 800;
         font-size: 13px;
+        letter-spacing:.2px;
       }
       .dot{
         width:8px; height:8px; border-radius:50%;
@@ -76,6 +103,7 @@
         user-select:none;
       }
 
+      /* Stage */
       .stage{
         position:relative;
         flex:1;
@@ -95,7 +123,7 @@
         pointer-events:none;
       }
 
-      /* Scroll-snap "story" */
+      /* Slides (scroll-snap story) */
       .slides{
         position:relative;
         height:100%;
@@ -107,17 +135,52 @@
         scroll-behavior: smooth;
       }
       .slides::-webkit-scrollbar{ display:none; }
+
       .slide{
         scroll-snap-align: start;
         flex: 0 0 100%;
         width:100%;
         height:100%;
-        padding: 18px 18px calc(18px + 44px);
+        padding: 14px 14px calc(14px + 62px);
+        position:relative;
+      }
+
+      /* Card shell */
+      .slide::before{
+        content:"";
+        position:absolute;
+        inset: 10px;
+        border-radius: calc(var(--radius) + 12px);
+        background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+        border: 1px solid rgba(255,255,255,.12);
+        box-shadow: 0 18px 70px rgba(0,0,0,.28);
+        pointer-events:none;
+      }
+      .slide::after{
+        content:"";
+        position:absolute;
+        inset: 10px;
+        border-radius: calc(var(--radius) + 12px);
+        background:
+          radial-gradient(560px 360px at 15% 20%, var(--glow1, rgba(124,247,210,.24)), transparent 58%),
+          radial-gradient(520px 340px at 88% 30%, var(--glow2, rgba(255,207,102,.18)), transparent 60%),
+          radial-gradient(520px 420px at 50% 115%, rgba(167,139,250,.14), transparent 55%);
+        opacity: .95;
+        pointer-events:none;
+      }
+
+      .inner{
+        position:relative;
+        z-index:1;
+        height:100%;
+        padding: 10px 10px;
         display:flex;
         flex-direction:column;
         justify-content:space-between;
         gap:14px;
       }
+
+      /* Kicker */
       .kicker{
         display:flex;
         align-items:center;
@@ -147,19 +210,29 @@
         font-size: 12px;
         color: rgba(255,255,255,.86);
       }
+
+      /* Typography */
       h1{
         margin:0;
-        font-size: 26px;
-        line-height:1.15;
-        letter-spacing:-0.2px;
+        font-size: 28px;
+        line-height:1.12;
+        letter-spacing:-0.25px;
       }
       p{
         margin:0;
         font-size: 14px;
-        line-height:1.5;
+        line-height:1.55;
         color: var(--muted);
         white-space: pre-line;
       }
+      .lead{ font-size: 15px; color: rgba(255,255,255,.82); }
+      .divider{
+        height: 1px;
+        background: rgba(255,255,255,.12);
+        margin: 12px 0;
+      }
+
+      /* Stat */
       .stat{
         padding: 14px 14px;
         border-radius: var(--radius);
@@ -175,14 +248,45 @@
       .value{
         margin-top:8px;
         font-size: 34px;
-        line-height: 1.1;
-        font-weight: 800;
-        letter-spacing: -0.6px;
+        line-height: 1.06;
+        font-weight: 900;
+        letter-spacing: -0.7px;
       }
       .hl{ color: var(--accent); }
       .hl2{ color: var(--accent2); }
 
-      /* Bottom nav (no JS) */
+      /* Slide controls (HTML-only) */
+      .slideNav{
+        display:flex;
+        justify-content:space-between;
+        gap:10px;
+        margin-top: 10px;
+      }
+
+      .btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        padding:10px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.16);
+        background: rgba(0,0,0,.14);
+        color: rgba(255,255,255,.92);
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration:none;
+        user-select:none;
+        white-space:nowrap;
+      }
+      .btn:active{ transform: scale(.98); }
+      .btn.ghost{ background: rgba(255,255,255,.06); }
+      .btn[aria-disabled="true"]{ opacity:.55; pointer-events:none; }
+      .slideNav .btn{ flex:1; }
+      .slideNav .btn:first-child{ justify-content:flex-start; }
+      .slideNav .btn:last-child{ justify-content:flex-end; }
+
+      /* Bottom global nav */
       .nav{
         position:absolute;
         left:12px;
@@ -192,9 +296,9 @@
         align-items:center;
         justify-content:space-between;
         gap:12px;
-        pointer-events:auto;
+        z-index: 3;
       }
-      .nav .dots{
+      .dots{
         display:flex;
         gap:8px;
         flex-wrap:wrap;
@@ -209,160 +313,248 @@
         text-decoration:none;
       }
       .dotlink:active{ transform: scale(.95); }
-      .nav .actions{
-        display:flex;
-        gap:8px;
-      }
-      .btn{
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        gap:8px;
-        padding:10px 12px;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,.16);
-        background: rgba(0,0,0,.14);
-        color: rgba(255,255,255,.92);
-        font-size: 12px;
-        font-weight: 700;
-        text-decoration:none;
-        user-select:none;
-        white-space:nowrap;
-      }
-      .btn:active{ transform: scale(.98); }
 
-      /* Simple top "segments" (static, no progress without JS) */
-      .segments{
+      .actions{
         display:flex;
-        gap:6px;
-        width:100%;
+        gap:8px;
       }
-      .seg{
-        flex:1;
-        height:3px;
-        border-radius:999px;
-        background: rgba(255,255,255,.18);
+
+      /* Themes */
+      .t-mint{ --glow1: rgba(124,247,210,.26); --glow2: rgba(96,165,250,.14); }
+      .t-gold{ --glow1: rgba(255,207,102,.24); --glow2: rgba(255,121,198,.14); }
+      .t-violet{ --glow1: rgba(167,139,250,.24); --glow2: rgba(124,247,210,.14); }
+      .t-blue{ --glow1: rgba(96,165,250,.22); --glow2: rgba(255,207,102,.14); }
+
+      /* Reduce motion */
+      @media (prefers-reduced-motion: reduce){
+        .slides{ scroll-behavior: auto; }
       }
     </style>
   </head>
   <body>
     <div class="frame">
-      <div class="segments" aria-hidden="true">
-        <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-        <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
-      </div>
-
-      <div class="top">
-        <div class="brand"><span class="dot" aria-hidden="true"></span>Rewind Đối tác Nhà hàng 2025</div>
-        <div class="hint">Lướt ngang để xem • Bấm chấm để nhảy slide</div>
+      <div class="topbar">
+        <div class="segments" aria-hidden="true">
+          <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+          <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+        </div>
+        <div class="meta">
+          <div class="brand"><span class="dot" aria-hidden="true"></span>Rewind Đối tác Nhà hàng 2025</div>
+          <div class="hint">Lướt ngang • hoặc bấm Prev/Next</div>
+        </div>
       </div>
 
       <div class="stage" role="group" aria-label="Rewind story (No JS)">
         <div class="bgfx" aria-hidden="true"></div>
 
         <div class="slides" id="slides">
-          <section class="slide" id="s1">
-            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Mở đầu</b></span><span class="badge">2025</span></div>
-            <div>
-              <h1>Cửa hàng <strong>{{ merchant_name }}</strong> ơi,</h1>
-              <p>2025 là một năm bận rộn tại Cửa hàng đấy! Mỗi cột mốc đều kể lại hành trình rất riêng, đều là dấu ấn của sự bền bỉ và tăng trưởng không ngừng trong năm.
-
-Cùng nhìn lại một năm đáng nhớ nhé 👇</p>
-            </div>
-            <div class="stat">
-              <div class="label">Tip</div>
-              <div class="value"><span class="hl2">Lướt</span> để tiếp tục</div>
-            </div>
-          </section>
-
-          <section class="slide" id="s2">
-            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Danh xưng</b></span><span class="badge">2025</span></div>
-            <div>
-              <h1>Cửa hàng xịn mới nhập hội</h1>
-              <p>tại <strong>{{ province }}</strong></p>
-            </div>
-            <div class="stat">
-              <div class="label">Merchant naming</div>
-              <div class="value"><span class="hl2">{{ province }}</span></div>
-            </div>
-          </section>
-
-          <section class="slide" id="s3">
-            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 01</b></span><span class="badge">2025</span></div>
-            <div>
-              <h1>Tổng số sản phẩm bán ra trong năm</h1>
-              <p>Đã có</p>
-            </div>
-            <div class="stat">
-              <div class="label">Sản phẩm đã bán</div>
-              <div class="value"><span class="hl">{{ item_quantity }}</span> sản phẩm</div>
-              <p style="margin-top:8px;color:var(--muted)">tại Cửa hàng đã được trao đến Người dùng trong năm qua</p>
+          <!-- Slide 1: Intro -->
+          <section class="slide t-mint" id="s1" aria-label="Slide 1">
+            <div class="inner">
+              <div class="kicker">
+                <span class="tag"><span aria-hidden="true">✦</span> <b>Mở đầu</b></span>
+                <span class="badge">2025</span>
+              </div>
+              <div>
+                <h1>Cửa hàng <strong>{{ merchant_name }}</strong> ơi,</h1>
+                <div class="divider"></div>
+                <p class="lead">2025 là một năm bận rộn tại Cửa hàng đấy! Mỗi cột mốc đều kể lại hành trình rất riêng, đều là dấu ấn của sự bền bỉ và tăng trưởng không ngừng trong năm.</p>
+                <p class="lead" style="margin-top:10px">Cùng nhìn lại một năm đáng nhớ nhé 👇</p>
+              </div>
+              <div>
+                <div class="stat">
+                  <div class="label">Tip</div>
+                  <div class="value"><span class="hl2">Chạm</span> để chuyển</div>
+                  <p style="margin-top:8px;color:var(--muted)">Bạn có thể lướt ngang, hoặc bấm Prev/Next.</p>
+                </div>
+                <div class="slideNav">
+                  <a class="btn ghost" href="#s1" aria-disabled="true">‹ Ở đầu</a>
+                  <a class="btn" href="#s2">Tiếp ›</a>
+                </div>
+              </div>
             </div>
           </section>
 
-          <section class="slide" id="s4">
-            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 02</b></span><span class="badge">2025</span></div>
-            <div>
-              <h1>"Nàng thơ" của Cửa hàng</h1>
-              <p>&nbsp;</p>
-            </div>
-            <div class="stat">
-              <div class="label">Sản phẩm bán chạy nhất</div>
-              <div class="value"><span class="hl2">{{ item_name }}</span></div>
-              <p style="margin-top:8px;color:var(--muted)">chính là sản phẩm gây thương nhớ nhất và được Người dùng đặt nhiều nhất năm qua</p>
-            </div>
-          </section>
-
-          <section class="slide" id="s5">
-            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 03</b></span><span class="badge">2025</span></div>
-            <div>
-              <h1>Chiến dịch mang lại nhiều đơn nhất</h1>
-              <p>Chiến dịch</p>
-            </div>
-            <div class="stat">
-              <div class="label">Top campaign</div>
-              <div class="value"><span class="hl">{{ campaign_name }}</span></div>
-              <p style="margin-top:8px;color:var(--muted)">đã góp 1 phần giúp Cửa hàng "lên hương" và thu hút về nhiều đơn hàng</p>
-            </div>
-          </section>
-
-          <section class="slide" id="s6">
-            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 04</b></span><span class="badge">2025</span></div>
-            <div>
-              <h1>Tháng tăng trưởng nhanh nhất trong năm</h1>
-              <p>Tháng bứt tốc của Cửa hàng là</p>
-            </div>
-            <div class="stat">
-              <div class="label">Tháng tăng trưởng nhanh nhất</div>
-              <div class="value"><span class="hl2">{{ fastest_growth_month }}</span></div>
-              <p style="margin-top:8px;color:var(--muted)">Giữ nhịp tăng trưởng này để 2026 còn rực rỡ hơn nhé!</p>
+          <!-- Slide 2: Naming -->
+          <section class="slide t-violet" id="s2" aria-label="Slide 2">
+            <div class="inner">
+              <div class="kicker">
+                <span class="tag"><span aria-hidden="true">✦</span> <b>Danh xưng</b></span>
+                <span class="badge">2025</span>
+              </div>
+              <div>
+                <h1>Cửa hàng xịn mới nhập hội</h1>
+                <div class="divider"></div>
+                <p class="lead">tại <strong>{{ province }}</strong></p>
+              </div>
+              <div>
+                <div class="stat">
+                  <div class="label">Merchant naming</div>
+                  <div class="value"><span class="hl2">Cửa hàng xịn</span></div>
+                  <p style="margin-top:8px;color:var(--muted)">Chào mừng bạn đến với Rewind 2025.</p>
+                </div>
+                <div class="slideNav">
+                  <a class="btn ghost" href="#s1">‹ Trước</a>
+                  <a class="btn" href="#s3">Tiếp ›</a>
+                </div>
+              </div>
             </div>
           </section>
 
-          <section class="slide" id="s7">
-            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 05</b></span><span class="badge">2025</span></div>
-            <div>
-              <h1>Khung giờ nhiều đơn nhất</h1>
-              <p>Giờ vàng Cửa hàng nổ đơn là</p>
-            </div>
-            <div class="stat">
-              <div class="label">Giờ vàng</div>
-              <div class="value"><span class="hl">{{ time }}</span></div>
-              <p style="margin-top:8px;color:var(--muted)">Đối tác hãy ghi sổ lại khung giờ này để có chuẩn bị vận hành thật tốt và đón đơn về nhé!</p>
+          <!-- Slide 3: Total items -->
+          <section class="slide t-mint" id="s3" aria-label="Slide 3">
+            <div class="inner">
+              <div class="kicker">
+                <span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 01</b></span>
+                <span class="badge">2025</span>
+              </div>
+              <div>
+                <h1>Tổng số sản phẩm bán ra trong năm</h1>
+                <div class="divider"></div>
+                <p class="lead">Đã có</p>
+              </div>
+              <div>
+                <div class="stat">
+                  <div class="label">Sản phẩm đã bán</div>
+                  <div class="value"><span class="hl">{{ item_quantity }}</span> sản phẩm</div>
+                  <p style="margin-top:8px;color:var(--muted)">tại Cửa hàng đã được trao đến Người dùng trong năm qua</p>
+                </div>
+                <div class="slideNav">
+                  <a class="btn ghost" href="#s2">‹ Trước</a>
+                  <a class="btn" href="#s4">Tiếp ›</a>
+                </div>
+              </div>
             </div>
           </section>
 
-          <section class="slide" id="s8">
-            <div class="kicker"><span class="tag"><span aria-hidden="true">✦</span> <b>Kết</b></span><span class="badge">2025</span></div>
-            <div>
-              <h1>Cảm ơn <strong>{{ merchant_name }}</strong>!</h1>
-              <p>Một năm bền bỉ đã qua — và hành trình vẫn đang tiếp tục.
-
-Chúc Cửa hàng 2026 bùng nổ đơn đều, vận hành mượt và tăng trưởng mạnh.</p>
+          <!-- Slide 4: Best item -->
+          <section class="slide t-gold" id="s4" aria-label="Slide 4">
+            <div class="inner">
+              <div class="kicker">
+                <span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 02</b></span>
+                <span class="badge">2025</span>
+              </div>
+              <div>
+                <h1>"Nàng thơ" của Cửa hàng</h1>
+                <div class="divider"></div>
+                <p class="lead">Sản phẩm gây thương nhớ nhất năm qua là…</p>
+              </div>
+              <div>
+                <div class="stat">
+                  <div class="label">Sản phẩm bán chạy nhất</div>
+                  <div class="value"><span class="hl2">{{ item_name }}</span></div>
+                  <p style="margin-top:8px;color:var(--muted)">chính là sản phẩm gây thương nhớ nhất và được Người dùng đặt nhiều nhất năm qua</p>
+                </div>
+                <div class="slideNav">
+                  <a class="btn ghost" href="#s3">‹ Trước</a>
+                  <a class="btn" href="#s5">Tiếp ›</a>
+                </div>
+              </div>
             </div>
-            <div class="stat">
-              <div class="label">Hẹn gặp lại</div>
-              <div class="value"><span class="hl2">Rewind 2026</span></div>
+          </section>
+
+          <!-- Slide 5: Best campaign -->
+          <section class="slide t-blue" id="s5" aria-label="Slide 5">
+            <div class="inner">
+              <div class="kicker">
+                <span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 03</b></span>
+                <span class="badge">2025</span>
+              </div>
+              <div>
+                <h1>Chiến dịch mang lại nhiều đơn nhất</h1>
+                <div class="divider"></div>
+                <p class="lead">Chiến dịch</p>
+              </div>
+              <div>
+                <div class="stat">
+                  <div class="label">Top campaign</div>
+                  <div class="value"><span class="hl">{{ campaign_name }}</span></div>
+                  <p style="margin-top:8px;color:var(--muted)">đã góp 1 phần giúp Cửa hàng "lên hương" và thu hút về nhiều đơn hàng</p>
+                </div>
+                <div class="slideNav">
+                  <a class="btn ghost" href="#s4">‹ Trước</a>
+                  <a class="btn" href="#s6">Tiếp ›</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Slide 6: Fastest month -->
+          <section class="slide t-violet" id="s6" aria-label="Slide 6">
+            <div class="inner">
+              <div class="kicker">
+                <span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 04</b></span>
+                <span class="badge">2025</span>
+              </div>
+              <div>
+                <h1>Tháng tăng trưởng nhanh nhất trong năm</h1>
+                <div class="divider"></div>
+                <p class="lead">Tháng bứt tốc của Cửa hàng là</p>
+              </div>
+              <div>
+                <div class="stat">
+                  <div class="label">Tháng tăng trưởng nhanh nhất</div>
+                  <div class="value"><span class="hl2">{{ fastest_growth_month }}</span></div>
+                  <p style="margin-top:8px;color:var(--muted)">Giữ nhịp tăng trưởng này để 2026 còn rực rỡ hơn nhé!</p>
+                </div>
+                <div class="slideNav">
+                  <a class="btn ghost" href="#s5">‹ Trước</a>
+                  <a class="btn" href="#s7">Tiếp ›</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Slide 7: Peak time -->
+          <section class="slide t-gold" id="s7" aria-label="Slide 7">
+            <div class="inner">
+              <div class="kicker">
+                <span class="tag"><span aria-hidden="true">✦</span> <b>Rewind 05</b></span>
+                <span class="badge">2025</span>
+              </div>
+              <div>
+                <h1>Khung giờ nhiều đơn nhất</h1>
+                <div class="divider"></div>
+                <p class="lead">Giờ vàng Cửa hàng nổ đơn là</p>
+              </div>
+              <div>
+                <div class="stat">
+                  <div class="label">Giờ vàng</div>
+                  <div class="value"><span class="hl">{{ time }}</span></div>
+                  <p style="margin-top:8px;color:var(--muted)">Đối tác hãy ghi sổ lại khung giờ này để có chuẩn bị vận hành thật tốt và đón đơn về nhé!</p>
+                </div>
+                <div class="slideNav">
+                  <a class="btn ghost" href="#s6">‹ Trước</a>
+                  <a class="btn" href="#s8">Tiếp ›</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Slide 8: End -->
+          <section class="slide t-blue" id="s8" aria-label="Slide 8">
+            <div class="inner">
+              <div class="kicker">
+                <span class="tag"><span aria-hidden="true">✦</span> <b>Kết</b></span>
+                <span class="badge">2025</span>
+              </div>
+              <div>
+                <h1>Cảm ơn <strong>{{ merchant_name }}</strong>!</h1>
+                <div class="divider"></div>
+                <p class="lead">Một năm bền bỉ đã qua — và hành trình vẫn đang tiếp tục.</p>
+                <p class="lead" style="margin-top:10px">Chúc Cửa hàng 2026 bùng nổ đơn đều, vận hành mượt và tăng trưởng mạnh.</p>
+              </div>
+              <div>
+                <div class="stat">
+                  <div class="label">Hẹn gặp lại</div>
+                  <div class="value"><span class="hl2">Rewind 2026</span></div>
+                  <p style="margin-top:8px;color:var(--muted)">Bạn có thể đóng story tại đây.</p>
+                </div>
+                <div class="slideNav">
+                  <a class="btn ghost" href="#s7">‹ Trước</a>
+                  <a class="btn" href="#s1">Về đầu ⟲</a>
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -379,7 +571,7 @@ Chúc Cửa hàng 2026 bùng nổ đơn đều, vận hành mượt và tăng tr
             <a class="dotlink" href="#s8" aria-label="Slide 8"></a>
           </div>
           <div class="actions" aria-label="Hành động nhanh">
-            <a class="btn" href="#s1">Về đầu</a>
+            <a class="btn ghost" href="#s1">Về đầu</a>
             <a class="btn" href="#s8">Kết</a>
           </div>
         </div>
