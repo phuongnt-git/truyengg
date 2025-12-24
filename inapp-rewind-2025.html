@@ -459,9 +459,6 @@
                 Chiến dịch <strong class="accentText">{{ campaign_name }}</strong> đã góp 1 phần giúp Cửa hàng “lên hương”
                 và thu hút về nhiều đơn hàng.
               </p>
-              <div class="pillRow" style="margin-top: 10px">
-                <div class="pill"><span>🚀</span><span>{{ campaign_name }}</span></div>
-              </div>
             {% else %}
               <div class="note warn">
                 <div style="font-weight: 950; letter-spacing: -0.01em">Đối tác không tham gia chiến dịch</div>
@@ -494,7 +491,7 @@
           - Giờ vàng nổ đơn: {{ time | default: 'time' }}<br />
           - Tháng tăng trưởng nhất: {{ month | default: 'month' }}<br />
           {% if campaign_name and campaign_name != '' %}
-            - Chiến dịch top: {{ campaign_name }}<br />
+            - Chiến dịch mang lại nhiều đơn nhất: {{ campaign_name }}<br />
           {% else %}
             - Gợi ý: tham gia chiến dịch để có thể tăng {{ order_percent | default: 'order_percent' }} số đơn trong năm<br />
           {% endif %}
