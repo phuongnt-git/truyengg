@@ -7,23 +7,24 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
     />
     <meta name="theme-color" content="#0b1020" />
-    <title>Rewind {{ year | default: '2025' }} – {{ store_name | default: 'Cửa hàng' }}</title>
+    <title>Rewind 2025 – {{ merchant_name | default: 'Cửa hàng' }}</title>
     <style>
       :root {
         --bg0: #070a13;
         --bg1: #0b1020;
+        --card: rgba(255, 255, 255, 0.08);
+        --card2: rgba(255, 255, 255, 0.12);
+        --stroke: rgba(255, 255, 255, 0.14);
         --text: rgba(255, 255, 255, 0.92);
         --muted: rgba(255, 255, 255, 0.72);
         --faint: rgba(255, 255, 255, 0.56);
-        --stroke: rgba(255, 255, 255, 0.14);
-        --glass: rgba(255, 255, 255, 0.08);
-        --glass2: rgba(255, 255, 255, 0.12);
         --accent: #00d48f;
         --accent2: #7c4dff;
+        --warn: #ffcc4d;
         --danger: #ff4d6d;
         --shadow: 0 18px 60px rgba(0, 0, 0, 0.42);
-        --radius: 22px;
-        --radius2: 28px;
+        --r: 18px;
+        --r2: 26px;
         --safeT: env(safe-area-inset-top);
         --safeB: env(safe-area-inset-bottom);
         --safeL: env(safe-area-inset-left);
@@ -42,6 +43,7 @@
 
       body {
         margin: 0;
+        color: var(--text);
         font-family:
           ui-sans-serif,
           system-ui,
@@ -52,136 +54,44 @@
           Arial,
           "Apple Color Emoji",
           "Segoe UI Emoji";
-        color: var(--text);
         background:
-          radial-gradient(900px 700px at 8% 12%, rgba(124, 77, 255, 0.22), transparent 55%),
-          radial-gradient(1000px 800px at 95% 15%, rgba(0, 212, 143, 0.18), transparent 60%),
+          radial-gradient(900px 700px at 8% 8%, rgba(124, 77, 255, 0.22), transparent 55%),
+          radial-gradient(1000px 800px at 95% 10%, rgba(0, 212, 143, 0.18), transparent 60%),
           radial-gradient(900px 800px at 50% 100%, rgba(255, 77, 109, 0.12), transparent 62%),
           linear-gradient(180deg, var(--bg0), var(--bg1) 70%, #070a13);
-        overflow: hidden;
       }
 
-      .app {
-        height: 100%;
-        padding: calc(10px + var(--safeT)) calc(14px + var(--safeR))
-          calc(12px + var(--safeB)) calc(14px + var(--safeL));
+      .wrap {
+        min-height: 100%;
+        padding: calc(14px + var(--safeT)) calc(14px + var(--safeR))
+          calc(18px + var(--safeB)) calc(14px + var(--safeL));
+        max-width: 520px;
+        margin: 0 auto;
       }
 
-      .shell {
-        height: 100%;
-        border-radius: var(--radius2);
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: rgba(0, 0, 0, 0.14);
-        box-shadow: var(--shadow);
-      }
-
-      .rail {
-        height: 100%;
-        display: flex;
-        overflow-x: auto;
-        overflow-y: hidden;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-x: contain;
-        scroll-behavior: smooth;
-      }
-      .rail::-webkit-scrollbar {
-        display: none;
-      }
-
-      .slide {
-        scroll-snap-align: start;
-        width: 100%;
-        height: 100%;
-        flex: 0 0 100%;
-        position: relative;
-        padding: 14px 14px 16px;
-        display: grid;
-        align-content: start;
-        gap: 12px;
-      }
-
-      /* Decorative blobs */
-      .backdrop {
-        position: absolute;
-        inset: -40px;
-        pointer-events: none;
-        opacity: 0.9;
-      }
-      .blob {
-        position: absolute;
-        border-radius: 999px;
-        filter: blur(18px);
-        opacity: 0.55;
-        transform: translateZ(0);
-      }
-      .blob.b1 {
-        width: 240px;
-        height: 240px;
-        left: -60px;
-        top: 30px;
-        background: radial-gradient(circle at 30% 30%, rgba(124, 77, 255, 0.8), rgba(124, 77, 255, 0.05));
-      }
-      .blob.b2 {
-        width: 320px;
-        height: 320px;
-        right: -100px;
-        top: 110px;
-        background: radial-gradient(circle at 30% 30%, rgba(0, 212, 143, 0.8), rgba(0, 212, 143, 0.04));
-      }
-      .blob.b3 {
-        width: 280px;
-        height: 280px;
-        left: 18%;
-        bottom: -120px;
-        background: radial-gradient(circle at 30% 30%, rgba(255, 77, 109, 0.7), rgba(255, 77, 109, 0.03));
-      }
-
-      .topbar {
-        display: grid;
-        gap: 10px;
+      /* Top */
+      .top {
         position: sticky;
         top: 0;
-        z-index: 5;
-        padding: 6px 6px 0;
-      }
-
-      .progressSegs {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 6px;
-      }
-      .progressSegs i {
-        height: 3px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.12);
-        display: block;
-        overflow: hidden;
-      }
-      .progressSegs i b {
-        display: block;
-        height: 100%;
-        width: 100%;
-        background: linear-gradient(90deg, var(--accent), var(--accent2));
-      }
-
-      .headerRow {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
+        z-index: 20;
+        padding-top: 6px;
+        padding-bottom: 10px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        background: linear-gradient(180deg, rgba(7, 10, 19, 0.88), rgba(7, 10, 19, 0.35));
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 0 0 var(--r2) var(--r2);
       }
 
       .brand {
         display: flex;
         align-items: center;
         gap: 10px;
-        min-width: 0;
+        padding: 10px 10px 0;
       }
       .badge {
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
         border-radius: 12px;
         background:
           radial-gradient(14px 14px at 30% 30%, rgba(255, 255, 255, 0.7), transparent 55%),
@@ -198,92 +108,67 @@
         filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
       }
       .brandText {
-        display: grid;
-        line-height: 1.05;
         min-width: 0;
+        display: grid;
+        line-height: 1.08;
       }
-      .brandText .kicker {
+      .kicker {
         font-size: 12px;
         letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--faint);
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
       }
-      .brandText .title {
-        font-size: 14px;
-        font-weight: 800;
+      .title {
+        font-weight: 900;
+        font-size: 15px;
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
       }
 
-      .nav {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex: 0 0 auto;
+      .progress {
+        margin: 10px 10px 0;
+        height: 3px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.12);
+      }
+      .progress > i {
+        display: block;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        opacity: 0.55;
       }
 
-      a.btn {
-        text-decoration: none;
-      }
-      .btn {
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--text);
-        padding: 10px 12px;
-        border-radius: 14px;
-        font-weight: 800;
-        font-size: 13px;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
-        user-select: none;
-        white-space: nowrap;
-      }
-      .btnPrimary {
-        border-color: rgba(0, 212, 143, 0.35);
-        background: linear-gradient(135deg, rgba(0, 212, 143, 0.9), rgba(124, 77, 255, 0.75));
-      }
-      .btnGhost {
-        background: rgba(255, 255, 255, 0.04);
-      }
-
-      .content {
-        margin-top: 4px;
-        display: grid;
-        gap: 14px;
+      .hero {
+        margin-top: 14px;
         padding: 16px;
-        border-radius: var(--radius2);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.05));
+        border-radius: var(--r2);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.05));
         border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+        box-shadow: var(--shadow);
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
+        position: relative;
+        overflow: hidden;
       }
-
-      .chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 7px 10px;
-        border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        background: rgba(255, 255, 255, 0.06);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-        font-size: 12px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.68);
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: -60px;
+        background:
+          radial-gradient(220px 220px at 0% 20%, rgba(124, 77, 255, 0.22), transparent 60%),
+          radial-gradient(260px 260px at 100% 25%, rgba(0, 212, 143, 0.18), transparent 62%),
+          radial-gradient(260px 260px at 50% 110%, rgba(255, 77, 109, 0.14), transparent 62%);
+        pointer-events: none;
       }
-      .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: linear-gradient(135deg, var(--accent), var(--accent2));
+      .hero > * {
+        position: relative;
+        z-index: 1;
       }
 
       h1,
@@ -292,21 +177,18 @@
         letter-spacing: -0.02em;
       }
       h1 {
-        font-size: 30px;
-        line-height: 1.06;
+        font-size: 28px;
+        line-height: 1.08;
       }
       h2 {
-        font-size: 22px;
-        line-height: 1.12;
+        font-size: 18px;
+        line-height: 1.2;
       }
       p {
         margin: 0;
         color: var(--muted);
-        line-height: 1.45;
         font-size: 14px;
-      }
-      strong {
-        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.48;
       }
       .accentText {
         background: linear-gradient(135deg, rgba(0, 212, 143, 0.98), rgba(124, 77, 255, 0.98));
@@ -314,52 +196,79 @@
         background-clip: text;
         color: transparent;
       }
-
-      .bigNumber {
-        font-variant-numeric: tabular-nums;
-        font-size: 38px;
-        line-height: 1;
-        font-weight: 900;
-        letter-spacing: -0.04em;
-      }
-      .bigNumber .unit {
-        font-size: 14px;
-        font-weight: 800;
-        letter-spacing: 0.12em;
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.74);
+        font-size: 12px;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.72);
-        margin-left: 8px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
       }
 
-      .grid2 {
+      .sections {
+        margin-top: 12px;
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 12px;
       }
-      .stat {
-        border-radius: 18px;
+
+      .card {
+        border-radius: var(--r2);
         border: 1px solid rgba(255, 255, 255, 0.12);
         background: rgba(255, 255, 255, 0.06);
-        padding: 12px;
-        display: grid;
-        gap: 8px;
-        min-height: 78px;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+        overflow: hidden;
       }
-      .stat .label {
+      .cardHead {
+        padding: 14px 14px 0;
+        display: grid;
+        gap: 10px;
+      }
+      .cardBody {
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+      }
+      .divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 12px 0 0;
+      }
+
+      .metric {
+        display: grid;
+        gap: 6px;
+        padding: 12px;
+        border-radius: var(--r);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0, 0, 0, 0.12);
+      }
+      .metric .label {
         font-size: 12px;
         color: rgba(255, 255, 255, 0.64);
         letter-spacing: 0.06em;
         text-transform: uppercase;
       }
-      .stat .value {
-        font-weight: 900;
-        font-size: 16px;
+      .metric .value {
+        font-variant-numeric: tabular-nums;
+        font-weight: 950;
+        font-size: 20px;
         letter-spacing: -0.02em;
-        color: rgba(255, 255, 255, 0.92);
       }
-      .stat .sub {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.62);
+      .metric .desc {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.66);
+        line-height: 1.45;
       }
 
       .pillRow {
@@ -371,671 +280,231 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 9px 11px;
+        padding: 10px 12px;
         border-radius: 999px;
         border: 1px solid rgba(255, 255, 255, 0.14);
         background: rgba(255, 255, 255, 0.06);
-        color: rgba(255, 255, 255, 0.84);
         font-weight: 900;
         font-size: 13px;
+        color: rgba(255, 255, 255, 0.86);
         max-width: 100%;
       }
-      .pill span {
+      .pill span:last-child {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
 
-      .hint {
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: 16px;
+      .note {
+        padding: 12px;
+        border-radius: var(--r);
         border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(0, 0, 0, 0.12);
-      }
-      .hint .left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 0;
-      }
-      .hintIcon {
-        width: 28px;
-        height: 28px;
-        border-radius: 12px;
-        display: grid;
-        place-items: center;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-      }
-      .hint .txt .t {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+        color: rgba(255, 255, 255, 0.82);
+        font-weight: 800;
+        line-height: 1.45;
         font-size: 13px;
-        font-weight: 900;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
-      .hint .txt .d {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.64);
+      .note.warn {
+        border-color: rgba(255, 204, 77, 0.28);
+        background:
+          radial-gradient(260px 260px at 0% 30%, rgba(255, 204, 77, 0.16), transparent 60%),
+          rgba(255, 255, 255, 0.05);
       }
 
-      .selectable {
+      .footer {
+        margin-top: 14px;
+        padding: 16px;
+        border-radius: var(--r2);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.26);
+        display: grid;
+        gap: 10px;
+      }
+
+      .shareBox {
         user-select: text;
         -webkit-user-select: text;
+        border-radius: var(--r);
+        border: 1px dashed rgba(255, 255, 255, 0.22);
+        background: rgba(0, 0, 0, 0.14);
+        padding: 12px;
+        color: rgba(255, 255, 255, 0.86);
+        line-height: 1.5;
+        font-size: 13px;
+        font-weight: 800;
       }
 
-      @media (prefers-reduced-motion: reduce) {
-        .rail {
-          scroll-behavior: auto;
-        }
-      }
-
-      @media (min-width: 520px) {
-        .shell {
-          max-width: 460px;
-          margin: 0 auto;
-        }
+      .small {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.62);
       }
     </style>
   </head>
   <body>
-    <div class="app" role="application" aria-label="Rewind story (swipe ngang)">
-      <div class="shell">
-        <div class="rail" aria-label="Kéo ngang để chuyển story">
-          <!-- Slide 1 -->
-          <section class="slide" aria-label="Giới thiệu">
-            <div class="backdrop" aria-hidden="true">
-              <div class="blob b1"></div>
-              <div class="blob b2"></div>
-              <div class="blob b3"></div>
-            </div>
-            <div class="topbar" aria-label="Thanh tiêu đề">
-              <div class="progressSegs" aria-hidden="true">
-                <i><b></b></i>
-                <i></i>
-                <i></i>
-                <i></i>
-                <i></i>
-                <i></i>
-                <i></i>
-              </div>
-              <div class="headerRow">
-                <div class="brand">
-                  <div class="badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2.5c3.3 0 6 2.7 6 6 0 5-6 13-6 13S6 13.5 6 8.5c0-3.3 2.7-6 6-6Z"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                      />
-                      <path
-                        d="M9.2 8.6h5.6M9.2 11.2h5.6M9.2 13.8h3.6"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div class="brandText">
-                    <div class="kicker">IN-APP REWIND</div>
-                    <div class="title">{{ store_name | default: 'Tên cửa hàng' }}</div>
-                  </div>
-                </div>
-                <div class="nav">
-                  <span class="btn btnGhost" aria-disabled="true">‹</span>
-                  <a class="btn btnPrimary" href="#s2" aria-label="Tiếp">Tiếp ›</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="content">
-              <div class="chip"><span class="dot"></span> REWIND {{ year | default: '2025' }}</div>
-              <h1>
-                Cửa hàng ơi, <span class="accentText">{{ year | default: '2025' }}</span> là một năm bận rộn tại
-                <span class="accentText">{{ store_name | default: 'Cửa hàng' }}</span> đấy!
-              </h1>
-              <p>
-                Mỗi cột mốc đều kể lại hành trình rất riêng, đều là dấu ấn của sự bền bỉ và tăng trưởng không
-                ngừng trong năm. Cùng Grab nhìn lại một năm đáng nhớ nhé 👇
-              </p>
-              <div class="hint">
-                <div class="left">
-                  <div class="hintIcon" aria-hidden="true">↔</div>
-                  <div class="txt">
-                    <div class="t">Vuốt ngang để xem tiếp</div>
-                    <div class="d">Story dạng swipe ngang (mobile)</div>
-                  </div>
-                </div>
-                <div class="pill"><span>1</span><span>/7</span></div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Slide 2 -->
-          <section class="slide" id="s2" aria-label="Tổng số sản phẩm bán ra">
-            <div class="backdrop" aria-hidden="true">
-              <div class="blob b1"></div>
-              <div class="blob b2"></div>
-              <div class="blob b3"></div>
-            </div>
-            <div class="topbar">
-              <div class="progressSegs" aria-hidden="true">
-                <i><b></b></i>
-                <i><b></b></i>
-                <i></i>
-                <i></i>
-                <i></i>
-                <i></i>
-                <i></i>
-              </div>
-              <div class="headerRow">
-                <div class="brand">
-                  <div class="badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2.5c3.3 0 6 2.7 6 6 0 5-6 13-6 13S6 13.5 6 8.5c0-3.3 2.7-6 6-6Z"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                      />
-                      <path
-                        d="M9.2 8.6h5.6M9.2 11.2h5.6M9.2 13.8h3.6"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div class="brandText">
-                    <div class="kicker">CỘT MỐC #1</div>
-                    <div class="title">{{ store_name | default: 'Tên cửa hàng' }}</div>
-                  </div>
-                </div>
-                <div class="nav">
-                  <a class="btn btnGhost" href="#" aria-label="Trước">‹</a>
-                  <a class="btn btnPrimary" href="#s3" aria-label="Tiếp">Tiếp ›</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="content">
-              <div class="chip"><span class="dot"></span> TỔNG SỐ SẢN PHẨM</div>
-              <h2>Tổng số sản phẩm bán ra trong năm</h2>
-              <div class="bigNumber">
-                {{ total_products | default: '—' }}<span class="unit">sản phẩm</span>
-              </div>
-              <p>
-                Đã có <strong>{{ total_products | default: '—' }}</strong> sản phẩm tại Cửa hàng đã được trao đến
-                Người dùng trong năm qua.
-              </p>
-              <div class="grid2" aria-label="Tóm tắt">
-                <div class="stat">
-                  <div class="label">Năm</div>
-                  <div class="value">{{ year | default: '2025' }}</div>
-                  <div class="sub">Hành trình tăng trưởng</div>
-                </div>
-                <div class="stat">
-                  <div class="label">Trung bình/ngày</div>
-                  <div class="value">{{ avg_per_day | default: '—' }}</div>
-                  <div class="sub">Ước tính</div>
-                </div>
-              </div>
-              <div class="hint">
-                <div class="left">
-                  <div class="hintIcon" aria-hidden="true">📦</div>
-                  <div class="txt">
-                    <div class="t">Cột mốc đầu tiên</div>
-                    <div class="d">Đà tăng trưởng thật ấn tượng!</div>
-                  </div>
-                </div>
-                <div class="pill"><span>2</span><span>/7</span></div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Slide 3 -->
-          <section class="slide" id="s3" aria-label="Sản phẩm bán chạy nhất">
-            <div class="backdrop" aria-hidden="true">
-              <div class="blob b1"></div>
-              <div class="blob b2"></div>
-              <div class="blob b3"></div>
-            </div>
-            <div class="topbar">
-              <div class="progressSegs" aria-hidden="true">
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i></i>
-                <i></i>
-                <i></i>
-                <i></i>
-              </div>
-              <div class="headerRow">
-                <div class="brand">
-                  <div class="badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2.5c3.3 0 6 2.7 6 6 0 5-6 13-6 13S6 13.5 6 8.5c0-3.3 2.7-6 6-6Z"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                      />
-                      <path
-                        d="M9.2 8.6h5.6M9.2 11.2h5.6M9.2 13.8h3.6"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div class="brandText">
-                    <div class="kicker">CỘT MỐC #2</div>
-                    <div class="title">{{ store_name | default: 'Tên cửa hàng' }}</div>
-                  </div>
-                </div>
-                <div class="nav">
-                  <a class="btn btnGhost" href="#s2" aria-label="Trước">‹</a>
-                  <a class="btn btnPrimary" href="#s4" aria-label="Tiếp">Tiếp ›</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="content">
-              <div class="chip"><span class="dot"></span> BEST-SELLER</div>
-              <h2>Sản phẩm bán chạy nhất trong năm</h2>
-              <p>
-                “Nàng thơ” của Cửa hàng chính là sản phẩm gây thương nhớ nhất và được Người dùng đặt nhiều nhất
-                năm qua:
-              </p>
-              <div class="pillRow">
-                <div class="pill"><span>⭐</span><span>{{ best_product_name | default: 'Tên sản phẩm' }}</span></div>
-                <div class="pill">
-                  <span>🧾</span><span>{{ best_product_orders | default: '—' }} lượt đặt</span>
-                </div>
-              </div>
-              <div class="grid2">
-                <div class="stat">
-                  <div class="label">Tỉ trọng</div>
-                  <div class="value">{{ best_product_share | default: '—' }}%</div>
-                  <div class="sub">Trong tổng số sản phẩm</div>
-                </div>
-                <div class="stat">
-                  <div class="label">Điểm nhấn</div>
-                  <div class="value"><span class="accentText">Gây thương nhớ</span></div>
-                  <div class="sub">Giữ chất lượng ổn định</div>
-                </div>
-              </div>
-              <div class="hint">
-                <div class="left">
-                  <div class="hintIcon" aria-hidden="true">⭐</div>
-                  <div class="txt">
-                    <div class="t">Món signature của năm</div>
-                    <div class="d">Một “nàng thơ” đúng nghĩa</div>
-                  </div>
-                </div>
-                <div class="pill"><span>3</span><span>/7</span></div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Slide 4 -->
-          <section class="slide" id="s4" aria-label="Chiến dịch mang lại nhiều đơn nhất">
-            <div class="backdrop" aria-hidden="true">
-              <div class="blob b1"></div>
-              <div class="blob b2"></div>
-              <div class="blob b3"></div>
-            </div>
-            <div class="topbar">
-              <div class="progressSegs" aria-hidden="true">
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i></i>
-                <i></i>
-                <i></i>
-              </div>
-              <div class="headerRow">
-                <div class="brand">
-                  <div class="badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2.5c3.3 0 6 2.7 6 6 0 5-6 13-6 13S6 13.5 6 8.5c0-3.3 2.7-6 6-6Z"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                      />
-                      <path
-                        d="M9.2 8.6h5.6M9.2 11.2h5.6M9.2 13.8h3.6"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div class="brandText">
-                    <div class="kicker">CỘT MỐC #3</div>
-                    <div class="title">{{ store_name | default: 'Tên cửa hàng' }}</div>
-                  </div>
-                </div>
-                <div class="nav">
-                  <a class="btn btnGhost" href="#s3" aria-label="Trước">‹</a>
-                  <a class="btn btnPrimary" href="#s5" aria-label="Tiếp">Tiếp ›</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="content">
-              <div class="chip"><span class="dot"></span> CHIẾN DỊCH TOP</div>
-              <h2>Chiến dịch mang lại nhiều đơn nhất</h2>
-              <p>
-                Chiến dịch <strong>{{ top_campaign_name | default: 'Chiến dịch' }}</strong> đã góp một phần giúp
-                Cửa hàng “lên hương” và thu hút về nhiều đơn hàng.
-              </p>
-              <div class="pillRow">
-                <div class="pill"><span>🚀</span><span>{{ top_campaign_name | default: 'Chiến dịch' }}</span></div>
-                <div class="pill"><span>📦</span><span>{{ top_campaign_orders | default: '—' }} đơn</span></div>
-              </div>
-              <div class="grid2">
-                <div class="stat">
-                  <div class="label">Hiệu quả</div>
-                  <div class="value">{{ top_campaign_lift | default: '—' }}x</div>
-                  <div class="sub">So với ngày thường</div>
-                </div>
-                <div class="stat">
-                  <div class="label">Gợi ý</div>
-                  <div class="value">Duy trì đều</div>
-                  <div class="sub">Tối ưu menu & hình ảnh</div>
-                </div>
-              </div>
-              <div class="hint">
-                <div class="left">
-                  <div class="hintIcon" aria-hidden="true">🚀</div>
-                  <div class="txt">
-                    <div class="t">Động lực tăng đơn</div>
-                    <div class="d">Một cú “boost” cực ổn</div>
-                  </div>
-                </div>
-                <div class="pill"><span>4</span><span>/7</span></div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Slide 5 -->
-          <section class="slide" id="s5" aria-label="Khung giờ nhiều đơn nhất">
-            <div class="backdrop" aria-hidden="true">
-              <div class="blob b1"></div>
-              <div class="blob b2"></div>
-              <div class="blob b3"></div>
-            </div>
-            <div class="topbar">
-              <div class="progressSegs" aria-hidden="true">
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i></i>
-                <i></i>
-              </div>
-              <div class="headerRow">
-                <div class="brand">
-                  <div class="badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2.5c3.3 0 6 2.7 6 6 0 5-6 13-6 13S6 13.5 6 8.5c0-3.3 2.7-6 6-6Z"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                      />
-                      <path
-                        d="M9.2 8.6h5.6M9.2 11.2h5.6M9.2 13.8h3.6"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div class="brandText">
-                    <div class="kicker">CỘT MỐC #4</div>
-                    <div class="title">{{ store_name | default: 'Tên cửa hàng' }}</div>
-                  </div>
-                </div>
-                <div class="nav">
-                  <a class="btn btnGhost" href="#s4" aria-label="Trước">‹</a>
-                  <a class="btn btnPrimary" href="#s6" aria-label="Tiếp">Tiếp ›</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="content">
-              <div class="chip"><span class="dot"></span> GIỜ VÀNG</div>
-              <h2>Khung giờ nhiều đơn nhất</h2>
-              <div class="bigNumber">
-                <span class="accentText">{{ peak_start | default: 'xx' }}h–{{ peak_end | default: 'xx' }}h</span>
-              </div>
-              <p>
-                Đối tác hãy ghi sổ lại khung giờ này để có chuẩn bị vận hành thật tốt và đón đơn về nhé!
-              </p>
-              <div class="grid2">
-                <div class="stat">
-                  <div class="label">Khung giờ</div>
-                  <div class="value">{{ peak_start | default: 'xx' }}h–{{ peak_end | default: 'xx' }}h</div>
-                  <div class="sub">Giờ cao điểm</div>
-                </div>
-                <div class="stat">
-                  <div class="label">Chuẩn bị</div>
-                  <div class="value">Vận hành xịn</div>
-                  <div class="sub">Sẵn hàng • Sẵn người • Sẵn bếp</div>
-                </div>
-              </div>
-              <div class="hint">
-                <div class="left">
-                  <div class="hintIcon" aria-hidden="true">⏱</div>
-                  <div class="txt">
-                    <div class="t">Canh đúng giờ vàng</div>
-                    <div class="d">Tối ưu nhân sự & nguyên liệu</div>
-                  </div>
-                </div>
-                <div class="pill"><span>5</span><span>/7</span></div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Slide 6 -->
-          <section class="slide" id="s6" aria-label="Cửa hàng tuyệt đỉnh tại Tỉnh">
-            <div class="backdrop" aria-hidden="true">
-              <div class="blob b1"></div>
-              <div class="blob b2"></div>
-              <div class="blob b3"></div>
-            </div>
-            <div class="topbar">
-              <div class="progressSegs" aria-hidden="true">
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i></i>
-              </div>
-              <div class="headerRow">
-                <div class="brand">
-                  <div class="badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2.5c3.3 0 6 2.7 6 6 0 5-6 13-6 13S6 13.5 6 8.5c0-3.3 2.7-6 6-6Z"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                      />
-                      <path
-                        d="M9.2 8.6h5.6M9.2 11.2h5.6M9.2 13.8h3.6"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div class="brandText">
-                    <div class="kicker">BẢNG VÀNG</div>
-                    <div class="title">{{ store_name | default: 'Tên cửa hàng' }}</div>
-                  </div>
-                </div>
-                <div class="nav">
-                  <a class="btn btnGhost" href="#s5" aria-label="Trước">‹</a>
-                  <a class="btn btnPrimary" href="#s7" aria-label="Tiếp">Tiếp ›</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="content">
-              <div class="chip"><span class="dot"></span> MERCHANT NAMING</div>
-              <h2>
-                Cửa hàng tuyệt đỉnh tại <span class="accentText">{{ province | default: 'Tỉnh/Thành phố' }}</span>
-              </h2>
-              <p>
-                “Bảng vàng gọi tên!!! Đối tác chính là”
-                <strong class="accentText">{{ store_name | default: 'Cửa hàng' }}</strong>
-              </p>
-              <p>
-                thuộc top những Cửa hàng có hoạt động nổi bật nhất tại
-                <strong>{{ province | default: 'Tỉnh/Thành phố' }}</strong> trong năm
-                <strong>{{ year | default: '2025' }}</strong>.
-              </p>
-              <div class="pillRow">
-                <div class="pill"><span>🏆</span><span>{{ award_title | default: 'Top Cửa hàng nổi bật' }}</span></div>
-                <div class="pill"><span>📈</span><span>Hạng {{ rank | default: '—' }}</span></div>
-              </div>
-              <p>
-                Hãy giữ vững phong độ để năm <strong>2026</strong> bứt phá hơn nữa cùng Grab nhé Đối tác ơi!
-              </p>
-              <div class="grid2">
-                <div class="stat">
-                  <div class="label">Gợi ý 2026</div>
-                  <div class="value">Làm mới thực đơn</div>
-                  <div class="sub">Món mới theo mùa • Combo thông minh</div>
-                </div>
-                <div class="stat">
-                  <div class="label">Vận hành</div>
-                  <div class="value">Xịn xò mỗi ngày</div>
-                  <div class="sub">Giảm huỷ • Giảm trễ • Tăng đánh giá</div>
-                </div>
-              </div>
-              <div class="hint">
-                <div class="left">
-                  <div class="hintIcon" aria-hidden="true">🏆</div>
-                  <div class="txt">
-                    <div class="t">Top hoạt động nổi bật</div>
-                    <div class="d">Giữ phong độ để bứt phá!</div>
-                  </div>
-                </div>
-                <div class="pill"><span>6</span><span>/7</span></div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Slide 7 -->
-          <section class="slide" id="s7" aria-label="Kết thúc & chia sẻ">
-            <div class="backdrop" aria-hidden="true">
-              <div class="blob b1"></div>
-              <div class="blob b2"></div>
-              <div class="blob b3"></div>
-            </div>
-            <div class="topbar">
-              <div class="progressSegs" aria-hidden="true">
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-                <i><b></b></i>
-              </div>
-              <div class="headerRow">
-                <div class="brand">
-                  <div class="badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 2.5c3.3 0 6 2.7 6 6 0 5-6 13-6 13S6 13.5 6 8.5c0-3.3 2.7-6 6-6Z"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                      />
-                      <path
-                        d="M9.2 8.6h5.6M9.2 11.2h5.6M9.2 13.8h3.6"
-                        stroke="rgba(255,255,255,.92)"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div class="brandText">
-                    <div class="kicker">SẴN SÀNG 2026</div>
-                    <div class="title">{{ store_name | default: 'Tên cửa hàng' }}</div>
-                  </div>
-                </div>
-                <div class="nav">
-                  <a class="btn btnGhost" href="#s6" aria-label="Trước">‹</a>
-                  <a class="btn btnPrimary" href="#" aria-label="Xem lại">Xem lại ↺</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="content">
-              <div class="chip"><span class="dot"></span> KẾT THÚC</div>
-              <h1>
-                Tự hào về hành trình <span class="accentText">{{ year | default: '2025' }}</span> và sẵn sàng cho một
-                năm <span class="accentText">2026 bứt phá</span>.
-              </h1>
-              <p>
-                Grab sẽ luôn đồng hành cùng Đối tác trên hành trình chạm đến những cột mốc doanh thu mới. Cùng Grab
-                chuẩn bị cho một năm mới đại thắng nhé!
-              </p>
-
-              <div class="grid2" aria-label="Tóm tắt nhanh">
-                <div class="stat">
-                  <div class="label">Tổng sản phẩm</div>
-                  <div class="value">{{ total_products | default: '—' }}</div>
-                  <div class="sub">Trao đến Người dùng</div>
-                </div>
-                <div class="stat">
-                  <div class="label">Giờ vàng</div>
-                  <div class="value">{{ peak_start | default: 'xx' }}h–{{ peak_end | default: 'xx' }}h</div>
-                  <div class="sub">Khung giờ nổ đơn</div>
-                </div>
-              </div>
-
-              <div class="stat selectable" aria-label="Nội dung chia sẻ (bôi đen để copy)">
-                <div class="label">KHOE CHIẾN TÍCH XỊN XÒ – CHIA SẺ NGAY!</div>
-                <div class="sub">
-                  (Không dùng JavaScript nên bạn có thể <strong>bôi đen</strong> đoạn dưới và <strong>Copy</strong> trong app)
-                </div>
-                <div class="value" style="font-size: 14px; line-height: 1.45; font-weight: 800">
-                  Rewind {{ year | default: '2025' }} của {{ store_name | default: 'Cửa hàng' }} ✨<br />
-                  - Tổng sản phẩm đã bán: {{ total_products | default: '—' }}<br />
-                  - Best-seller: {{ best_product_name | default: 'Tên sản phẩm' }}<br />
-                  - Chiến dịch mang nhiều đơn nhất: {{ top_campaign_name | default: 'Chiến dịch' }}<br />
-                  - Giờ vàng nổ đơn: {{ peak_start | default: 'xx' }}h–{{ peak_end | default: 'xx' }}h<br />
-                  - Khu vực: {{ province | default: 'Tỉnh/Thành phố' }}<br />
-                  <br />
-                  Sẵn sàng bứt phá 2026 cùng Grab!
-                </div>
-              </div>
-
-              <div class="hint">
-                <div class="left">
-                  <div class="hintIcon" aria-hidden="true">✨</div>
-                  <div class="txt">
-                    <div class="t">Hẹn gặp 2026</div>
-                    <div class="d">Vuốt lại để xem từ đầu</div>
-                  </div>
-                </div>
-                <div class="pill"><span>7</span><span>/7</span></div>
-              </div>
-            </div>
-          </section>
+    <div class="wrap">
+      <div class="top" aria-label="Tiêu đề">
+        <div class="brand">
+          <div class="badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 2.5c3.3 0 6 2.7 6 6 0 5-6 13-6 13S6 13.5 6 8.5c0-3.3 2.7-6 6-6Z"
+                stroke="rgba(255,255,255,.92)"
+                stroke-width="1.8"
+              />
+              <path
+                d="M9.2 8.6h5.6M9.2 11.2h5.6M9.2 13.8h3.6"
+                stroke="rgba(255,255,255,.92)"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <div class="brandText">
+            <div class="kicker">IN-APP REWIND</div>
+            <div class="title">Rewind 2025 • {{ merchant_name | default: 'Cửa hàng' }}</div>
+          </div>
         </div>
+        <div class="progress" aria-hidden="true"><i></i></div>
       </div>
+
+      <section class="hero" aria-label="Mở đầu">
+        <div class="chip"><span class="dot"></span> REWIND 2025</div>
+        <h1>
+          Cửa hàng <span class="accentText">{{ merchant_name | default: 'merchant_name' }}</span> ơi,
+        </h1>
+        <p style="margin-top: 8px">
+          2025 là một năm bận rộn tại Cửa hàng đấy! Mỗi cột mốc đều kể lại hành trình rất riêng, đều là dấu ấn của
+          sự bền bỉ và tăng trưởng không ngừng trong năm. Cùng Grab nhìn lại một năm đáng nhớ nhé 👇
+        </p>
+      </section>
+
+      <div class="sections" aria-label="Các cột mốc">
+        <!-- 1) Tổng số sản phẩm -->
+        <section class="card" aria-label="Tổng số sản phẩm bán ra">
+          <div class="cardHead">
+            <div class="chip"><span class="dot"></span> CỘT MỐC #1</div>
+            <h2>Tổng số sản phẩm bán ra trong năm</h2>
+          </div>
+          <div class="cardBody">
+            <div class="metric">
+              <div class="label">Đã có</div>
+              <div class="value">{{ item_quantity | default: '—' }} <span style="font-size: 13px; color: rgba(255,255,255,.72)">sản phẩm</span></div>
+              <div class="desc">tại Cửa hàng đã được trao đến Người dùng trong năm qua</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2) Best seller -->
+        <section class="card" aria-label="Sản phẩm bán chạy nhất">
+          <div class="cardHead">
+            <div class="chip"><span class="dot"></span> CỘT MỐC #2</div>
+            <h2>Sản phẩm bán chạy nhất trong năm</h2>
+          </div>
+          <div class="cardBody">
+            <p>
+              “Nàng thơ” của Cửa hàng <strong class="accentText">{{ top1item_name | default: 'top1item_name' }}</strong>
+              chính là sản phẩm gây thương nhớ nhất và được Người dùng đặt nhiều nhất năm qua.
+            </p>
+            <div class="pillRow" style="margin-top: 10px">
+              <div class="pill"><span>⭐</span><span>{{ top1item_name | default: 'top1item_name' }}</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3) Khung giờ vàng -->
+        <section class="card" aria-label="Khung giờ nhiều đơn nhất">
+          <div class="cardHead">
+            <div class="chip"><span class="dot"></span> CỘT MỐC #3</div>
+            <h2>Khung giờ nhiều đơn nhất</h2>
+          </div>
+          <div class="cardBody">
+            <div class="metric">
+              <div class="label">Giờ vàng Cửa hàng nổ đơn là</div>
+              <div class="value"><span class="accentText">{{ time | default: 'time' }}</span></div>
+              <div class="desc">
+                Đối tác hãy ghi sổ lại khung giờ này để có chuẩn bị vận hành thật tốt và đón đơn về nhé!
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4) Tháng tăng trưởng nhất -->
+        <section class="card" aria-label="Tháng tăng trưởng nhất trong năm">
+          <div class="cardHead">
+            <div class="chip"><span class="dot"></span> CỘT MỐC #4</div>
+            <h2>Tháng tăng trưởng nhất trong năm</h2>
+          </div>
+          <div class="cardBody">
+            <div class="pillRow">
+              <div class="pill"><span>📅</span><span>{{ month | default: 'month' }}</span></div>
+              <div class="pill"><span>📈</span><span>Cả năm thích nhất</span></div>
+            </div>
+            <div class="note" style="margin-top: 8px">
+              Một tháng bứt tốc rõ rệt, khi nhịp hoạt động rộn ràng hơn và doanh thu tăng trưởng cao nhất trong 12 tháng.
+            </div>
+          </div>
+        </section>
+
+        <!-- 5) Chiến dịch mang lại nhiều đơn nhất -->
+        <section class="card" aria-label="Chiến dịch mang lại nhiều đơn nhất">
+          <div class="cardHead">
+            <div class="chip"><span class="dot"></span> CỘT MỐC #5</div>
+            <h2>Chiến dịch mang lại nhiều đơn nhất</h2>
+          </div>
+          <div class="cardBody">
+            {% if campaign_name and campaign_name != '' %}
+              <p>
+                Chiến dịch <strong class="accentText">{{ campaign_name }}</strong> đã góp 1 phần giúp Cửa hàng “lên hương”
+                và thu hút về nhiều đơn hàng.
+              </p>
+              <div class="pillRow" style="margin-top: 10px">
+                <div class="pill"><span>🚀</span><span>{{ campaign_name }}</span></div>
+              </div>
+            {% else %}
+              <div class="note warn">
+                <div style="font-weight: 950; letter-spacing: -0.01em">Đối tác không tham gia chiến dịch</div>
+                <div style="margin-top: 6px; color: rgba(255,255,255,.8)">
+                  Trung bình các Cửa hàng tham gia Chiến dịch tiêu điểm có thể tăng
+                  <strong>{{ order_percent | default: 'order_percent' }}</strong>
+                  “số đơn hàng trong năm đấy Đối tác ơi! Hãy cân nhắc tham gia các Chiến dịch tiêu điểm để có cơ hội gia tăng
+                  doanh thu nhé.”
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+      </div>
+
+      <section class="footer" aria-label="Kết">
+        <div class="chip"><span class="dot"></span> CHỐT REWIND</div>
+        <h2>
+          Tự hào về hành trình 2025 và sẵn sàng cho một năm 2026 bứt phá.
+        </h2>
+        <p>
+          Grab sẽ luôn đồng hành cùng Đối tác trên hành trình chạm đến những cột mốc doanh thu mới. Cùng Grab chuẩn bị cho
+          một năm mới đại thắng nhé!
+        </p>
+        <div class="shareBox" aria-label="Nội dung chia sẻ (bôi đen để copy)">
+          KHOE CHIẾN TÍCH XỊN XÒ - CHIA SẺ NGAY!<br /><br />
+          Rewind 2025 của {{ merchant_name | default: 'Cửa hàng' }} ✨<br />
+          - Tổng sản phẩm đã bán: {{ item_quantity | default: '—' }} sản phẩm<br />
+          - Best-seller: {{ top1item_name | default: 'top1item_name' }}<br />
+          - Giờ vàng nổ đơn: {{ time | default: 'time' }}<br />
+          - Tháng tăng trưởng nhất: {{ month | default: 'month' }}<br />
+          {% if campaign_name and campaign_name != '' %}
+            - Chiến dịch top: {{ campaign_name }}<br />
+          {% else %}
+            - Gợi ý: tham gia chiến dịch để có thể tăng {{ order_percent | default: 'order_percent' }} số đơn trong năm<br />
+          {% endif %}
+          <br />
+          Sẵn sàng bứt phá 2026 cùng Grab!
+        </div>
+        <div class="small">
+          Tip: Không dùng JavaScript. Người dùng có thể bôi đen đoạn “chia sẻ” và copy trong app.
+        </div>
+      </section>
     </div>
   </body>
 </html>

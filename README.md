@@ -1,4 +1,4 @@
-## In-app Rewind 2025 (HTML-only)
+## In-app Rewind 2025 (Vertical scroll, Liquid)
 
 File: `inapp-rewind-2025.html`
 
@@ -10,22 +10,14 @@ python3 -m http.server 8080 --directory /workspace
 
 Sau đó mở `http://localhost:8080/inapp-rewind-2025.html`.
 
-### Liquid template variables (in-app)
+### Liquid variables
 
-File này **không dùng JavaScript** và tương thích Liquid. Bạn chỉ cần render các biến sau:
+Trang này **chỉ dùng HTML/CSS** (không JavaScript), optimized cho mobile in-app.
 
-- `year` (string) – ví dụ: `2025`
-- `store_name` (string)
-- `province` (string)
-- `total_products` (number/string)
-- `avg_per_day` (number/string, tuỳ bạn tính trước)
-- `best_product_name` (string)
-- `best_product_orders` (number/string)
-- `best_product_share` (number/string, %)
-- `top_campaign_name` (string)
-- `top_campaign_orders` (number/string)
-- `top_campaign_lift` (number/string, x)
-- `peak_start` (string, giờ dạng `11`)
-- `peak_end` (string, giờ dạng `13`)
-- `award_title` (string)
-- `rank` (string/number)
+- `merchant_name`
+- `item_quantity`
+- `top1item_name`
+- `time`
+- `month`
+- `campaign_name` (nếu rỗng/không có sẽ hiện block “Đối tác không tham gia chiến dịch”)
+- `order_percent`
