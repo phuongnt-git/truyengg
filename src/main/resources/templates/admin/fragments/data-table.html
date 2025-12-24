@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="card" th:fragment="data-table(title, tableId, searchPlaceholder)">
+    <div class="card-header">
+        <h4 class="card-title" th:text="${title}">Data Table</h4>
+        <div class="card-tools" th:if="${searchPlaceholder != null}">
+            <input class="form-control d-inline-block" 
+                   th:id="'search-' + ${tableId}" 
+                   th:placeholder="${searchPlaceholder}"
+                   style="width: 250px; margin-right: 10px;" 
+                   type="text">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class='table table-striped' th:id="${tableId}">
+                <th:block th:fragment="table-content">
+                    <!-- Table content will be inserted here -->
+                </th:block>
+            </table>
+        </div>
+    </div>
+</div>
+</html>
+

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruyenGG - Crawl Truyện</title>
+    <link rel="stylesheet" th:href="@{/voler/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/voler/css/app.css}">
+    <link rel="shortcut icon" th:href="@{/voler/images/favicon.png}" type="image/png">
+</head>
+<body>
+    <div id="app">
+        <div id="sidebar" class='active'>
+            <th:block th:replace="~{admin/layouts/sidebar :: sidebar}"></th:block>
+        </div>
+        <div id="main">
+            <nav class="navbar navbar-header navbar-expand navbar-light">
+                <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
+                <button class="btn navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav d-flex align-items-center navbar-light ms-auto">
+                        <li class="dropdown">
+                            <a href="#" data-bs-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+                                <div class="avatar me-1">
+                                    <img th:src="@{/voler/images/avatar/avatar-s-1.png}" alt="Avatar" srcset="">
+                                </div>
+                                <div class="d-none d-md-block d-lg-inline-block">
+                                    <span sec:authentication="name">Admin</span>
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" th:href="@{/}">
+                                    <i data-feather="home"></i> Home
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="logout(); return false;">
+                                    <i data-feather="log-out"></i> Logout
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="main-content container-fluid">
+                <th:block th:replace="~{admin/fragments/page-header :: page-header('Crawl Truyện', 'Công cụ crawl truyện từ các nguồn')}"></th:block>
+                <section class="section">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title"><i data-feather="download"></i> Công cụ Crawl Truyện</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form id="crawlForm" class="form form-vertical">
+                                        <div class="form-body">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label for="web" class="form-label">Nhập đường dẫn của truyện:</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text"><i data-feather="link"></i></span>
+                                                            <input class="form-control" id="web" name="web" 
+                                                                   placeholder="https://truyenqqgo.com/truyen-tranh/ten-truyen, https://truyenqqno.com/truyen-tranh/ten-truyen hoặc https://mimihentai.com/g/60986"
+                                                                   required type="text"
+                                                                   value="https://truyenqqno.com/truyen-tranh/one-piece-128">
+                                                        </div>
+                                                        <small class="form-text text-muted">Hệ thống sẽ tự động phát hiện nguồn từ URL.</small>
+                                                    </div>
+                                                </div>
+                                                <!-- Image Download Mode Selection -->
+                                                <div class="col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label class="form-label fw-bold">Image Download Mode <span class="text-danger">*</span></label>
+                                                        <div class="alert alert-info">
+                                                            <i data-feather="info"></i> Select how images should be handled during crawl
+                                                        </div>
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input" id="download_mode_none" name="downloadMode" type="radio" value="NONE">
+                                                            <label class="form-check-label" for="download_mode_none">
+                                                                <strong>None</strong> - Only update image URLs from source, do not download images
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input" id="download_mode_partial" name="downloadMode" type="radio" value="PARTIAL">
+                                                            <label class="form-check-label" for="download_mode_partial">
+                                                                <strong>Partial</strong> - Download images for specific chapters only
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input" id="download_mode_full" name="downloadMode" type="radio" value="FULL" checked>
+                                                            <label class="form-check-label" for="download_mode_full">
+                                                                <strong>Full</strong> - Download all images for all chapters
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Partial Download Options -->
+                                                <div class="col-12" id="partial_download_options" style="display: none;">
+                                                    <div class="border-start border-primary ps-3 mb-3">
+                                                        <label class="form-label fw-bold">Partial Crawl Configuration</label>
+                                                        
+                                                        <!-- Step 1: Crawl Range (Required) -->
+                                                        <div class="border-start border-info ps-3 mb-3">
+                                                            <label class="form-label fw-bold text-primary">Step 1: Define Crawl Range <span class="text-danger">*</span></label>
+                                                            <div class="alert alert-info">
+                                                                <i data-feather="info"></i> Specify the chapter range to crawl (metadata and chapters will be created for this range)
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group mb-3">
+                                                                        <label for="part_start" class="form-label">Start Chapter Index:</label>
+                                                                        <input class="form-control" id="part_start" min="1" name="part_start" type="number" value="1" placeholder="e.g., 1" required>
+                                                                        <small class="form-text text-muted">First chapter index to crawl (1-based)</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group mb-3">
+                                                                        <label for="part_end" class="form-label">End Chapter Index:</label>
+                                                                        <input class="form-control" id="part_end" min="1" name="part_end" type="number" value="5" placeholder="e.g., 10" required>
+                                                                        <small class="form-text text-muted">Last chapter index to crawl (inclusive)</small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <small class="form-text text-muted">
+                                                                <i data-feather="info"></i> All chapters from Start to End will be crawled and saved to database
+                                                            </small>
+                                                        </div>
+
+                                                        <!-- Step 2: Image Download Selection -->
+                                                        <div class="border-start border-success ps-3">
+                                                            <label class="form-label fw-bold text-success">Step 2: Select Image Download Method</label>
+                                                            <div class="alert alert-warning">
+                                                                <i data-feather="alert-triangle"></i> Choose how images should be downloaded within the crawl range
+                                                            </div>
+                                                            
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input" id="partial_type_range" name="partialType" type="radio" value="range" checked>
+                                                                <label class="form-check-label" for="partial_type_range">
+                                                                    <strong>Download All</strong> - Download images for all chapters in the crawl range (<span id="partStartDisplay">1</span> to <span id="partEndDisplay">5</span>)
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input" id="partial_type_specific" name="partialType" type="radio" value="specific">
+                                                                <label class="form-check-label" for="partial_type_specific">
+                                                                    <strong>Download Specific</strong> - Download images only for specific chapter indices within the crawl range
+                                                                </label>
+                                                            </div>
+
+                                                            <!-- Specific Chapters Options -->
+                                                            <div class="form-group mt-3" id="partial_specific_options" style="display: none;">
+                                                                <label for="image_download_chapters" class="form-label">Chapter Indices (comma-separated):</label>
+                                                                <input class="form-control" id="image_download_chapters" name="image_download_chapters" 
+                                                                       type="text" placeholder="e.g., 1, 3, 5, 10-15, 20">
+                                                                <small class="form-text text-muted">
+                                                                    <i data-feather="info"></i> Enter chapter indices separated by commas. Supports ranges (e.g., 10-15) and individual numbers (e.g., 1, 3, 5). 
+                                                                    <strong>Note:</strong> These indices should be within the crawl range specified above.
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 d-flex gap-2 flex-wrap align-items-center">
+                                                    <button class="btn btn-primary btn-lg" id="crawlButton" type="submit">
+                                                        <i data-feather="download"></i> Bắt đầu tải
+                                                    </button>
+                                                    <button class="btn btn-secondary btn-lg" type="button" id="refreshButton">
+                                                        <i data-feather="refresh-cw"></i> Làm mới
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="mt-3">
+                                        <div class="progress" style="display: none;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <footer>
+                <div class="footer clearfix mb-0 text-muted">
+                    <div class="float-start">
+                        <p>2024 &copy; <a th:href="@{/}">TruyenGG</a></p>
+                    </div>
+                    <div class="float-end">
+                        <p>Crafted with <span class='text-danger'><i data-feather="heart"></i></span> by TruyenGG Team</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Crawl Progress Modal -->
+    <div class="modal fade" id="crawlProgressModal" tabindex="-1" aria-labelledby="crawlProgressModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="crawlProgressModalLabel">
+                        <i data-feather="activity"></i> Tiến độ Crawl
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="crawlProgressContent">
+                        <!-- Progress content will be inserted here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div id="crawlProgressActions" class="d-flex gap-2 me-auto">
+                        <!-- Action buttons will be inserted here -->
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/voler/js/feather-icons/feather.min.js}"></script>
+    <script th:src="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/voler/js/app.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script th:src="@{/js/admin-auth.js}"></script>
+    <script th:src="@{/js/admin/voler-init.js}"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/utils.js}"></script>
+    <script th:src="@{/js/admin/crawl.js}"></script>
+    <script th:src="@{/voler/js/main.js}"></script>
+</body>
+</html>

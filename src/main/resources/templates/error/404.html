@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>404 - Không tìm thấy trang</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<header th:replace="fragments/header :: header"></header>
+
+<main class="container">
+  <div class="error-container">
+    <h1>404</h1>
+    <p>Không tìm thấy trang bạn yêu cầu.</p>
+    <a class="btn" th:href="@{/}">Quay lại trang chủ</a>
+  </div>
+</main>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+</body>
+</html>

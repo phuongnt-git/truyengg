@@ -1,0 +1,27 @@
+package com.truyengg.model.dto;
+
+import com.truyengg.domain.entity.Comic;
+import com.truyengg.model.response.ChapterCrawlProgress;
+
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+public record ChapterCrawlProcessingParams(
+    String url,
+    String domain,
+    UUID crawlId,
+    String chapterKey,
+    int chapterIndex,
+    Map<String, ChapterCrawlProgress> chapterProgress,
+    List<String> messages,
+    ZonedDateTime startTime,
+    int totalChapters,
+    int currentTotalImages,
+    int currentTotalDownloadedImages,
+    Comic comic,
+    int resumeFromImageIndex,
+    List<String> resumeImageUrls
+) {
+}

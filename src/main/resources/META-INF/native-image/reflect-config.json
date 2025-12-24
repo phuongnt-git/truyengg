@@ -1,0 +1,10 @@
+[
+  {
+    "name": "com.truyengg.TruyenGgApplication",
+    "methods": [
+      {"name": "<init>", "parameterTypes": []},
+      {"name": "main", "parameterTypes": ["[Ljava/lang/String;"]}
+    ]
+  }
+]
+

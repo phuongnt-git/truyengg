@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruyenGG - Crawl Theo Thể Loại</title>
+    <link rel="stylesheet" th:href="@{/voler/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/voler/css/app.css}">
+    <link rel="shortcut icon" th:href="@{/voler/images/favicon.png}" type="image/png">
+</head>
+<body>
+    <div id="app">
+        <div id="sidebar" class='active'>
+            <th:block th:replace="~{admin/layouts/sidebar :: sidebar}"></th:block>
+        </div>
+        <div id="main">
+            <nav class="navbar navbar-header navbar-expand navbar-light">
+                <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
+                <button class="btn navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav d-flex align-items-center navbar-light ms-auto">
+                        <li class="dropdown">
+                            <a href="#" data-bs-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+                                <div class="avatar me-1">
+                                    <img th:src="@{/voler/images/avatar/avatar-s-1.png}" alt="Avatar" srcset="">
+                                </div>
+                                <div class="d-none d-md-block d-lg-inline-block">
+                                    <span sec:authentication="name">Admin</span>
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" th:href="@{/}">
+                                    <i data-feather="home"></i> Home
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="logout(); return false;">
+                                    <i data-feather="log-out"></i> Logout
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="main-content container-fluid">
+                <th:block th:replace="~{admin/fragments/page-header :: page-header('Crawl Theo Thể Loại', 'Crawl truyện theo thể loại từ các nguồn')}"></th:block>
+                <section class="section">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Công cụ Crawl Theo Thể Loại</h4>
+                                </div>
+                                <div class="card-body">
+                                    <form id="categoryCrawlForm" class="form form-vertical">
+                                        <div class="form-body">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label for="source" class="form-label">Chọn nguồn truyện:</label>
+                                                        <select class="form-select" id="source" name="source">
+                                                            <option value="truyenqqno">TruyenQQNo (truyenqqno.com)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-group mb-3">
+                                                        <label for="categoryUrl" class="form-label">Nhập đường dẫn thể loại:</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text"><i data-feather="link"></i></span>
+                                                            <input class="form-control" id="categoryUrl" name="categoryUrl"
+                                                                   placeholder="https://truyenqqno.com/the-loai/isekai-85/trang-1.html"
+                                                                   required type="text">
+                                                        </div>
+                                                        <small class="form-text text-muted">Hệ thống sẽ tự động crawl tất cả các trang của thể loại này</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 d-flex justify-content-end">
+                                                    <button class="btn btn-primary" id="startButton" type="submit">
+                                                        <i data-feather="download"></i> Bắt đầu crawl
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Danh sách Jobs</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div id="jobsList"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <footer>
+                <div class="footer clearfix mb-0 text-muted">
+                    <div class="float-start">
+                        <p>2024 &copy; <a th:href="@{/}">TruyenGG</a></p>
+                    </div>
+                    <div class="float-end">
+                        <p>Crafted with <span class='text-danger'><i data-feather="heart"></i></span> by TruyenGG Team</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/voler/js/feather-icons/feather.min.js}"></script>
+    <script th:src="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/voler/js/app.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script th:src="@{/js/admin-auth.js}"></script>
+    <script th:src="@{/js/admin/voler-init.js}"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script th:src="@{/js/utils.js}"></script>
+    <script th:src="@{/js/admin/category-crawl.js}"></script>
+    <script th:src="@{/voler/js/main.js}"></script>
+</body>
+</html>

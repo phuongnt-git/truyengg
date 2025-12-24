@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="card" th:fragment="form-card(title)">
+    <div class="card-header">
+        <h4 class="card-title" th:text="${title}">Form Title</h4>
+    </div>
+    <div class="card-content">
+        <div class="card-body">
+            <th:block th:fragment="form-content">
+                <!-- Form content will be inserted here -->
+            </th:block>
+        </div>
+    </div>
+</div>
+</html>
+

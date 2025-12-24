@@ -1,0 +1,22 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "application.*\\.yml"
+      },
+      {
+        "pattern": "application.*\\.properties"
+      },
+      {
+        "pattern": "db/migration/.*"
+      },
+      {
+        "pattern": "static/.*"
+      },
+      {
+        "pattern": "templates/.*"
+      }
+    ]
+  }
+}
+

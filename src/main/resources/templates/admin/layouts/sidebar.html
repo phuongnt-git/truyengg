@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div class="sidebar-wrapper active" th:fragment="sidebar">
+    <div class="sidebar-header">
+        <a th:href="@{/admin}">
+            <img th:src="@{/voler/images/logo.png}" alt="TruyenGG Logo" srcset="" style="max-height: 40px;">
+        </a>
+    </div>
+    <div class="sidebar-menu">
+        <ul class="menu">
+            <li class="sidebar-title">Main Menu</li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/dashboard}" data-page="dashboard">
+                    <i data-feather="home" width="20"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/users}" data-page="users">
+                    <i data-feather="users" width="20"></i>
+                    <span>Quản lý người dùng</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link" th:href="@{/admin/stories}" data-page="stories">
+                    <i data-feather="book" width="20"></i>
+                    <span>Quản lý truyện</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/comics}" data-page="comics">
+                    <i data-feather="book-open" width="20"></i>
+                    <span>Quản lý Comics</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/chapters}" data-page="chapters">
+                    <i data-feather="list" width="20"></i>
+                    <span>Quản lý Chapters</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/duplicates}" data-page="duplicates">
+                    <i data-feather="copy" width="20"></i>
+                    <span>Quản lý Duplicates</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/images}" data-page="images">
+                    <i data-feather="image" width="20"></i>
+                    <span>Quản lý Images</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/backup}" data-page="backup">
+                    <i data-feather="save" width="20"></i>
+                    <span>Backup Truyện</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/crawl}" data-page="crawl">
+                    <i data-feather="download" width="20"></i>
+                    <span>Crawl Truyện</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/category-crawl}" data-page="category-crawl">
+                    <i data-feather="grid" width="20"></i>
+                    <span>Crawl Theo Thể Loại</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/jobs}" data-page="jobs">
+                    <i data-feather="briefcase" width="20"></i>
+                    <span>Crawl Jobs</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/reports}" data-page="reports">
+                    <i data-feather="alert-triangle" width="20"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </li>
+            <li class="sidebar-item" sec:authorize="hasRole('ADMIN')">
+                <a class="sidebar-link" th:href="@{/admin/settings}" data-page="settings">
+                    <i data-feather="settings" width="20"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="javascript:void(0);" onclick="logout(); return false;">
+                    <i data-feather="log-out" width="20"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+</div>
+</html>
+
