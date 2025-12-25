@@ -238,6 +238,40 @@
   (function () {
     "use strict";
 
+    // ===== Compatibility (older Android WebView / iOS WKWebView) =====
+    if (!Date.now) Date.now = function () { return new Date().getTime(); };
+    if (!window.requestAnimationFrame) {
+      window.requestAnimationFrame = function (cb) {
+        return window.setTimeout(function () { cb(Date.now()); }, 16);
+      };
+    }
+
+    var supportsPassive = false;
+    try {
+      var passiveTest = Object.defineProperty({}, "passive", {
+        get: function () { supportsPassive = true; }
+      });
+      window.addEventListener("testPassive", function () {}, passiveTest);
+      window.removeEventListener("testPassive", function () {}, passiveTest);
+    } catch (e) { /* ignore */ }
+
+    var OPT_PASSIVE_TRUE = supportsPassive ? { passive: true } : false;
+    var OPT_PASSIVE_FALSE = supportsPassive ? { passive: false } : false;
+
+    function addEvt(el, type, handler, options) {
+      if (!el) return;
+      try {
+        el.addEventListener(type, handler, options);
+      } catch (e) {
+        // Fallback for browsers that don't accept options object
+        try {
+          el.addEventListener(type, handler, false);
+        } catch (e2) {
+          el["on" + type] = handler;
+        }
+      }
+    }
+
     var SLIDE_DURATION_MS = 6000;
     var HOLD_TO_PAUSE = true;
 
@@ -425,10 +459,10 @@
 
       var ctaBtn = document.getElementById("ctaBtn");
       if (ctaBtn) {
-        ctaBtn.addEventListener("click", function (e) {
+        addEvt(ctaBtn, "click", function (e) {
           e.preventDefault();
           next();
-        }, { passive: true });
+        }, false);
       }
     }
 
@@ -489,34 +523,34 @@
     }
 
     // Tap left/right
-    elPrev.addEventListener("click", function (e) { e.preventDefault(); prev(); }, { passive: false });
-    elNext.addEventListener("click", function (e) { e.preventDefault(); next(); }, { passive: false });
+    addEvt(elPrev, "click", function (e) { e.preventDefault(); prev(); }, false);
+    addEvt(elNext, "click", function (e) { e.preventDefault(); next(); }, false);
 
     // Hold to pause
     function bindHold(el){
-      el.addEventListener("touchstart", function(){ pause(); }, { passive: true });
-      el.addEventListener("touchend", function(){ resume(); }, { passive: true });
-      el.addEventListener("touchcancel", function(){ resume(); }, { passive: true });
-      el.addEventListener("mousedown", function(){ pause(); });
-      el.addEventListener("mouseup", function(){ resume(); });
-      el.addEventListener("mouseleave", function(){ resume(); });
+      addEvt(el, "touchstart", function(){ pause(); }, OPT_PASSIVE_TRUE);
+      addEvt(el, "touchend", function(){ resume(); }, OPT_PASSIVE_TRUE);
+      addEvt(el, "touchcancel", function(){ resume(); }, OPT_PASSIVE_TRUE);
+      addEvt(el, "mousedown", function(){ pause(); }, false);
+      addEvt(el, "mouseup", function(){ resume(); }, false);
+      addEvt(el, "mouseleave", function(){ resume(); }, false);
     }
     bindHold(elStage);
 
     // Prevent double-tap zoom on iOS webviews
     var lastTouch = 0;
-    document.addEventListener("touchend", function (e) {
+    addEvt(document, "touchend", function (e) {
       var now = Date.now();
       if (now - lastTouch <= 250) e.preventDefault();
       lastTouch = now;
-    }, { passive: false });
+    }, OPT_PASSIVE_FALSE);
 
     // Keyboard (debug)
-    document.addEventListener("keydown", function (e) {
+    addEvt(document, "keydown", function (e) {
       if (e.key === "ArrowRight") next();
       if (e.key === "ArrowLeft") prev();
       if (e.key === " ") { paused ? resume() : pause(); }
-    });
+    }, false);
 
     renderSlide(idx);
     tick();
