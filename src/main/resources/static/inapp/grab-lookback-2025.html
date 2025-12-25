@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="color-scheme" content="light" />
+    <title>Nhìn lại Grab 2025</title>
+    <style>
+      :root {
+        --bg1: #bff2cf;
+        --bg2: #f7f5df;
+        --bg3: #e9f0ff;
+        --card: rgba(255, 255, 255, 0.74);
+        --card-border: rgba(22, 163, 74, 0.16);
+        --text: #0f172a;
+        --muted: rgba(15, 23, 42, 0.62);
+        --green: #16a34a;
+        --green-700: #0f7a37;
+        --shadow: 0 24px 64px rgba(2, 6, 23, 0.12);
+        --radius: 22px;
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-right: env(safe-area-inset-right, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left: env(safe-area-inset-left, 0px);
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family:
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          "Apple Color Emoji",
+          "Segoe UI Emoji";
+        color: var(--text);
+        background: linear-gradient(135deg, var(--bg1), var(--bg2) 55%, var(--bg3));
+      }
+
+      body {
+        overflow: hidden;
+      }
+
+      .viewport {
+        height: 100%;
+        padding: calc(14px + var(--safe-top)) calc(14px + var(--safe-right))
+          calc(14px + var(--safe-bottom)) calc(14px + var(--safe-left));
+      }
+
+      .story {
+        height: 100%;
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 16px;
+        padding-bottom: 2px;
+      }
+      .story::-webkit-scrollbar {
+        display: none;
+      }
+
+      .slide {
+        flex: 0 0 calc(100% - 0px);
+        height: 100%;
+        scroll-snap-align: start;
+        position: relative;
+      }
+
+      .card {
+        height: 100%;
+        border-radius: var(--radius);
+        background: radial-gradient(
+            1200px 400px at 40% 10%,
+            rgba(22, 163, 74, 0.12),
+            transparent 60%
+          ),
+          radial-gradient(900px 520px at 70% 25%, rgba(59, 130, 246, 0.08), transparent 62%),
+          var(--card);
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .chrome {
+        position: absolute;
+        inset: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        color: rgba(15, 23, 42, 0.78);
+        font-weight: 600;
+        font-size: 13px;
+        line-height: 1;
+        backdrop-filter: blur(8px);
+      }
+
+      .pill .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--green);
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.18);
+        flex: 0 0 auto;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(253, 230, 138, 0.62);
+        border: 1px solid rgba(245, 158, 11, 0.24);
+        color: rgba(12, 74, 110, 0.9);
+        font-weight: 800;
+        font-size: 13px;
+        gap: 8px;
+        backdrop-filter: blur(8px);
+      }
+
+      .year {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 62px;
+        height: 38px;
+        border-radius: 999px;
+        background: rgba(209, 250, 229, 0.84);
+        border: 1px solid rgba(22, 163, 74, 0.18);
+        color: rgba(12, 74, 110, 0.85);
+        font-weight: 800;
+        font-size: 13px;
+      }
+
+      .content {
+        flex: 1;
+        min-height: 0;
+        padding: 10px 6px 0 6px;
+      }
+
+      .title {
+        font-size: 30px;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        margin: 14px 0 10px;
+        font-weight: 900;
+      }
+
+      .title .name {
+        color: var(--text);
+        white-space: nowrap;
+      }
+
+      .sub {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .hint {
+        color: rgba(15, 23, 42, 0.5);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 4px 0;
+      }
+
+      .stats {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .stat {
+        display: grid;
+        grid-template-columns: 46px 1fr;
+        gap: 12px;
+        align-items: start;
+        padding: 12px 12px;
+        background: rgba(255, 255, 255, 0.62);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+      }
+
+      .emoji {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: rgba(22, 163, 74, 0.08);
+        border: 1px solid rgba(22, 163, 74, 0.14);
+        font-size: 22px;
+      }
+
+      .stat .kpi {
+        font-weight: 900;
+        font-size: 18px;
+        line-height: 1.2;
+        margin: 0;
+      }
+
+      .stat .desc {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .quote {
+        margin-top: 14px;
+        padding: 14px 14px;
+        border-radius: 16px;
+        background: rgba(209, 250, 229, 0.6);
+        border: 1px solid rgba(22, 163, 74, 0.18);
+        color: rgba(12, 74, 110, 0.88);
+        font-weight: 800;
+        line-height: 1.5;
+      }
+
+      .quote .big {
+        display: block;
+        font-size: 18px;
+        margin-top: 6px;
+        color: rgba(15, 23, 42, 0.9);
+      }
+
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 6px 0 6px;
+      }
+
+      .btn {
+        border: none;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        border-radius: 999px;
+        padding: 12px 16px;
+        font-weight: 900;
+        font-size: 14px;
+        box-shadow: 0 12px 24px rgba(22, 163, 74, 0.18);
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .btn-next {
+        margin-left: auto;
+        background: var(--green);
+        color: white;
+      }
+
+      .btn-share {
+        background: var(--green);
+        color: white;
+        width: 100%;
+      }
+
+      .muted {
+        color: rgba(15, 23, 42, 0.58);
+        font-size: 12px;
+      }
+
+      .fineprint {
+        margin-top: 14px;
+        padding: 12px 12px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        color: rgba(15, 23, 42, 0.78);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .signature {
+        margin-top: 12px;
+        color: rgba(15, 23, 42, 0.74);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .pager {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.22);
+      }
+      .dot.is-active {
+        width: 18px;
+        background: rgba(22, 163, 74, 0.88);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewport">
+      <div id="story" class="story" aria-label="Nhìn lại Grab 2025 - vuốt ngang để xem">
+        <!-- Slide 1 -->
+        <section class="slide" aria-label="Mở đầu">
+          <div class="card">
+            <div class="chrome">
+              <div class="topbar">
+                <div class="pill"><span class="dot" aria-hidden="true"></span>Nhìn lại Grab 2025</div>
+                <div class="year">2025</div>
+              </div>
+
+              <div class="content">
+                <div class="badge">✦ <span>Mở đầu</span></div>
+                <h1 class="title">
+                  Đối tác <span class="name" data-var="partner_name">Nguyễn Văn A</span> thân mến 💚
+                </h1>
+                <p class="sub">
+                  Năm 2025 vừa khép lại, Đối tác có tò mò rằng bản thân đã hoạt động như thế nào trong năm
+                  qua không? Hãy cùng Grab nhìn lại tại đây nhé:
+                </p>
+                <p class="sub">👉 Số lượng chuyến xe Đối tác hoàn thành theo loại dịch vụ:</p>
+              </div>
+
+              <div class="footer">
+                <div class="hint">
+                  <span>Vuốt ngang để xem tiếp.</span>
+                  <span class="pager" aria-hidden="true">
+                    <span class="dot is-active"></span><span class="dot"></span><span class="dot"></span
+                    ><span class="dot"></span>
+                  </span>
+                </div>
+                <button class="btn btn-next" type="button" data-action="next">Tiếp</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 2 -->
+        <section class="slide" aria-label="Số chuyến theo dịch vụ">
+          <div class="card">
+            <div class="chrome">
+              <div class="topbar">
+                <div class="pill"><span class="dot" aria-hidden="true"></span>Nhìn lại Grab 2025</div>
+                <div class="year">2025</div>
+              </div>
+
+              <div class="content">
+                <h2 class="title" style="font-size: 26px; margin-top: 6px">Số chuyến theo loại dịch vụ</h2>
+                <div class="stats">
+                  <div class="stat">
+                    <div class="emoji" aria-hidden="true">🛵</div>
+                    <div>
+                      <p class="kpi"><span data-var="grab_bike_trips">1.000</span> chuyến xe GrabBike</p>
+                      <p class="desc">giúp nhiều Hành khách “đi đến nơi, về đến chốn”</p>
+                    </div>
+                  </div>
+                  <div class="stat">
+                    <div class="emoji" aria-hidden="true">🍜🛒</div>
+                    <div>
+                      <p class="kpi">
+                        <span data-var="grab_food_mart_trips">1.000</span> chuyến xe GrabFood và GrabMart
+                      </p>
+                      <p class="desc">
+                        giúp nhiều Người dùng nhận những món hàng thiết yếu, những bữa ăn vẹn tròn
+                      </p>
+                    </div>
+                  </div>
+                  <div class="stat">
+                    <div class="emoji" aria-hidden="true">📦</div>
+                    <div>
+                      <p class="kpi"><span data-var="grab_express_trips">1.000</span> chuyến xe GrabExpress</p>
+                      <p class="desc">để Người dùng có thể nhận tận tay những kiện hàng kịp thời và đúng lúc.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="quote">
+                  “Với tần suất vận hành như vậy, đích thị Đối tác chính là:
+                  <span class="big">Đại sứ an toàn</span>
+                  vì mang lại sự an tâm trên mọi nẻo đường”
+                </div>
+              </div>
+
+              <div class="footer">
+                <div class="hint">
+                  <span>Vuốt ngang để xem tiếp.</span>
+                  <span class="pager" aria-hidden="true">
+                    <span class="dot"></span><span class="dot is-active"></span><span class="dot"></span
+                    ><span class="dot"></span>
+                  </span>
+                </div>
+                <button class="btn btn-next" type="button" data-action="next">Tiếp</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3 -->
+        <section class="slide" aria-label="Đánh giá và huy hiệu">
+          <div class="card">
+            <div class="chrome">
+              <div class="topbar">
+                <div class="pill"><span class="dot" aria-hidden="true"></span>Nhìn lại Grab 2025</div>
+                <div class="year">2025</div>
+              </div>
+
+              <div class="content">
+                <h2 class="title" style="font-size: 26px; margin-top: 6px">Thành tích nổi bật</h2>
+                <div class="fineprint">
+                  Ngoài ra, Đối tác đã “thu hoạch” được
+                  <b><span data-var="five_star_count">500</span> đánh giá 5 sao</b>, chiếm
+                  <b><span data-var="five_star_percent">{{%_5starsreviewsreview}}</span></b> trên tổng số lượng
+                  đánh giá 5 sao mà Đối tác đã nhận được từ Người dùng.
+                  <br /><br />
+                  Trong đó, <b>Tài xế nhiệt tình</b> là loại huy hiệu Đối tác nhận được nhiều nhất.
+                </div>
+              </div>
+
+              <div class="footer">
+                <div class="hint">
+                  <span>Vuốt ngang để xem tiếp.</span>
+                  <span class="pager" aria-hidden="true">
+                    <span class="dot"></span><span class="dot"></span><span class="dot is-active"></span
+                    ><span class="dot"></span>
+                  </span>
+                </div>
+                <button class="btn btn-next" type="button" data-action="next">Tiếp</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 4 -->
+        <section class="slide" aria-label="Tỷ lệ hủy chuyến và chia sẻ">
+          <div class="card">
+            <div class="chrome">
+              <div class="topbar">
+                <div class="pill"><span class="dot" aria-hidden="true"></span>Nhìn lại Grab 2025</div>
+                <div class="year">2025</div>
+              </div>
+
+              <div class="content">
+                <h2 class="title" style="font-size: 26px; margin-top: 6px">Tiếp tục bứt phá 2026</h2>
+                <div class="fineprint">
+                  “Tỷ lệ hủy chuyến trung bình trong năm 2025 của Đối tác là
+                  <b><span data-var="cancel_rate">0.5%</span></b>
+                  <br /><br />
+                  Hãy tiếp tục cải thiện tỷ lệ nhận này để nhận thêm nhiều cơ hội gia tăng thu nhập trong năm
+                  2026!”
+                </div>
+
+                <div class="signature">
+                  “Hãy dành lời cám ơn đến bản thân vì đã không ngừng cố gắng trong năm 2025. Giờ thì hãy
+                  chia sẻ thành tích này đến các “chiến hữu” Grab nhé!
+                  <br /><br />
+                  Mến chúc Đối tác luôn hoạt động hiệu quả và an toàn trên mọi nẻo đường 💚
+                  <br /><br />
+                  Trân trọng,<br />
+                  Đội ngũ Grab”
+                </div>
+              </div>
+
+              <div class="footer">
+                <span class="muted" id="shareStatus" aria-live="polite"></span>
+                <button class="btn btn-share" type="button" data-action="share">KHOE CHIẾN TÍCH NGAY</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const story = document.getElementById("story");
+        const shareStatus = document.getElementById("shareStatus");
+        const slides = Array.from(story.querySelectorAll(".slide"));
+
+        function clamp(n, min, max) {
+          return Math.max(min, Math.min(max, n));
+        }
+
+        function getCurrentIndex() {
+          const x = story.scrollLeft;
+          const w = story.clientWidth + 16; // includes gap
+          return clamp(Math.round(x / w), 0, slides.length - 1);
+        }
+
+        function scrollToIndex(idx) {
+          const w = story.clientWidth + 16;
+          story.scrollTo({ left: idx * w, behavior: "smooth" });
+        }
+
+        function buildShareText() {
+          const name = document.querySelector('[data-var="partner_name"]')?.textContent?.trim() || "Đối tác";
+          const bike = document.querySelector('[data-var="grab_bike_trips"]')?.textContent?.trim() || "";
+          const food = document
+            .querySelector('[data-var="grab_food_mart_trips"]')
+            ?.textContent?.trim() || "";
+          const express = document.querySelector('[data-var="grab_express_trips"]')?.textContent?.trim() || "";
+          const stars = document.querySelector('[data-var="five_star_count"]')?.textContent?.trim() || "";
+          const cancel = document.querySelector('[data-var="cancel_rate"]')?.textContent?.trim() || "";
+
+          return [
+            `Nhìn lại Grab 2025`,
+            `Đối tác ${name} thân mến 💚`,
+            ``,
+            `🛵 ${bike} chuyến GrabBike`,
+            `🍜🛒 ${food} chuyến GrabFood & GrabMart`,
+            `📦 ${express} chuyến GrabExpress`,
+            ``,
+            `⭐ ${stars} đánh giá 5 sao`,
+            `❌ Tỷ lệ hủy: ${cancel}`,
+          ].join("\n");
+        }
+
+        async function share() {
+          const payload = {
+            type: "GRAB_LOOKBACK_2025_SHARE",
+            text: buildShareText(),
+          };
+
+          // RN WebView
+          if (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage === "function") {
+            window.ReactNativeWebView.postMessage(JSON.stringify(payload));
+            shareStatus.textContent = "Đã gửi yêu cầu chia sẻ.";
+            return;
+          }
+
+          // iOS WKWebView bridge (common naming patterns)
+          const handler =
+            window.webkit?.messageHandlers?.share ||
+            window.webkit?.messageHandlers?.grab ||
+            window.webkit?.messageHandlers?.native;
+          if (handler && typeof handler.postMessage === "function") {
+            handler.postMessage(payload);
+            shareStatus.textContent = "Đã gửi yêu cầu chia sẻ.";
+            return;
+          }
+
+          // Web Share API fallback
+          if (navigator.share) {
+            try {
+              await navigator.share({ text: payload.text, title: "Nhìn lại Grab 2025" });
+              shareStatus.textContent = "Đã mở chia sẻ.";
+              return;
+            } catch (e) {
+              // user cancelled -> silent
+            }
+          }
+
+          // Clipboard fallback
+          try {
+            await navigator.clipboard.writeText(payload.text);
+            shareStatus.textContent = "Đã sao chép nội dung để chia sẻ.";
+          } catch (e) {
+            shareStatus.textContent = "Không thể chia sẻ tự động trên thiết bị này.";
+          }
+        }
+
+        story.addEventListener(
+          "click",
+          function (e) {
+            const btn = e.target.closest("[data-action]");
+            if (!btn) return;
+            const action = btn.getAttribute("data-action");
+            if (action === "next") scrollToIndex(getCurrentIndex() + 1);
+            if (action === "share") share();
+          },
+          { passive: true }
+        );
+
+        // Improve snapping accuracy on some WebViews
+        let snapTimer = null;
+        story.addEventListener(
+          "scroll",
+          function () {
+            clearTimeout(snapTimer);
+            snapTimer = setTimeout(function () {
+              scrollToIndex(getCurrentIndex());
+            }, 120);
+          },
+          { passive: true }
+        );
+      })();
+    </script>
+  </body>
+</html>
