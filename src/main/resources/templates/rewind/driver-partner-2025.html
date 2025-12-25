@@ -8,15 +8,16 @@
   <title>Rewind Đối tác Tài xế 2025</title>
   <style>
     :root{
-      --bg0:#0b1020;
-      --bg1:#1a0f2e;
-      --bg2:#0d2b2a;
-      --card:rgba(255,255,255,.08);
-      --card2:rgba(255,255,255,.06);
-      --text:rgba(255,255,255,.94);
-      --muted:rgba(255,255,255,.72);
-      --muted2:rgba(255,255,255,.56);
-      --line:rgba(255,255,255,.14);
+      /* Light theme (Mex-style) */
+      --bg0:#D9FCDE;  /* Softest green */
+      --bg1:#EBFAFF;  /* Softest blue */
+      --bg2:#FBF0FF;  /* Softest purple */
+      --card:rgba(255,255,255,.92);
+      --card2:rgba(255,255,255,.78);
+      --text:#184440;   /* deep green/ink */
+      --muted:rgba(24,68,64,.74);
+      --muted2:rgba(24,68,64,.58);
+      --line:rgba(0,177,79,.20);
       /* Brand palette (primary) */
       --accent:#00B14F;         /* Default */
       --accent-600:#00804A;     /* Bolder */
@@ -32,7 +33,7 @@
       --teal:#17B5A6;
       --blue:#136FD8;
       --purple:#D194FF;
-      --shadow: 0 18px 60px rgba(0,0,0,.42);
+      --shadow: 0 14px 40px rgba(24,68,64,.10);
       --radius: 18px;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-right: env(safe-area-inset-right, 0px);
@@ -46,15 +47,14 @@
       margin:0;
       font-family: var(--font);
       color: var(--text);
-      /* Brand background using submitted palette; green is dominant */
+      /* Bright background using submitted palette (Mex-style) */
       background:
-        radial-gradient(1100px 820px at 18% 14%, rgba(0,177,79,.28), transparent 54%),
-        radial-gradient(980px 760px at 88% 20%, rgba(19,111,216,.18), transparent 56%),
-        radial-gradient(920px 760px at 72% 70%, rgba(23,181,166,.18), transparent 58%),
-        radial-gradient(900px 720px at 46% 92%, rgba(209,148,255,.16), transparent 60%),
-        radial-gradient(760px 620px at 30% 62%, rgba(255,217,51,.12), transparent 60%),
-        radial-gradient(720px 560px at 86% 52%, rgba(247,103,8,.10), transparent 62%),
-        linear-gradient(160deg, var(--bg0), var(--bg1) 50%, var(--bg2));
+        radial-gradient(980px 760px at 14% 16%, rgba(0,177,79,.22), transparent 62%),
+        radial-gradient(920px 720px at 86% 18%, rgba(255,217,51,.20), transparent 64%),
+        radial-gradient(900px 700px at 82% 78%, rgba(23,181,166,.18), transparent 64%),
+        radial-gradient(900px 700px at 34% 88%, rgba(209,148,255,.16), transparent 66%),
+        radial-gradient(820px 640px at 60% 58%, rgba(19,111,216,.12), transparent 70%),
+        linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 56%, var(--bg2) 100%);
       overflow:hidden;
     }
     .wrap{
@@ -66,7 +66,7 @@
     }
     .topbar{ display:flex; flex-direction:column; gap:10px; }
     .progress{ display:flex; gap:6px; width:100%; align-items:center; }
-    .seg{ position:relative; flex:1; height:3px; border-radius:999px; background: rgba(255,255,255,.18); overflow:hidden; }
+    .seg{ position:relative; flex:1; height:4px; border-radius:999px; background: rgba(0,177,79,.18); overflow:hidden; }
     .seg > i{
       position:absolute; left:0; top:0; bottom:0;
       width:0%;
@@ -79,24 +79,22 @@
       display:inline-flex; align-items:center; gap:8px;
       padding:8px 10px;
       border-radius:999px;
-      background: rgba(255,255,255,.09);
-      border:1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.78);
+      border:1px solid rgba(0,177,79,.22);
     }
     .dot{
       width:8px; height:8px; border-radius:50%;
       background: var(--accent);
       box-shadow: 0 0 0 6px rgba(0,177,79,.18);
     }
-    .brand{ font-weight: 700; letter-spacing: .2px; font-size: 13px; color: rgba(255,255,255,.92); }
+    .brand{ font-weight: 800; letter-spacing: .2px; font-size: 13px; color: var(--accent-700); }
     .hint{ font-size: 12px; color: var(--muted2); user-select:none; white-space:nowrap; }
     .stage{
       position:relative;
       flex:1;
       border-radius: calc(var(--radius) + 8px);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.88));
+      border: 2px solid rgba(0,177,79,.26);
       box-shadow: var(--shadow);
       overflow:hidden;
       display:flex;
@@ -104,13 +102,12 @@
     .bgfx{
       position:absolute; inset:-2px;
       background:
-        radial-gradient(560px 380px at 12% 18%, rgba(0,177,79,.26), transparent 60%),
-        radial-gradient(560px 380px at 92% 30%, rgba(19,111,216,.18), transparent 62%),
-        radial-gradient(540px 420px at 68% 108%, rgba(23,181,166,.18), transparent 58%),
-        radial-gradient(520px 420px at 46% 112%, rgba(209,148,255,.14), transparent 62%),
-        radial-gradient(520px 340px at 30% 40%, rgba(255,217,51,.10), transparent 64%);
+        radial-gradient(620px 420px at 10% 18%, rgba(0,177,79,.18), transparent 62%),
+        radial-gradient(600px 420px at 92% 22%, rgba(255,217,51,.16), transparent 64%),
+        radial-gradient(620px 520px at 82% 110%, rgba(23,181,166,.14), transparent 66%),
+        radial-gradient(620px 520px at 42% 118%, rgba(209,148,255,.12), transparent 70%);
       filter: saturate(1.2);
-      opacity: .9;
+      opacity: .85;
       pointer-events:none;
     }
     .content{
@@ -129,32 +126,32 @@
       gap:8px;
       padding:7px 10px;
       border-radius: 999px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.14);
-      color: rgba(255,255,255,.92);
+      background: rgba(255,249,192,.92);
+      border: 1px solid rgba(255,217,51,.45);
+      color: rgba(24,68,64,.92);
       font-size: 12px;
       letter-spacing:.2px;
     }
-    .tag b{ color: var(--accent2); }
+    .tag b{ color: var(--accent-600); }
     .badge{
       display:inline-flex;
       align-items:center;
       gap:8px;
       padding:7px 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(217,252,222,.75);
+      border: 1px solid rgba(0,177,79,.24);
       font-size: 12px;
-      color: rgba(255,255,255,.86);
+      color: rgba(24,68,64,.88);
     }
     .title{ font-size: 26px; line-height: 1.15; margin:0; letter-spacing: -0.2px; }
-    .title strong{ color: rgba(255,255,255,.98); }
+    .title strong{ color: var(--accent-700); }
     .sub{ margin:0; font-size: 14px; line-height:1.5; color: var(--muted); white-space: pre-line; }
     .stat{
       padding: 14px 14px;
       border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.90));
+      border:1px solid rgba(0,177,79,.22);
     }
     .stat .label{ font-size: 12px; letter-spacing:.3px; text-transform: uppercase; color: var(--muted2); }
     .stat .value{ margin-top:8px; font-size: 34px; line-height: 1.1; font-weight: 800; letter-spacing: -0.6px; }
@@ -163,14 +160,14 @@
 
     /* Persona (special) */
     .stage.is-persona{
-      border-color: rgba(0,177,79,.42);
-      box-shadow: 0 18px 70px rgba(0,177,79,.20), var(--shadow);
+      border-color: rgba(0,177,79,.34);
+      box-shadow: 0 18px 52px rgba(0,177,79,.14), var(--shadow);
     }
     .stage.is-persona .bgfx{
       background:
-        radial-gradient(620px 420px at 18% 18%, rgba(0,177,79,.30), transparent 60%),
-        radial-gradient(560px 380px at 88% 30%, rgba(255,217,51,.22), transparent 62%),
-        radial-gradient(700px 520px at 55% 115%, rgba(0,128,74,.22), transparent 60%);
+        radial-gradient(760px 520px at 16% 18%, rgba(0,177,79,.22), transparent 62%),
+        radial-gradient(720px 520px at 88% 22%, rgba(255,217,51,.18), transparent 66%),
+        radial-gradient(820px 620px at 55% 118%, rgba(23,181,166,.14), transparent 70%);
       opacity: 1;
     }
     .personaWrap{
@@ -178,11 +175,11 @@
       padding: 14px 14px 12px;
       border-radius: 16px;
       background:
-        radial-gradient(420px 180px at 20% 0%, rgba(0,177,79,.22), transparent 60%),
-        radial-gradient(420px 180px at 85% 10%, rgba(255,217,51,.16), transparent 58%),
-        linear-gradient(180deg, rgba(0,177,79,.14), rgba(0,0,0,.10));
-      border: 1px solid rgba(0,177,79,.32);
-      box-shadow: 0 14px 40px rgba(0,177,79,.14);
+        radial-gradient(420px 220px at 16% 0%, rgba(0,177,79,.14), transparent 62%),
+        radial-gradient(420px 220px at 92% 10%, rgba(255,217,51,.14), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.92));
+      border: 1px solid rgba(0,177,79,.22);
+      box-shadow: 0 14px 34px rgba(24,68,64,.10);
       overflow: hidden;
     }
     .personaWrap:before{
@@ -209,9 +206,9 @@
       gap:8px;
       padding: 8px 10px;
       border-radius: 999px;
-      background: rgba(0,177,79,.14);
-      border: 1px solid rgba(0,177,79,.34);
-      color: rgba(255,255,255,.92);
+      background: rgba(0,177,79,1);
+      border: 1px solid rgba(0,128,74,.30);
+      color: #fff;
       font-size: 12px;
       font-weight: 800;
       letter-spacing:.2px;
@@ -232,9 +229,9 @@
       gap:8px;
       padding: 7px 10px;
       border-radius: 999px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.12);
-      color: rgba(255,255,255,.84);
+      background: rgba(255,249,192,.95);
+      border: 1px solid rgba(255,217,51,.40);
+      color: rgba(24,68,64,.86);
       font-size: 12px;
       white-space:nowrap;
     }
@@ -245,8 +242,8 @@
       font-weight: 900;
       letter-spacing: -0.8px;
       margin: 2px 0 8px;
-      color: rgba(255,255,255,.98);
-      text-shadow: 0 14px 40px rgba(0,177,79,.18);
+      color: rgba(24,68,64,.98);
+      text-shadow: 0 14px 34px rgba(0,177,79,.12);
     }
     .personaName .g{
       color: var(--accent);
@@ -255,7 +252,7 @@
       position: relative;
       font-size: 13px;
       line-height: 1.45;
-      color: rgba(255,255,255,.84);
+      color: rgba(24,68,64,.82);
     }
     .personaLine b{ color: var(--accent2); }
     .foot{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; }
@@ -263,11 +260,11 @@
     .cta{
       font-size: 12px;
       font-weight: 700;
-      color: rgba(255,255,255,.92);
+      color: #fff;
       padding:10px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.14);
+      border: 1px solid rgba(0,128,74,.20);
+      background: linear-gradient(180deg, rgba(0,177,79,1), rgba(0,128,74,1));
       user-select:none;
       white-space:nowrap;
     }
