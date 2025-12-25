@@ -2,29 +2,21 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
     <title>Nhìn lại Grab 2025</title>
     <style>
       :root {
-        --bg1: #bff2cf;
-        --bg2: #f7f5df;
+        --bg1: #c9f3d7;
+        --bg2: #f6f4e2;
         --bg3: #e9f0ff;
-        --card: rgba(255, 255, 255, 0.74);
-        --card-border: rgba(22, 163, 74, 0.16);
+        --card: rgba(255, 255, 255, 0.92);
+        --card-border: rgba(22, 163, 74, 0.12);
         --text: #0f172a;
         --muted: rgba(15, 23, 42, 0.62);
         --green: #16a34a;
-        --green-700: #0f7a37;
-        --shadow: 0 24px 64px rgba(2, 6, 23, 0.12);
+        --shadow: 0 12px 28px rgba(2, 6, 23, 0.1);
         --radius: 22px;
-        --safe-top: env(safe-area-inset-top, 0px);
-        --safe-right: env(safe-area-inset-right, 0px);
-        --safe-bottom: env(safe-area-inset-bottom, 0px);
-        --safe-left: env(safe-area-inset-left, 0px);
       }
 
       * {
@@ -54,9 +46,17 @@
       }
 
       .viewport {
-        height: 100%;
-        padding: calc(14px + var(--safe-top)) calc(14px + var(--safe-right))
-          calc(14px + var(--safe-bottom)) calc(14px + var(--safe-left));
+        height: 100vh;
+        height: 100dvh;
+        padding: 14px;
+        padding-top: calc(14px + constant(safe-area-inset-top));
+        padding-top: calc(14px + env(safe-area-inset-top));
+        padding-right: calc(14px + constant(safe-area-inset-right));
+        padding-right: calc(14px + env(safe-area-inset-right));
+        padding-bottom: calc(14px + constant(safe-area-inset-bottom));
+        padding-bottom: calc(14px + env(safe-area-inset-bottom));
+        padding-left: calc(14px + constant(safe-area-inset-left));
+        padding-left: calc(14px + env(safe-area-inset-left));
       }
 
       .story {
@@ -65,44 +65,41 @@
         overflow-x: auto;
         overflow-y: hidden;
         scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
+        scroll-snap-stop: always;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        gap: 16px;
-        padding-bottom: 2px;
+        -ms-overflow-style: none;
       }
       .story::-webkit-scrollbar {
         display: none;
       }
 
       .slide {
-        flex: 0 0 calc(100% - 0px);
+        flex: 0 0 100%;
+        min-width: 100%;
         height: 100%;
         scroll-snap-align: start;
         position: relative;
+        transform: translateZ(0);
       }
 
       .card {
         height: 100%;
         border-radius: var(--radius);
-        background: radial-gradient(
-            1200px 400px at 40% 10%,
-            rgba(22, 163, 74, 0.12),
-            transparent 60%
-          ),
-          radial-gradient(900px 520px at 70% 25%, rgba(59, 130, 246, 0.08), transparent 62%),
-          var(--card);
+        background: var(--card);
         border: 1px solid var(--card-border);
         box-shadow: var(--shadow);
         overflow: hidden;
+        display: flex;
       }
 
       .chrome {
-        position: absolute;
-        inset: 14px;
+        flex: 1;
         display: flex;
         flex-direction: column;
         gap: 14px;
+        padding: 14px;
+        min-height: 0;
       }
 
       .topbar {
@@ -118,13 +115,12 @@
         gap: 8px;
         padding: 9px 12px;
         border-radius: 999px;
-        background: rgba(255, 255, 255, 0.72);
+        background: rgba(255, 255, 255, 0.92);
         border: 1px solid rgba(15, 23, 42, 0.08);
         color: rgba(15, 23, 42, 0.78);
         font-weight: 600;
         font-size: 13px;
         line-height: 1;
-        backdrop-filter: blur(8px);
       }
 
       .pill .dot {
@@ -148,7 +144,6 @@
         font-weight: 800;
         font-size: 13px;
         gap: 8px;
-        backdrop-filter: blur(8px);
       }
 
       .year {
@@ -169,6 +164,8 @@
         flex: 1;
         min-height: 0;
         padding: 10px 6px 0 6px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .title {
@@ -214,10 +211,9 @@
         gap: 12px;
         align-items: start;
         padding: 12px 12px;
-        background: rgba(255, 255, 255, 0.62);
+        background: rgba(255, 255, 255, 0.92);
         border: 1px solid rgba(15, 23, 42, 0.08);
         border-radius: 16px;
-        backdrop-filter: blur(10px);
       }
 
       .emoji {
@@ -526,116 +522,122 @@
 
     <script>
       (function () {
-        const story = document.getElementById("story");
-        const shareStatus = document.getElementById("shareStatus");
-        const slides = Array.from(story.querySelectorAll(".slide"));
+        var story = document.getElementById("story");
+        var shareStatus = document.getElementById("shareStatus");
+        var slides = story ? story.getElementsByClassName("slide") : [];
+
+        function trim(s) {
+          return String(s || "").replace(/^\s+|\s+$/g, "");
+        }
+
+        function textOf(selector, fallback) {
+          var el = document.querySelector(selector);
+          if (!el) return fallback;
+          var t = trim(el.textContent);
+          return t || fallback;
+        }
 
         function clamp(n, min, max) {
           return Math.max(min, Math.min(max, n));
         }
 
         function getCurrentIndex() {
-          const x = story.scrollLeft;
-          const w = story.clientWidth + 16; // includes gap
-          return clamp(Math.round(x / w), 0, slides.length - 1);
+          var w = story.clientWidth || 1;
+          var idx = Math.round((story.scrollLeft || 0) / w);
+          return clamp(idx, 0, slides.length - 1);
         }
 
         function scrollToIndex(idx) {
-          const w = story.clientWidth + 16;
-          story.scrollTo({ left: idx * w, behavior: "smooth" });
+          var w = story.clientWidth || 1;
+          var x = clamp(idx, 0, slides.length - 1) * w;
+          try {
+            if (typeof story.scrollTo === "function") {
+              story.scrollTo(x, 0);
+            } else {
+              story.scrollLeft = x;
+            }
+          } catch (e) {
+            story.scrollLeft = x;
+          }
         }
 
         function buildShareText() {
-          const name = document.querySelector('[data-var="partner_name"]')?.textContent?.trim() || "Đối tác";
-          const bike = document.querySelector('[data-var="grab_bike_trips"]')?.textContent?.trim() || "";
-          const food = document
-            .querySelector('[data-var="grab_food_mart_trips"]')
-            ?.textContent?.trim() || "";
-          const express = document.querySelector('[data-var="grab_express_trips"]')?.textContent?.trim() || "";
-          const stars = document.querySelector('[data-var="five_star_count"]')?.textContent?.trim() || "";
-          const cancel = document.querySelector('[data-var="cancel_rate"]')?.textContent?.trim() || "";
+          var name = textOf('[data-var="partner_name"]', "Đối tác");
+          var bike = textOf('[data-var="grab_bike_trips"]', "");
+          var food = textOf('[data-var="grab_food_mart_trips"]', "");
+          var express = textOf('[data-var="grab_express_trips"]', "");
+          var stars = textOf('[data-var="five_star_count"]', "");
+          var cancel = textOf('[data-var="cancel_rate"]', "");
 
           return [
-            `Nhìn lại Grab 2025`,
-            `Đối tác ${name} thân mến 💚`,
-            ``,
-            `🛵 ${bike} chuyến GrabBike`,
-            `🍜🛒 ${food} chuyến GrabFood & GrabMart`,
-            `📦 ${express} chuyến GrabExpress`,
-            ``,
-            `⭐ ${stars} đánh giá 5 sao`,
-            `❌ Tỷ lệ hủy: ${cancel}`,
+            "Nhìn lại Grab 2025",
+            "Đối tác " + name + " thân mến 💚",
+            "",
+            "🛵 " + bike + " chuyến GrabBike",
+            "🍜🛒 " + food + " chuyến GrabFood & GrabMart",
+            "📦 " + express + " chuyến GrabExpress",
+            "",
+            "⭐ " + stars + " đánh giá 5 sao",
+            "❌ Tỷ lệ hủy: " + cancel
           ].join("\n");
         }
 
-        async function share() {
-          const payload = {
-            type: "GRAB_LOOKBACK_2025_SHARE",
-            text: buildShareText(),
-          };
-
-          // RN WebView
-          if (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage === "function") {
-            window.ReactNativeWebView.postMessage(JSON.stringify(payload));
-            shareStatus.textContent = "Đã gửi yêu cầu chia sẻ.";
-            return;
-          }
-
-          // iOS WKWebView bridge (common naming patterns)
-          const handler =
-            window.webkit?.messageHandlers?.share ||
-            window.webkit?.messageHandlers?.grab ||
-            window.webkit?.messageHandlers?.native;
-          if (handler && typeof handler.postMessage === "function") {
-            handler.postMessage(payload);
-            shareStatus.textContent = "Đã gửi yêu cầu chia sẻ.";
-            return;
-          }
-
-          // Web Share API fallback
-          if (navigator.share) {
-            try {
-              await navigator.share({ text: payload.text, title: "Nhìn lại Grab 2025" });
-              shareStatus.textContent = "Đã mở chia sẻ.";
-              return;
-            } catch (e) {
-              // user cancelled -> silent
-            }
-          }
-
-          // Clipboard fallback
+        function copyToClipboard(text) {
           try {
-            await navigator.clipboard.writeText(payload.text);
-            shareStatus.textContent = "Đã sao chép nội dung để chia sẻ.";
+            var ta = document.createElement("textarea");
+            ta.value = text;
+            ta.setAttribute("readonly", "readonly");
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            ta.style.top = "0";
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            var ok = document.execCommand && document.execCommand("copy");
+            document.body.removeChild(ta);
+            return !!ok;
           } catch (e) {
-            shareStatus.textContent = "Không thể chia sẻ tự động trên thiết bị này.";
+            return false;
           }
         }
 
-        story.addEventListener(
-          "click",
-          function (e) {
-            const btn = e.target.closest("[data-action]");
-            if (!btn) return;
-            const action = btn.getAttribute("data-action");
-            if (action === "next") scrollToIndex(getCurrentIndex() + 1);
-            if (action === "share") share();
-          },
-          { passive: true }
-        );
+        function share() {
+          var payload = { type: "GRAB_LOOKBACK_2025_SHARE", text: buildShareText() };
 
-        // Improve snapping accuracy on some WebViews
-        let snapTimer = null;
-        story.addEventListener(
-          "scroll",
-          function () {
-            clearTimeout(snapTimer);
-            snapTimer = setTimeout(function () {
-              scrollToIndex(getCurrentIndex());
-            }, 120);
-          },
-          { passive: true }
-        );
+          // RN WebView
+          try {
+            if (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage === "function") {
+              window.ReactNativeWebView.postMessage(JSON.stringify(payload));
+              if (shareStatus) shareStatus.textContent = "Đã gửi yêu cầu chia sẻ.";
+              return;
+            }
+          } catch (e) {}
+
+          // iOS WKWebView bridge
+          try {
+            var mh = window.webkit && window.webkit.messageHandlers;
+            var handler = (mh && (mh.share || mh.grab || mh.native)) || null;
+            if (handler && typeof handler.postMessage === "function") {
+              handler.postMessage(payload);
+              if (shareStatus) shareStatus.textContent = "Đã gửi yêu cầu chia sẻ.";
+              return;
+            }
+          } catch (e) {}
+
+          // Clipboard fallback
+          var ok = copyToClipboard(payload.text);
+          if (shareStatus) shareStatus.textContent = ok ? "Đã sao chép nội dung để chia sẻ." : "Không thể tự động chia sẻ.";
+        }
+
+        if (!story) return;
+        story.onclick = function (e) {
+          var t = e.target;
+          while (t && t !== story && !t.getAttribute("data-action")) t = t.parentNode;
+          if (!t || t === story) return;
+          var action = t.getAttribute("data-action");
+          if (action === "next") scrollToIndex(getCurrentIndex() + 1);
+          if (action === "share") share();
+        };
       })();
     </script>
   </body>
