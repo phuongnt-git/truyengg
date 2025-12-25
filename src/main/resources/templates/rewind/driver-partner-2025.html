@@ -374,7 +374,27 @@
 
   <div class="stage" id="stage" role="group" aria-label="Rewind story">
     <div class="bgfx" aria-hidden="true"></div>
-    <div class="content" id="content"></div>
+    <!-- Fallback content (in case JS is blocked in some Android WebViews) -->
+    <div class="content" id="content">
+      <div class="kicker">
+        <span class="tag"><span aria-hidden="true">✦</span> <b>Mở đầu</b></span>
+        <span class="badge">2025</span>
+      </div>
+      <div>
+        <h1 class="title">
+          Đối tác <strong th:text="${driverName}">Đối tác</strong> thân mến 💚
+        </h1>
+        <p class="sub">
+          Năm 2025 vừa khép lại, Đối tác có tò mò rằng bản thân đã hoạt động như thế nào trong năm qua không? Hãy cùng Grab nhìn lại tại đây nhé:
+
+          👉 Số lượng chuyến xe Đối tác hoàn thành theo loại dịch vụ:
+        </p>
+      </div>
+      <div class="foot">
+        <div class="note">Nếu thiết bị chặn JavaScript, story sẽ không tự chuyển.</div>
+        <div class="cta">Bắt đầu</div>
+      </div>
+    </div>
     <div class="tapzones" aria-hidden="true">
       <div class="zone" id="zonePrev" title="Trước"></div>
       <div class="zone" id="zoneNext" title="Tiếp"></div>
@@ -386,6 +406,17 @@
 <script th:inline="javascript">
   (function () {
     "use strict";
+
+    // Show JS errors early (helps Android webview debugging)
+    window.onerror = function (msg, url, line, col) {
+      try {
+        var t = document.getElementById("toast");
+        var tt = document.getElementById("toastText");
+        if (tt) tt.textContent = "Lỗi: " + String(msg || "Unknown") + " @" + String(line || 0) + ":" + String(col || 0);
+        if (t && t.classList) t.classList.add("show");
+      } catch (e) { /* ignore */ }
+      return false;
+    };
 
     // ===== Compatibility (older Android WebView / iOS WKWebView) =====
     if (!Date.now) Date.now = function () { return new Date().getTime(); };
@@ -625,7 +656,7 @@
     }
 
     function renderSlide(i) {
-      var s = slides[i];
+      var s = slides[i] || {};
       toggleClass(elStage, "is-persona", !!(s && s.key === "persona"));
       var tagText = (s && s.tag != null) ? escapeHtml(s.tag) : "";
       var kickerHtml =
@@ -634,7 +665,7 @@
         "<span class='badge'>2025</span>" +
         "</div>";
 
-      var titleHtml = "<h1 class='title fadeIn' style='animation-delay:60ms'>" + tpl(s.title) + "</h1>";
+      var titleHtml = "<h1 class='title fadeIn' style='animation-delay:60ms'>" + tpl(s.title || "") + "</h1>";
       var bodyHtml = s.body ? ("<p class='sub fadeIn' style='animation-delay:110ms'>" + tpl(s.body) + "</p>") : "";
 
       var statHtml = "";
@@ -701,6 +732,10 @@
     }
 
     function tick() {
+      if (!segEls || !segEls.length || !segEls[idx]) {
+        rafId = window.requestAnimationFrame(tick);
+        return;
+      }
       for (var i = 0; i < segEls.length; i++) {
         if (i < idx) segEls[i].style.width = "100%";
         else if (i > idx) segEls[i].style.width = "0%";
