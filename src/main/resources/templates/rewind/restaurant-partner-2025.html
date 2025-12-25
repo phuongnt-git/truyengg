@@ -246,17 +246,9 @@
       };
     }
 
-    var supportsPassive = false;
-    try {
-      var passiveTest = Object.defineProperty({}, "passive", {
-        get: function () { supportsPassive = true; }
-      });
-      window.addEventListener("testPassive", function () {}, passiveTest);
-      window.removeEventListener("testPassive", function () {}, passiveTest);
-    } catch (e) { /* ignore */ }
-
-    var OPT_PASSIVE_TRUE = supportsPassive ? { passive: true } : false;
-    var OPT_PASSIVE_FALSE = supportsPassive ? { passive: false } : false;
+    // Always avoid options objects for max compatibility
+    var OPT_PASSIVE_TRUE = false;
+    var OPT_PASSIVE_FALSE = false;
 
     function addEvt(el, type, handler, options) {
       if (!el) return;
@@ -270,6 +262,13 @@
           el["on" + type] = handler;
         }
       }
+    }
+
+    function prevent(e) {
+      e = e || window.event;
+      if (!e) return;
+      if (e.preventDefault) e.preventDefault();
+      e.returnValue = false;
     }
 
     var SLIDE_DURATION_MS = 6000;
@@ -460,7 +459,7 @@
       var ctaBtn = document.getElementById("ctaBtn");
       if (ctaBtn) {
         addEvt(ctaBtn, "click", function (e) {
-          e.preventDefault();
+          prevent(e);
           next();
         }, false);
       }
@@ -523,8 +522,8 @@
     }
 
     // Tap left/right
-    addEvt(elPrev, "click", function (e) { e.preventDefault(); prev(); }, false);
-    addEvt(elNext, "click", function (e) { e.preventDefault(); next(); }, false);
+    addEvt(elPrev, "click", function (e) { prevent(e); prev(); }, false);
+    addEvt(elNext, "click", function (e) { prevent(e); next(); }, false);
 
     // Hold to pause
     function bindHold(el){
@@ -541,16 +540,25 @@
     var lastTouch = 0;
     addEvt(document, "touchend", function (e) {
       var now = Date.now();
-      if (now - lastTouch <= 250) e.preventDefault();
+      if (now - lastTouch <= 250) prevent(e);
       lastTouch = now;
     }, OPT_PASSIVE_FALSE);
 
     // Keyboard (debug)
     addEvt(document, "keydown", function (e) {
+      e = e || window.event;
       if (e.key === "ArrowRight") next();
       if (e.key === "ArrowLeft") prev();
       if (e.key === " ") { paused ? resume() : pause(); }
     }, false);
+
+    // Show JS errors in toast (helps Android webview debugging)
+    window.onerror = function (msg, url, line, col) {
+      try {
+        showToast("Lỗi: " + String(msg || "Unknown") + " @" + String(line || 0) + ":" + String(col || 0));
+      } catch (e) { /* ignore */ }
+      return false;
+    };
 
     renderSlide(idx);
     tick();
