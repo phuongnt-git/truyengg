@@ -44,6 +44,7 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/**", "/auth/**", "/", "/api/comics/**", "/api/chapters/**",
                 "/api/categories/**", "/api/search/**", "/swagger-ui/**", "/v3/api-docs/**",
                 "/webjars/**", "/css/**", "/js/**", "/img/**", "/fonts/**",
+                "/rewind/**",
                 "/ws/**", "/ws").permitAll() // WebSocket endpoints
             .requestMatchers("/jobrunr/**").hasRole("ADMIN") // JobRunr dashboard requires ADMIN role
             .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")

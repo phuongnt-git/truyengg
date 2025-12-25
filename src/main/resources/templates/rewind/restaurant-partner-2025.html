@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="format-detection" content="telephone=no,date=no,address=no,email=no"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>Rewind Đối tác Nhà hàng 2025</title>
+  <style>
+    :root{
+      --bg0:#0b1020;
+      --bg1:#1a0f2e;
+      --bg2:#0d2b2a;
+      --card:rgba(255,255,255,.08);
+      --card2:rgba(255,255,255,.06);
+      --text:rgba(255,255,255,.94);
+      --muted:rgba(255,255,255,.72);
+      --muted2:rgba(255,255,255,.56);
+      --line:rgba(255,255,255,.14);
+      --accent:#7cf7d2;
+      --accent2:#ffcf66;
+      --danger:#ff6b6b;
+      --shadow: 0 18px 60px rgba(0,0,0,.42);
+      --radius: 18px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--font);
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 20% 15%, rgba(124,247,210,.18), transparent 50%),
+      radial-gradient(900px 700px at 85% 20%, rgba(255,207,102,.18), transparent 48%),
+      radial-gradient(900px 700px at 50% 80%, rgba(160,120,255,.16), transparent 55%),
+      linear-gradient(160deg, var(--bg0), var(--bg1) 50%, var(--bg2));
+      overflow:hidden;
+    }
+    .wrap{
+      height:100%;
+      padding: calc(12px + var(--safe-top)) calc(14px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(14px + var(--safe-left));
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .topbar{ display:flex; flex-direction:column; gap:10px; }
+    .progress{ display:flex; gap:6px; width:100%; align-items:center; }
+    .seg{ position:relative; flex:1; height:3px; border-radius:999px; background: rgba(255,255,255,.18); overflow:hidden; }
+    .seg > i{
+      position:absolute; left:0; top:0; bottom:0;
+      width:0%;
+      background: rgba(255,255,255,.92);
+      border-radius:999px;
+      transform: translateZ(0);
+    }
+    .meta{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.09);
+      border:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(124,247,210,.15);
+    }
+    .brand{ font-weight: 700; letter-spacing: .2px; font-size: 13px; color: rgba(255,255,255,.92); }
+    .hint{ font-size: 12px; color: var(--muted2); user-select:none; white-space:nowrap; }
+    .stage{
+      position:relative;
+      flex:1;
+      border-radius: calc(var(--radius) + 8px);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+    }
+    .bgfx{
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(540px 340px at 10% 20%, rgba(124,247,210,.22), transparent 55%),
+        radial-gradient(540px 340px at 90% 35%, rgba(255,207,102,.20), transparent 58%),
+        radial-gradient(520px 420px at 50% 110%, rgba(160,120,255,.18), transparent 55%);
+      filter: saturate(1.2);
+      opacity: .9;
+      pointer-events:none;
+    }
+    .content{
+      position:relative;
+      width:100%;
+      padding: 22px 18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .kicker{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.14);
+      color: rgba(255,255,255,.92);
+      font-size: 12px;
+      letter-spacing:.2px;
+    }
+    .tag b{ color: var(--accent2); }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      font-size: 12px;
+      color: rgba(255,255,255,.86);
+    }
+    .title{ font-size: 26px; line-height: 1.15; margin:0; letter-spacing: -0.2px; }
+    .title strong{ color: rgba(255,255,255,.98); }
+    .sub{ margin:0; font-size: 14px; line-height:1.5; color: var(--muted); white-space: pre-line; }
+    .stat{
+      padding: 14px 14px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .stat .label{ font-size: 12px; letter-spacing:.3px; text-transform: uppercase; color: var(--muted2); }
+    .stat .value{ margin-top:8px; font-size: 34px; line-height: 1.1; font-weight: 800; letter-spacing: -0.6px; }
+    .value .hl{ color: var(--accent); }
+    .value .hl2{ color: var(--accent2); }
+    .foot{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; }
+    .note{ font-size: 12px; color: var(--muted2); line-height:1.35; max-width: 80%; }
+    .cta{
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,.92);
+      padding:10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.14);
+      user-select:none;
+      white-space:nowrap;
+    }
+    .cta:active{ transform: scale(.98); }
+    .tapzones{ position:absolute; inset:0; display:flex; z-index: 5; }
+    .zone{ flex:1; cursor:pointer; }
+    .zone:active{ background: rgba(255,255,255,.03); }
+    .toast{
+      position:absolute;
+      left:12px;
+      right:12px;
+      bottom: calc(12px + var(--safe-bottom));
+      z-index: 6;
+      display:flex;
+      justify-content:center;
+      pointer-events:none;
+      opacity:0;
+      transform: translateY(8px);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .toast > div{
+      max-width: 520px;
+      padding:10px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.40);
+      border:1px solid rgba(255,255,255,.14);
+      color: rgba(255,255,255,.88);
+      font-size: 12px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .toast.show{ opacity:1; transform: translateY(0); }
+    .fadeIn{ animation: fadeInUp .38s ease both; }
+    @keyframes fadeInUp{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .fadeIn{ animation:none; }
+      .toast{ transition:none; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="progress" id="progress"></div>
+    <div class="meta">
+      <div class="pill" aria-label="Dự án">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="brand">Rewind Đối tác Nhà hàng 2025</span>
+      </div>
+      <div class="hint" id="hint">Chạm để chuyển • Nhấn giữ để tạm dừng</div>
+    </div>
+  </div>
+
+  <div class="stage" id="stage" role="group" aria-label="Rewind story">
+    <div class="bgfx" aria-hidden="true"></div>
+    <div class="content" id="content"></div>
+    <div class="tapzones" aria-hidden="true">
+      <div class="zone" id="zonePrev" title="Trước"></div>
+      <div class="zone" id="zoneNext" title="Tiếp"></div>
+    </div>
+    <div class="toast" id="toast"><div id="toastText"></div></div>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  (function () {
+    "use strict";
+
+    var SLIDE_DURATION_MS = 6000;
+    var HOLD_TO_PAUSE = true;
+
+    var DATA = {
+      merchant_name: /*[[${merchantName}]]*/ "Cửa hàng của bạn",
+      province: /*[[${province}]]*/ "Việt Nam",
+      item_quantity: /*[[${itemQuantity}]]*/ "0",
+      item_name: /*[[${itemName}]]*/ "Sản phẩm bán chạy",
+      campaign_name: /*[[${campaignName}]]*/ "Chiến dịch nổi bật",
+      fastest_growth_month: /*[[${fastestGrowthMonth}]]*/ "Tháng 1",
+      time: /*[[${peakTime}]]*/ "19:00 - 20:00"
+    };
+
+    function escapeHtml(str) {
+      return String(str == null ? "" : str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function tpl(html) {
+      return String(html).replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, function (_, key) {
+        return escapeHtml(DATA[key]);
+      });
+    }
+
+    var slides = [
+      {
+        key: "intro",
+        tag: "Mở đầu",
+        title: "Cửa hàng <strong>{{merchant_name}}</strong> ơi,",
+        body:
+          "2025 là một năm bận rộn tại Cửa hàng đấy! Mỗi cột mốc đều kể lại hành trình rất riêng, đều là dấu ấn của sự bền bỉ và tăng trưởng không ngừng trong năm.\n\nCùng nhìn lại một năm đáng nhớ nhé 👇",
+        statLabel: null,
+        statValue: null,
+        note: "Tip: Chạm bên phải để next, bên trái để quay lại.",
+        cta: "Bắt đầu"
+      },
+      {
+        key: "naming",
+        tag: "Danh xưng",
+        title: "Cửa hàng xịn mới nhập hội",
+        body: "tại <strong>{{province}}</strong>",
+        statLabel: "Merchant naming",
+        statValue: "<span class='hl2'>{{province}}</span>",
+        note: "Chào mừng bạn đến với Rewind 2025.",
+        cta: "Tiếp"
+      },
+      {
+        key: "total_items",
+        tag: "Rewind 01",
+        title: "Tổng số sản phẩm bán ra trong năm",
+        body: "Đã có",
+        statLabel: "Sản phẩm đã bán",
+        statValue: "<span class='hl'>{{item_quantity}}</span> sản phẩm",
+        note: "tại Cửa hàng đã được trao đến Người dùng trong năm qua",
+        cta: "Tiếp"
+      },
+      {
+        key: "best_item",
+        tag: "Rewind 02",
+        title: "\"Nàng thơ\" của Cửa hàng",
+        body: "",
+        statLabel: "Sản phẩm bán chạy nhất",
+        statValue: "<span class='hl2'>{{item_name}}</span>",
+        note: "chính là sản phẩm gây thương nhớ nhất và được Người dùng đặt nhiều nhất năm qua",
+        cta: "Tiếp"
+      },
+      {
+        key: "best_campaign",
+        tag: "Rewind 03",
+        title: "Chiến dịch mang lại nhiều đơn nhất",
+        body: "Chiến dịch",
+        statLabel: "Top campaign",
+        statValue: "<span class='hl'>{{campaign_name}}</span>",
+        note: "đã góp 1 phần giúp Cửa hàng \"lên hương\" và thu hút về nhiều đơn hàng",
+        cta: "Tiếp"
+      },
+      {
+        key: "fastest_month",
+        tag: "Rewind 04",
+        title: "Tháng tăng trưởng nhanh nhất trong năm",
+        body: "Tháng bứt tốc của Cửa hàng là",
+        statLabel: "Tháng tăng trưởng nhanh nhất",
+        statValue: "<span class='hl2'>{{fastest_growth_month}}</span>",
+        note: "Giữ nhịp tăng trưởng này để 2026 còn rực rỡ hơn nhé!",
+        cta: "Tiếp"
+      },
+      {
+        key: "peak_time",
+        tag: "Rewind 05",
+        title: "Khung giờ nhiều đơn nhất",
+        body: "Giờ vàng Cửa hàng nổ đơn là",
+        statLabel: "Giờ vàng",
+        statValue: "<span class='hl'>{{time}}</span>",
+        note: "Đối tác hãy ghi sổ lại khung giờ này để có chuẩn bị vận hành thật tốt và đón đơn về nhé!",
+        cta: "Tiếp"
+      },
+      {
+        key: "end",
+        tag: "Kết",
+        title: "Cảm ơn <strong>{{merchant_name}}</strong>!",
+        body:
+          "Một năm bền bỉ đã qua — và hành trình vẫn đang tiếp tục.\n\nChúc Cửa hàng 2026 bùng nổ đơn đều, vận hành mượt và tăng trưởng mạnh.",
+        statLabel: "Hẹn gặp lại",
+        statValue: "<span class='hl2'>Rewind 2026</span>",
+        note: "Bạn có thể đóng story tại đây.",
+        cta: "Xong"
+      }
+    ];
+
+    // ===== State =====
+    var idx = 0;
+    var startedAt = Date.now();
+    var paused = false;
+    var pauseStartedAt = 0;
+    var pausedAccum = 0;
+    var rafId = 0;
+    var toastT = 0;
+
+    // ===== DOM =====
+    var elProgress = document.getElementById("progress");
+    var elContent = document.getElementById("content");
+    var elStage = document.getElementById("stage");
+    var elPrev = document.getElementById("zonePrev");
+    var elNext = document.getElementById("zoneNext");
+    var elToast = document.getElementById("toast");
+    var elToastText = document.getElementById("toastText");
+
+    // Build progress segments
+    var segEls = [];
+    (function buildProgress() {
+      elProgress.innerHTML = "";
+      segEls = [];
+      for (var i = 0; i < slides.length; i++) {
+        var seg = document.createElement("div");
+        seg.className = "seg";
+        var fill = document.createElement("i");
+        seg.appendChild(fill);
+        elProgress.appendChild(seg);
+        segEls.push(fill);
+      }
+    })();
+
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+    function showToast(msg) {
+      window.clearTimeout(toastT);
+      elToastText.textContent = msg;
+      elToast.classList.add("show");
+      toastT = window.setTimeout(function () {
+        elToast.classList.remove("show");
+      }, 900);
+    }
+
+    function renderSlide(i) {
+      var s = slides[i];
+      var kickerHtml =
+        "<div class='kicker fadeIn'>" +
+        "<span class='tag'><span aria-hidden='true'>✦</span> <b>" + escapeHtml(s.tag) + "</b></span>" +
+        "<span class='badge'>2025</span>" +
+        "</div>";
+
+      var titleHtml = "<h1 class='title fadeIn' style='animation-delay:60ms'>" + tpl(s.title) + "</h1>";
+      var bodyHtml = s.body ? ("<p class='sub fadeIn' style='animation-delay:110ms'>" + tpl(s.body) + "</p>") : "";
+
+      var statHtml = "";
+      if (s.statLabel && s.statValue) {
+        statHtml =
+          "<div class='stat fadeIn' style='animation-delay:160ms'>" +
+          "<div class='label'>" + escapeHtml(s.statLabel) + "</div>" +
+          "<div class='value'>" + tpl(s.statValue) + "</div>" +
+          "</div>";
+      }
+
+      var footHtml =
+        "<div class='foot fadeIn' style='animation-delay:210ms'>" +
+        "<div class='note'>" + tpl(s.note || "") + "</div>" +
+        "<div class='cta' id='ctaBtn'>" + escapeHtml(s.cta || "Tiếp") + "</div>" +
+        "</div>";
+
+      elContent.innerHTML = kickerHtml + "<div>" + titleHtml + bodyHtml + "</div>" + statHtml + footHtml;
+
+      var ctaBtn = document.getElementById("ctaBtn");
+      if (ctaBtn) {
+        ctaBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          next();
+        }, { passive: true });
+      }
+    }
+
+    function resetTimer() {
+      startedAt = Date.now();
+      pausedAccum = 0;
+      paused = false;
+      pauseStartedAt = 0;
+    }
+
+    function setIndex(nextIdx, reason) {
+      var newIdx = clamp(nextIdx, 0, slides.length - 1);
+      if (newIdx === idx) {
+        if (reason === "next" && idx === slides.length - 1) showToast("Đã tới slide cuối");
+        if (reason === "prev" && idx === 0) showToast("Đang ở slide đầu");
+        return;
+      }
+      idx = newIdx;
+      resetTimer();
+      renderSlide(idx);
+    }
+
+    function next(){ setIndex(idx + 1, "next"); }
+    function prev(){ setIndex(idx - 1, "prev"); }
+
+    function pause() {
+      if (!HOLD_TO_PAUSE) return;
+      if (paused) return;
+      paused = true;
+      pauseStartedAt = Date.now();
+    }
+
+    function resume() {
+      if (!HOLD_TO_PAUSE) return;
+      if (!paused) return;
+      paused = false;
+      pausedAccum += (Date.now() - pauseStartedAt);
+      pauseStartedAt = 0;
+    }
+
+    function tick() {
+      for (var i = 0; i < segEls.length; i++) {
+        if (i < idx) segEls[i].style.width = "100%";
+        else if (i > idx) segEls[i].style.width = "0%";
+      }
+
+      var now = Date.now();
+      var effectiveNow = paused ? pauseStartedAt : now;
+      var elapsed = effectiveNow - startedAt - pausedAccum;
+      var p = clamp(elapsed / SLIDE_DURATION_MS, 0, 1);
+      segEls[idx].style.width = (p * 100).toFixed(2) + "%";
+
+      if (!paused && p >= 1) {
+        if (idx < slides.length - 1) setIndex(idx + 1, "next");
+      }
+
+      rafId = window.requestAnimationFrame(tick);
+    }
+
+    // Tap left/right
+    elPrev.addEventListener("click", function (e) { e.preventDefault(); prev(); }, { passive: false });
+    elNext.addEventListener("click", function (e) { e.preventDefault(); next(); }, { passive: false });
+
+    // Hold to pause
+    function bindHold(el){
+      el.addEventListener("touchstart", function(){ pause(); }, { passive: true });
+      el.addEventListener("touchend", function(){ resume(); }, { passive: true });
+      el.addEventListener("touchcancel", function(){ resume(); }, { passive: true });
+      el.addEventListener("mousedown", function(){ pause(); });
+      el.addEventListener("mouseup", function(){ resume(); });
+      el.addEventListener("mouseleave", function(){ resume(); });
+    }
+    bindHold(elStage);
+
+    // Prevent double-tap zoom on iOS webviews
+    var lastTouch = 0;
+    document.addEventListener("touchend", function (e) {
+      var now = Date.now();
+      if (now - lastTouch <= 250) e.preventDefault();
+      lastTouch = now;
+    }, { passive: false });
+
+    // Keyboard (debug)
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === " ") { paused ? resume() : pause(); }
+    });
+
+    renderSlide(idx);
+    tick();
+  })();
+</script>
+</body>
+</html>
+
