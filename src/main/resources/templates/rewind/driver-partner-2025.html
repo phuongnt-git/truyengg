@@ -17,9 +17,15 @@
       --muted:rgba(255,255,255,.72);
       --muted2:rgba(255,255,255,.56);
       --line:rgba(255,255,255,.14);
-      --accent:#7cf7d2;
-      --accent2:#ffcf66;
-      --danger:#ff6b6b;
+      /* Brand palette (primary) */
+      --accent:#00B14F;         /* Default */
+      --accent-600:#00804A;     /* Bolder */
+      --accent-700:#005339;     /* Boldest */
+      --accent-soft:#B1EABA;    /* Soft */
+      --accent-softest:#D9FCDE; /* Softest */
+      --accent2:#FFD933;        /* Yellow default */
+      --accent2-soft:#FFEC8F;   /* Yellow soft */
+      --danger:#D42E1C;         /* Red default */
       --shadow: 0 18px 60px rgba(0,0,0,.42);
       --radius: 18px;
       --safe-top: env(safe-area-inset-top, 0px);
@@ -34,9 +40,9 @@
       margin:0;
       font-family: var(--font);
       color: var(--text);
-      background: radial-gradient(1200px 800px at 20% 15%, rgba(124,247,210,.18), transparent 50%),
-      radial-gradient(900px 700px at 85% 20%, rgba(255,207,102,.18), transparent 48%),
-      radial-gradient(900px 700px at 50% 80%, rgba(160,120,255,.16), transparent 55%),
+      background: radial-gradient(1200px 800px at 20% 15%, rgba(0,177,79,.18), transparent 52%),
+      radial-gradient(900px 700px at 85% 20%, rgba(255,217,51,.16), transparent 50%),
+      radial-gradient(900px 700px at 55% 85%, rgba(23,181,166,.14), transparent 55%),
       linear-gradient(160deg, var(--bg0), var(--bg1) 50%, var(--bg2));
       overflow:hidden;
     }
@@ -53,7 +59,7 @@
     .seg > i{
       position:absolute; left:0; top:0; bottom:0;
       width:0%;
-      background: rgba(255,255,255,.92);
+      background: linear-gradient(90deg, rgba(0,177,79,.95), rgba(0,177,79,.70));
       border-radius:999px;
       transform: translateZ(0);
     }
@@ -70,7 +76,7 @@
     .dot{
       width:8px; height:8px; border-radius:50%;
       background: var(--accent);
-      box-shadow: 0 0 0 6px rgba(124,247,210,.15);
+      box-shadow: 0 0 0 6px rgba(0,177,79,.18);
     }
     .brand{ font-weight: 700; letter-spacing: .2px; font-size: 13px; color: rgba(255,255,255,.92); }
     .hint{ font-size: 12px; color: var(--muted2); user-select:none; white-space:nowrap; }
@@ -87,9 +93,9 @@
     .bgfx{
       position:absolute; inset:-2px;
       background:
-        radial-gradient(540px 340px at 10% 20%, rgba(124,247,210,.22), transparent 55%),
-        radial-gradient(540px 340px at 90% 35%, rgba(255,207,102,.20), transparent 58%),
-        radial-gradient(520px 420px at 50% 110%, rgba(160,120,255,.18), transparent 55%);
+        radial-gradient(540px 340px at 10% 20%, rgba(0,177,79,.22), transparent 58%),
+        radial-gradient(540px 340px at 90% 35%, rgba(255,217,51,.18), transparent 60%),
+        radial-gradient(520px 420px at 50% 110%, rgba(23,181,166,.16), transparent 56%);
       filter: saturate(1.2);
       opacity: .9;
       pointer-events:none;
@@ -141,6 +147,104 @@
     .stat .value{ margin-top:8px; font-size: 34px; line-height: 1.1; font-weight: 800; letter-spacing: -0.6px; }
     .value .hl{ color: var(--accent); }
     .value .hl2{ color: var(--accent2); }
+
+    /* Persona (special) */
+    .stage.is-persona{
+      border-color: rgba(0,177,79,.42);
+      box-shadow: 0 18px 70px rgba(0,177,79,.20), var(--shadow);
+    }
+    .stage.is-persona .bgfx{
+      background:
+        radial-gradient(620px 420px at 18% 18%, rgba(0,177,79,.30), transparent 60%),
+        radial-gradient(560px 380px at 88% 30%, rgba(255,217,51,.22), transparent 62%),
+        radial-gradient(700px 520px at 55% 115%, rgba(0,128,74,.22), transparent 60%);
+      opacity: 1;
+    }
+    .personaWrap{
+      position: relative;
+      padding: 14px 14px 12px;
+      border-radius: 16px;
+      background:
+        radial-gradient(420px 180px at 20% 0%, rgba(0,177,79,.22), transparent 60%),
+        radial-gradient(420px 180px at 85% 10%, rgba(255,217,51,.16), transparent 58%),
+        linear-gradient(180deg, rgba(0,177,79,.14), rgba(0,0,0,.10));
+      border: 1px solid rgba(0,177,79,.32);
+      box-shadow: 0 14px 40px rgba(0,177,79,.14);
+      overflow: hidden;
+    }
+    .personaWrap:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(240px 240px at 10% 20%, rgba(0,177,79,.18), transparent 60%),
+        radial-gradient(220px 220px at 95% 35%, rgba(255,217,51,.14), transparent 62%);
+      pointer-events:none;
+      opacity:.95;
+    }
+    .personaTop{
+      position: relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .personaSeal{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(0,177,79,.14);
+      border: 1px solid rgba(0,177,79,.34);
+      color: rgba(255,255,255,.92);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+    .personaSeal i{
+      width: 18px;
+      height: 18px;
+      display:inline-grid;
+      place-items:center;
+      border-radius: 50%;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.12);
+      font-style: normal;
+    }
+    .personaChip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.84);
+      font-size: 12px;
+      white-space:nowrap;
+    }
+    .personaName{
+      position: relative;
+      font-size: 34px;
+      line-height: 1.05;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      margin: 2px 0 8px;
+      color: rgba(255,255,255,.98);
+      text-shadow: 0 14px 40px rgba(0,177,79,.18);
+    }
+    .personaName .g{
+      color: var(--accent);
+    }
+    .personaLine{
+      position: relative;
+      font-size: 13px;
+      line-height: 1.45;
+      color: rgba(255,255,255,.84);
+    }
+    .personaLine b{ color: var(--accent2); }
     .foot{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; }
     .note{ font-size: 12px; color: var(--muted2); line-height:1.35; max-width: 80%; }
     .cta{
@@ -300,11 +404,19 @@
       {
         key: "persona",
         tag: "Rewind 04",
-        title: "Đích thị Đối tác chính là:",
+        title: "Đối tác đích thị là…",
         body: "Với tần suất vận hành như vậy,",
         statLabel: "Danh xưng 2025",
-        statValue: "<span class='hl2'>Đại sứ an toàn</span>",
-        note: "vì mang lại sự an tâm trên mọi nẻo đường.",
+        statValue:
+          "<div class='personaWrap'>" +
+            "<div class='personaTop'>" +
+              "<span class='personaSeal'><i>✓</i> Rewind 2025</span>" +
+              "<span class='personaChip'>🏁 An toàn là số 1</span>" +
+            "</div>" +
+            "<div class='personaName'><span class='g'>Đại sứ</span> an toàn</div>" +
+            "<div class='personaLine'>vì mang lại sự an tâm <b>trên mọi nẻo đường</b></div>" +
+          "</div>",
+        note: "Slide đặc biệt của năm — xin được “đứng hình” 1 nhịp cho danh hiệu này.",
         cta: "Tiếp"
       },
       {
@@ -396,6 +508,8 @@
 
     function renderSlide(i) {
       var s = slides[i];
+      if (s && s.key === "persona") elStage.classList.add("is-persona");
+      else elStage.classList.remove("is-persona");
       var kickerHtml =
         "<div class='kicker fadeIn'>" +
         "<span class='tag'><span aria-hidden='true'>✦</span> <b>" + escapeHtml(s.tag) + "</b></span>" +
