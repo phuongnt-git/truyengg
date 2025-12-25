@@ -116,7 +116,7 @@
       padding: 22px 18px;
       display:flex;
       flex-direction:column;
-      justify-content:space-between;
+      justify-content:flex-start;
       gap:14px;
     }
     .kicker{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
@@ -157,6 +157,57 @@
     .stat .value{ margin-top:8px; font-size: 34px; line-height: 1.1; font-weight: 800; letter-spacing: -0.6px; }
     .value .hl{ color: var(--accent); }
     .value .hl2{ color: var(--accent2); }
+
+    /* Compact multi stats (3 rows) */
+    .multiStat{
+      margin-top: 8px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .msRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 10px;
+      border-radius: 14px;
+      background: rgba(217,252,222,.60);
+      border: 1px solid rgba(0,177,79,.18);
+    }
+    .msLeft{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width: 0;
+    }
+    .msName{
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(24,68,64,.92);
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .msDesc{
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(24,68,64,.72);
+    }
+    .msVal{
+      flex: 0 0 auto;
+      font-size: 20px;
+      line-height: 1.1;
+      font-weight: 900;
+      letter-spacing: -0.3px;
+      color: var(--accent-700);
+      white-space:nowrap;
+    }
+    .msVal i{
+      font-style: normal;
+      color: var(--accent);
+    }
 
     /* Persona (special) */
     .stage.is-persona{
@@ -255,7 +306,7 @@
       color: rgba(24,68,64,.82);
     }
     .personaLine b{ color: var(--accent2); }
-    .foot{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; }
+    .foot{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-top: 6px; }
     .note{ font-size: 12px; color: var(--muted2); line-height:1.35; max-width: 80%; }
     .cta{
       font-size: 12px;
@@ -382,40 +433,43 @@
         cta: "Bắt đầu"
       },
       {
-        key: "gb",
+        key: "rides",
         tag: "Rewind 01",
-        title: "GrabBike 🛵",
-        body: "Đối tác đã hoàn thành",
-        statLabel: "Số chuyến GrabBike",
-        statValue: "<span class='hl'>{{total_gbrides}}</span> chuyến xe",
-        note: "giúp nhiều Hành khách “đi đến nơi, về đến chốn”.",
-        cta: "Tiếp"
-      },
-      {
-        key: "gfm",
-        tag: "Rewind 02",
-        title: "GrabFood & GrabMart 🍜🛒",
-        body: "Đối tác đã hoàn thành",
-        statLabel: "Số chuyến GrabFood/GrabMart",
-        statValue: "<span class='hl2'>{{total_gfmrides}}</span> chuyến xe",
-        note: "giúp nhiều Người dùng nhận những món hàng thiết yếu, những bữa ăn vẹn tròn.",
-        cta: "Tiếp"
-      },
-      {
-        key: "ge",
-        tag: "Rewind 03",
-        title: "GrabExpress 📦",
-        body: "Đối tác đã hoàn thành",
-        statLabel: "Số chuyến GrabExpress",
-        statValue: "<span class='hl'>{{total_gerides}}</span> chuyến xe",
-        note: "để Người dùng nhận tận tay những kiện hàng kịp thời và đúng lúc.",
+        title: "Số lượng chuyến xe theo dịch vụ",
+        body: "Trong năm 2025, Đối tác đã hoàn thành:",
+        statLabel: "Tổng quan chuyến xe",
+        statValue:
+          "<div class='multiStat'>" +
+            "<div class='msRow'>" +
+              "<div class='msLeft'>" +
+                "<div class='msName'>GrabBike 🛵</div>" +
+                "<div class='msDesc'>giúp nhiều Hành khách “đi đến nơi, về đến chốn”.</div>" +
+              "</div>" +
+              "<div class='msVal'><i>" + "{{total_gbrides}}" + "</i> chuyến</div>" +
+            "</div>" +
+            "<div class='msRow' style='background: rgba(255,249,192,.85); border-color: rgba(255,217,51,.35)'>" +
+              "<div class='msLeft'>" +
+                "<div class='msName'>GrabFood & GrabMart 🍜🛒</div>" +
+                "<div class='msDesc'>giúp nhiều Người dùng nhận những bữa ăn vẹn tròn, món hàng thiết yếu.</div>" +
+              "</div>" +
+              "<div class='msVal'><i>" + "{{total_gfmrides}}" + "</i> chuyến</div>" +
+            "</div>" +
+            "<div class='msRow' style='background: rgba(235,250,255,.92); border-color: rgba(19,111,216,.18)'>" +
+              "<div class='msLeft'>" +
+                "<div class='msName'>GrabExpress 📦</div>" +
+                "<div class='msDesc'>để Người dùng nhận tận tay những kiện hàng kịp thời và đúng lúc.</div>" +
+              "</div>" +
+              "<div class='msVal'><i>" + "{{total_gerides}}" + "</i> chuyến</div>" +
+            "</div>" +
+          "</div>",
+        note: "Một năm bền bỉ với nhiều vai trò khác nhau.",
         cta: "Tiếp"
       },
       {
         key: "persona",
-        tag: "Rewind 04",
+        tag: "Rewind 02",
         title: "Đối tác đích thị là…",
-        body: "Với tần suất vận hành như vậy,",
+        body: "Với tần suất vận hành như vậy, đích thị Đối tác chính là:",
         statLabel: "Danh xưng 2025",
         statValue:
           "<div class='personaWrap'>" +
@@ -430,28 +484,34 @@
         cta: "Tiếp"
       },
       {
-        key: "rating",
-        tag: "Rewind 05",
-        title: "Đánh giá 5 sao ⭐",
-        body: "Ngoài ra, Đối tác đã “thu hoạch” được",
-        statLabel: "Tổng 5 sao",
-        statValue: "<span class='hl'>{{total_5starsreviews}}</span> đánh giá",
-        note: "chiếm {{%_5starsreviewsreview}} trên tổng số lượng đánh giá 5 sao mà Đối tác đã nhận được từ Người dùng.",
-        cta: "Tiếp"
-      },
-      {
-        key: "badge",
-        tag: "Rewind 06",
-        title: "Huy hiệu nổi bật",
-        body: "Trong đó, loại huy hiệu Đối tác nhận được nhiều nhất là",
-        statLabel: "Top badge",
-        statValue: "<span class='hl2'>{{badget_top1}}</span>",
+        key: "rating_badge",
+        tag: "Rewind 03",
+        title: "5 sao & huy hiệu ⭐",
+        body: "Ngoài ra, Đối tác đã “thu hoạch” được:",
+        statLabel: "Điểm nổi bật",
+        statValue:
+          "<div class='multiStat'>" +
+            "<div class='msRow'>" +
+              "<div class='msLeft'>" +
+                "<div class='msName'>Đánh giá 5 sao</div>" +
+                "<div class='msDesc'>chiếm {{%_5starsreviewsreview}} trên tổng số lượt đánh giá 5 sao.</div>" +
+              "</div>" +
+              "<div class='msVal'><i>" + "{{total_5starsreviews}}" + "</i></div>" +
+            "</div>" +
+            "<div class='msRow' style='background: rgba(255,255,255,.96)'>" +
+              "<div class='msLeft'>" +
+                "<div class='msName'>Huy hiệu nhận nhiều nhất</div>" +
+                "<div class='msDesc'>Đây là loại huy hiệu Đối tác nhận được nhiều nhất trong năm.</div>" +
+              "</div>" +
+              "<div class='msVal'><i>" + "{{badget_top1}}" + "</i></div>" +
+            "</div>" +
+          "</div>",
         note: "Giữ phong độ này để 2026 còn bứt tốc hơn nhé!",
         cta: "Tiếp"
       },
       {
         key: "cr",
-        tag: "Rewind 07",
+        tag: "Rewind 04",
         title: "Tỷ lệ hủy chuyến",
         body: "Tỷ lệ hủy chuyến trung bình trong năm 2025 của Đối tác là",
         statLabel: "Average CR",
