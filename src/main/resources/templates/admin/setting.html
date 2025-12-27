@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>TruyenGG - Setting Management</title>
+    <link rel="stylesheet" th:href="@{/voler/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/voler/vendors/toastify/src/toastify.css}">
+    <link rel="stylesheet" th:href="@{/voler/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/setting.css}">
+    <link rel="shortcut icon" th:href="@{/voler/images/favicon.png}" type="image/png">
+</head>
+<body>
+<div id="app">
+    <div class='active' id="sidebar">
+        <th:block th:replace="~{admin/layouts/sidebar :: sidebar}"></th:block>
+    </div>
+    <div id="main">
+        <nav class="navbar navbar-header navbar-expand navbar-light">
+            <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
+            <button class="btn navbar-toggler" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse"
+                    type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav d-flex align-items-center navbar-light ms-auto">
+                    <li class="dropdown">
+                        <a aria-expanded="false" class="nav-link dropdown-toggle nav-link-lg nav-link-user" data-bs-toggle="dropdown"
+                           href="#">
+                            <div class="avatar me-1">
+                                <img alt="Avatar" th:src="@{/voler/images/avatar/avatar-s-1.png}">
+                            </div>
+                            <div class="d-none d-md-block d-lg-inline-block">
+                                <span sec:authentication="name">Admin</span>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" data-bs-target="#profileModal" data-bs-toggle="modal" href="#">
+                                <i data-feather="user"></i> Profile
+                            </a>
+                            <a class="dropdown-item" th:href="@{/}">
+                                <i data-feather="home"></i> Home
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="logout(); return false;">
+                                <i data-feather="log-out"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="main-content container-fluid">
+            <!-- Page Header -->
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-12 col-md-6 order-md-1 order-last">
+                        <h3>Settings</h3>
+                        <p class="text-subtitle text-muted">System configuration management</p>
+                    </div>
+                    <div class="col-12 col-md-6 order-md-2 order-first">
+                        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a th:href="@{/admin}">Admin</a></li>
+                                <li aria-current="page" class="breadcrumb-item active">Settings</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <section class="section">
+                <div class="row">
+                    <!-- Category Sidebar -->
+                    <div class="col-lg-3 col-md-4">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-1">
+                                    <i class="me-2" data-feather="folder"></i>Categories
+                                </h5>
+                                <p class="mb-0 opacity-75 small">Browse by category</p>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="p-3 border-bottom">
+                                    <input class="form-control form-control-sm" id="categorySearch" placeholder="Search categories..."
+                                           type="text">
+                                </div>
+                                <div class="category-tree" id="categoryTree">
+                                    <div class="text-center p-4 text-muted">
+                                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                                        <div class="mt-2 small">Loading categories...</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-light">
+                                <div class="d-flex justify-content-between small">
+                                    <span class="text-muted">Categories</span>
+                                    <span class="fw-semibold" id="footerCategories">0</span>
+                                </div>
+                                <div class="d-flex justify-content-between small">
+                                    <span class="text-muted">Settings</span>
+                                    <span class="fw-semibold" id="footerSettings">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Table -->
+                    <div class="col-lg-9 col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <h5 class="card-title mb-0" id="currentCategoryTitle">All Settings</h5>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="d-flex gap-2 justify-content-md-end">
+                                            <div class="input-group" style="max-width: 300px;">
+                                                    <span class="input-group-text">
+                                                        <i data-feather="search"></i>
+                                                    </span>
+                                                <input class="form-control" id="settingSearch" placeholder="Search settings..."
+                                                       type="text">
+                                            </div>
+                                            <select class="form-select form-select-sm" id="typeFilter"
+                                                    style="width: auto;">
+                                                <option value="">All Types</option>
+                                                <option value="STRING">String</option>
+                                                <option value="INT">Integer</option>
+                                                <option value="LONG">Long</option>
+                                                <option value="DOUBLE">Double</option>
+                                                <option value="BOOLEAN">Boolean</option>
+                                                <option value="SECRET">Secret</option>
+                                                <option value="PASSWORD">Password</option>
+                                                <option value="URL">URL</option>
+                                                <option value="JSON">JSON</option>
+                                            </select>
+                                            <button class="btn btn-sm btn-light" onclick="refreshSettings()"
+                                                    title="Refresh">
+                                                <i data-feather="refresh-cw"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover settings-table mb-0">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th data-sort="key">Key</th>
+                                            <th data-sort="fullKey">Full Key</th>
+                                            <th>Value</th>
+                                            <th data-sort="valueType">Type</th>
+                                            <th>Status</th>
+                                            <th data-sort="updatedAt">Updated</th>
+                                            <th class="text-center" style="width: 100px;">Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="settingsTableBody">
+                                        <tr>
+                                            <td class="text-center p-4 text-muted" colspan="7">
+                                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                <div class="mt-2">Loading settings...</div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                    <div class="text-muted small">
+                                        Showing <span id="pageStart">0</span> - <span id="pageEnd">0</span>
+                                        of <span id="totalItems">0</span> settings
+                                        <select class="form-select form-select-sm d-inline-block ms-2" id="pageSize"
+                                                style="width: auto;">
+                                            <option value="10">10</option>
+                                            <option selected value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        per page
+                                    </div>
+                                    <nav>
+                                        <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- View Detail Modal -->
+<div aria-hidden="true" class="modal fade" id="viewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header modal-header-gradient">
+                <h5 class="modal-title">
+                    <i class="me-2" data-feather="eye"></i>View Setting
+                </h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Basic Info -->
+                <h6 class="text-muted text-uppercase small border-bottom pb-2 mb-3">Basic Information</h6>
+                <div class="row mb-2">
+                    <div class="col-4 detail-label">Full Key</div>
+                    <div class="col-8 detail-value detail-value-mono" id="viewFullKey">-</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 detail-label">Category</div>
+                    <div class="col-8">
+                        <span class="category-path" id="viewCategory">-</span>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 detail-label">Type</div>
+                    <div class="col-8">
+                        <span class="badge badge-type" id="viewType">-</span>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-4 detail-label">Value</div>
+                    <div class="col-8 detail-value detail-value-mono" id="viewValue">-</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-4 detail-label">Default</div>
+                    <div class="col-8 detail-value detail-value-mono text-muted" id="viewDefault">-</div>
+                </div>
+
+                <!-- Constraints -->
+                <div id="viewConstraintsSection">
+                    <h6 class="text-muted text-uppercase small border-bottom pb-2 mb-3">Constraints</h6>
+                    <div class="constraint-box" id="viewConstraints">
+                        <p class="text-muted mb-0 small">No constraints defined</p>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <h6 class="text-muted text-uppercase small border-bottom pb-2 mb-3 mt-4">Description</h6>
+                <p class="text-muted mb-3" id="viewDescription">-</p>
+
+                <!-- Status -->
+                <h6 class="text-muted text-uppercase small border-bottom pb-2 mb-3">Status</h6>
+                <div class="d-flex gap-4 mb-3">
+                        <span class="small" id="viewRequired">
+                            <span class="status-dot status-dot-required me-1"></span>Required
+                        </span>
+                    <span class="small" id="viewSensitive">
+                            <span class="status-dot status-dot-sensitive me-1"></span>Sensitive
+                        </span>
+                    <span class="small" id="viewReadonly">
+                            <span class="status-dot status-dot-readonly me-1"></span>Readonly
+                        </span>
+                </div>
+
+                <!-- Audit -->
+                <h6 class="text-muted text-uppercase small border-bottom pb-2 mb-3">Audit</h6>
+                <div class="row mb-2">
+                    <div class="col-4 detail-label">Created</div>
+                    <div class="col-8 detail-value" id="viewCreatedAt">-</div>
+                </div>
+                <div class="row">
+                    <div class="col-4 detail-label">Updated</div>
+                    <div class="col-8 detail-value" id="viewUpdatedAt">-</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="viewEditBtn" type="button">
+                    <i class="me-1" data-feather="edit-2"></i>Edit
+                </button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div aria-hidden="true" class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-gradient">
+                <h5 class="modal-title">
+                    <i class="me-2" data-feather="edit-2"></i>Edit Setting
+                </h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Full Key</label>
+                    <div class="form-control-plaintext detail-value-mono bg-light rounded px-3 py-2" id="editFullKey">
+                        -
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Type</label>
+                    <div>
+                        <span class="badge badge-type" id="editType">-</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="editValue">
+                        Value <span class="text-danger" id="editRequiredIndicator" style="display: none;">*</span>
+                    </label>
+                    <div class="input-group">
+                        <input class="form-control" id="editValue" placeholder="Enter value..." type="text">
+                        <button class="btn btn-outline-secondary" id="togglePassword" style="display: none;"
+                                type="button">
+                            <i data-feather="eye"></i>
+                        </button>
+                    </div>
+                    <div class="form-text" id="editValueHelp"></div>
+                </div>
+
+                <div class="constraint-box mb-3" id="editConstraintsBox" style="display: none;">
+                    <div class="small" id="editConstraintsInfo"></div>
+                    <div class="validation-status mt-2" id="validationStatus" style="display: none;">
+                        <i class="me-1" data-feather="check-circle"></i>
+                        <span id="validationMessage">Valid</span>
+                    </div>
+                </div>
+
+                <div id="editDefaultBox" style="display: none;">
+                    <button class="btn btn-sm btn-outline-secondary" id="resetToDefault" type="button">
+                        <i class="me-1" data-feather="rotate-ccw"></i>Reset to Default
+                    </button>
+                    <span class="text-muted ms-2 small" id="editDefaultValue"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-primary" id="saveSettingBtn" type="button">
+                    <i class="me-1" data-feather="save"></i>Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/voler/js/feather-icons/feather.min.js}"></script>
+<script th:src="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:src="@{/voler/vendors/toastify/src/toastify.js}"></script>
+<script th:src="@{/voler/js/app.js}"></script>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/passkey.js}"></script>
+<script th:src="@{/js/admin-profile.js}"></script>
+<script th:src="@{/js/admin-auth.js}"></script>
+<script th:src="@{/js/admin/voler-init.js}"></script>
+<script th:src="@{/js/admin/setting/index.js}" type="module"></script>
+<script th:src="@{/voler/js/main.js}"></script>
+</body>
+</html>

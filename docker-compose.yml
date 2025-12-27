@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: truyengg-postgres
+    environment:
+      POSTGRES_DB: truyengg
+      POSTGRES_USER: truyengg
+      POSTGRES_PASSWORD: truyengg
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U truyengg"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - truyengg-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: truyengg-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-truyengg}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-truyengg}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - truyengg-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.native
+    container_name: truyengg-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      DB_USERNAME: truyengg
+      DB_PASSWORD: truyengg
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/truyengg
+      SPRING_PROFILES_ACTIVE: prod
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production-min-256-bits}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      IMGBB_API_KEY: ${IMGBB_API_KEY:-}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+      TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-truyengg}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-truyengg}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-truyengg}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - truyengg-network
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  truyengg-network:
+    driver: bridge
+

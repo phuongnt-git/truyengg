@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    show-sql: false
+  thymeleaf:
+    cache: true
+
+logging:
+  level:
+    root: WARN
+    com.truyengg: INFO
+

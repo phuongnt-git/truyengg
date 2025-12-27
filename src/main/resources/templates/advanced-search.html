@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="vi" translate="no"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <meta content="notranslate" name="google">
+    <title>Tìm Kiếm Nâng Cao - TruyenGG</title>
+    <link href="https://st.truyengg.net/template/frontend/styles/style.css?v=1.9.4" rel="stylesheet" type="text/css">
+    <link href="https://st.truyengg.net/template/frontend/styles/dark_style.css?v=1.3.4" rel="stylesheet"
+          type="text/css">
+    <link href="https://st.truyengg.net/template/frontend/icon/css/font-awesome.min.css?v=1.2.3" rel="stylesheet"
+          type="text/css">
+</head>
+<body class="dark-style" th:replace="~{fragments/header :: header-body}">
+<div class="container container-background">
+    <section>
+        <div class="story-list-bl01">
+            <div class="text-center mb15">
+                <button class="btn-collapse">
+                    <span class="show-text">Hiện Bộ Lọc</span>
+                    <span class="hide-text hidden">Ẩn Bộ Lọc</span>
+                </button>
+            </div>
+            <div class="advsearch-form hidden" id="search-form">
+                <form id="adv-search-form">
+                    <div class="row">
+                        <div class="col-md-12 mb15">
+                            <div class="label-search">Từ Khóa</div>
+                            <input class="txt_search" id="keywords" name="keywords" placeholder="Nhập tên truyện..."
+                                   type="text"
+                                   value="">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb15">
+                            <div class="label-search">Thể Loại</div>
+                            <div class="row" id="genres-container">
+                                <!-- Genres will be loaded here -->
+                            </div>
+                            <input id="genres-input" name="genres" type="hidden" value="">
+                            <input id="notgenres-input" name="notgenres" type="hidden" value="">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6 col-12 mb15">
+                            <div class="label-search">Quốc Gia</div>
+                            <div class="select select-search is-warning">
+                                <select class="custom-select" id="country" name="country">
+                                    <option value="0">Tất Cả</option>
+                                    <option value="1">Trung Quốc</option>
+                                    <option value="2">Hàn Quốc</option>
+                                    <option value="3">Nhật Bản</option>
+                                    <option value="4">Việt Nam</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-12 mb15">
+                            <div class="label-search">Trạng Thái</div>
+                            <div class="select select-search is-warning">
+                                <select class="custom-select" id="status" name="status">
+                                    <option value="-1">Tất Cả</option>
+                                    <option value="0">Đang tiến hành</option>
+                                    <option value="2">Hoàn thành</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-12 mb15">
+                            <div class="label-search">Số Lượng Chương</div>
+                            <div class="select select-search is-warning">
+                                <select class="custom-select" id="minchapter" name="minchapter">
+                                    <option value="0">> 0</option>
+                                    <option value="50">>= 50</option>
+                                    <option value="100">>= 100</option>
+                                    <option value="200">>= 200</option>
+                                    <option value="300">>= 300</option>
+                                    <option value="400">>= 400</option>
+                                    <option value="500">>= 500</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-12 mb15">
+                            <div class="label-search">Sắp Xếp</div>
+                            <div class="select select-search is-warning">
+                                <select class="custom-select" id="sort" name="sort">
+                                    <option value="0">Ngày đăng giảm dần</option>
+                                    <option value="1">Ngày đăng tăng dần</option>
+                                    <option value="2">Ngày cập nhật giảm dần</option>
+                                    <option value="3">Ngày cập nhật tăng dần</option>
+                                    <option value="4">Lượt xem giảm dần</option>
+                                    <option value="5">Lượt xem tăng dần</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <div class="text-center">
+                            <button class="btn btn-success btn-search is-danger" type="submit">Tìm Kiếm</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="d-flex mb15">
+            <h2 class="title_cate mr-auto" id="search-title">Tìm Kiếm</h2>
+        </div>
+        <div class="row list_item_home" id="comics-list">
+            <div class="col-12 text-center">
+                <p>Vui lòng nhập từ khóa hoặc chọn bộ lọc để tìm kiếm</p>
+            </div>
+        </div>
+        <div class="has-text-centered mt-3" id="pagination-container">
+            <!-- Pagination will be loaded here -->
+        </div>
+    </section>
+</div>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<script th:src="@{/js/jquery.lazy.min.js}"></script>
+<script th:src="@{/js/app.js}"></script>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/utils.js}"></script>
+<script th:src="@{/js/comics.js}"></script>
+<script th:src="@{/js/search.js}"></script>
+<script>
+    let currentPage = 0;
+    const pageSize = 24;
+    let categories = [];
+
+    $(document).ready(function () {
+        // Load categories for genre selection
+        loadCategories();
+
+        // Get filters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        currentPage = parseInt(urlParams.get('page')) || 0;
+        const keywords = urlParams.get('keywords') || '';
+        const genres = urlParams.get('genres') || '';
+        const notgenres = urlParams.get('notgenres') || '';
+        const country = urlParams.get('country') || '0';
+        const status = urlParams.get('status') || '-1';
+        const minchapter = urlParams.get('minchapter') || '0';
+        const sort = urlParams.get('sort') || '0';
+
+        // Set form values
+        $('#keywords').val(keywords);
+        $('#country').val(country);
+        $('#status').val(status);
+        $('#minchapter').val(minchapter);
+        $('#sort').val(sort);
+
+        // Perform search if filters are present
+        if (keywords || genres || notgenres || country !== '0' || status !== '-1' || minchapter !== '0') {
+            performSearch();
+        }
+
+        // Form submission
+        $('#adv-search-form').on('submit', function (e) {
+            e.preventDefault();
+            currentPage = 0;
+            performSearch();
+        });
+
+        // Toggle search form
+        $('.btn-collapse').on('click', function () {
+            if ($('.show-text').hasClass('hidden')) {
+                $('.show-text').removeClass('hidden');
+                $('.hide-text').addClass('hidden');
+                $('.advsearch-form').addClass('hidden');
+            } else {
+                $('.hide-text').removeClass('hidden');
+                $('.show-text').addClass('hidden');
+                $('.advsearch-form').removeClass('hidden');
+            }
+        });
+    });
+
+    function loadCategories() {
+        ApiClient.get('/categories', null, false).done(function (response) {
+            if (response.success && response.data && response.data.data && response.data.data.items) {
+                categories = response.data.data.items;
+                renderGenres();
+            }
+        }).fail(function (xhr) {
+            console.error('Failed to load categories:', xhr);
+        });
+    }
+
+    function renderGenres() {
+        const $container = $('#genres-container');
+        $container.empty();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedGenres = (urlParams.get('genres') || '').split(',').filter(g => g);
+        const excludedGenres = (urlParams.get('notgenres') || '').split(',').filter(g => g);
+
+        categories.forEach(function (genre) {
+            let type = 'neutral';
+            if (selectedGenres.includes(genre.slug)) {
+                type = 'include';
+            } else if (excludedGenres.includes(genre.slug)) {
+                type = 'exclude';
+            }
+
+            const genreItem = `
+                    <div class="col-md-4 col-sm-6 col-6 genre-item">
+                        <span class="icon-checkbox ${type === 'include' ? 'icon-tick' : (type === 'exclude' ? 'icon-cross' : '')}" 
+                              data-id="${genre.slug}" 
+                              data-type="${type}">
+                        </span>
+                        ${genre.name}
+                    </div>
+                `;
+            $container.append(genreItem);
+        });
+
+        // Update hidden inputs
+        updateHiddenInputs();
+
+        // Handle genre clicks
+        $('.genre-item .icon-checkbox').on('click', function () {
+            const genreId = $(this).attr('data-id');
+            let type = $(this).attr('data-type');
+
+            if (type === 'neutral') {
+                $(this).attr('data-type', 'include').removeClass('icon-checkbox icon-cross').addClass('icon-tick');
+            } else if (type === 'include') {
+                $(this).attr('data-type', 'exclude').removeClass('icon-tick icon-checkbox').addClass('icon-cross');
+            } else {
+                $(this).attr('data-type', 'neutral').removeClass('icon-cross icon-tick').addClass('icon-checkbox');
+            }
+
+            updateHiddenInputs();
+        });
+    }
+
+    function updateHiddenInputs() {
+        const genres = [];
+        const notGenres = [];
+
+        $('.genre-item .icon-checkbox').each(function () {
+            const id = $(this).attr('data-id');
+            const type = $(this).attr('data-type');
+            if (type === 'include') {
+                genres.push(id);
+            } else if (type === 'exclude') {
+                notGenres.push(id);
+            }
+        });
+
+        $('#genres-input').val(genres.join(','));
+        $('#notgenres-input').val(notGenres.join(','));
+    }
+
+    function performSearch() {
+        const keywords = $('#keywords').val().trim();
+        const genres = $('#genres-input').val();
+        const notgenres = $('#notgenres-input').val();
+        const country = $('#country').val();
+        const status = $('#status').val();
+        const minchapter = $('#minchapter').val();
+        const sort = $('#sort').val();
+
+        // Build query params
+        const params = {
+            page: currentPage,
+            size: pageSize
+        };
+
+        if (keywords) params.keywords = keywords;
+        if (genres) params.genres = genres;
+        if (notgenres) params.notGenres = notgenres;
+        if (country !== '0') params.country = country;
+        if (status !== '-1') params.status = status;
+        if (minchapter !== '0') params.minChapter = parseInt(minchapter);
+        if (sort !== '0') params.sort = sort;
+
+        // Update URL without reload
+        const queryString = new URLSearchParams(params).toString();
+        window.history.pushState({}, '', '/tim-kiem-nang-cao?' + queryString);
+
+        // Update search title
+        const titleParts = [];
+        if (keywords) titleParts.push('Từ khóa: ' + keywords);
+        if (genres) titleParts.push('Thể loại: ' + genres.split(',').length + ' thể loại');
+        if (status !== '-1') titleParts.push('Trạng thái: ' + (status === '0' ? 'Đang tiến hành' : 'Hoàn thành'));
+        $('#search-title').text(titleParts.length > 0 ? titleParts.join(' | ') : 'Tìm Kiếm');
+
+        // Perform search
+        // Show loading state
+        const $container = $('#comics-list');
+        $container.html('<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Đang tìm kiếm...</span></div><p class="mt-2">Đang tìm kiếm truyện...</p></div>');
+
+        ApiClient.postWithQuery('/search/advanced', params, false).done(function (response) {
+            if (response.success && response.data) {
+                const comics = response.data.content || [];
+                const $container = $('#comics-list');
+                $container.empty();
+
+                if (comics.length === 0) {
+                    $container.html('<div class="col-12 text-center"><p>Không tìm thấy truyện phù hợp với bộ lọc!</p></div>');
+                    $('#pagination-container').empty();
+                    return;
+                }
+
+                comics.forEach(function (comic) {
+                    const card = ComicsModule.renderComicCard(comic);
+                    $container.append(card);
+                });
+
+                renderPagination(response.data);
+
+                if (typeof $.fn.lazy !== 'undefined') {
+                    $container.find('.lazy-image').lazy({
+                        effect: 'fadeIn',
+                        effectTime: 300,
+                        threshold: 0
+                    });
+                    $container.empty();
+                    let errorMsg = handleApiError(xhr, 'Lỗi khi tìm kiếm');
+                    {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                else
+                    if (xhr.status === 0) {
+                        errorMsg = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+                    } else if (xhr.status >= 500) {
+                        errorMsg = 'Lỗi server. Vui lòng thử lại sau.';
+                    }
+                    $container.html('<div class="col-12 text-center"><p class="text-danger">' + errorMsg + '</p></div>');
+                    console.error('Search error:', xhr);
+                    $container.empty();
+                    let errorMsg = 'Lỗi khi tìm kiếm. Vui lòng thử lại.';
+                    if (xhr.responseJSON
+                } else {
+                }
+            else
+                {
+                    xhr.responseJSON.message
+                )
+                    {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                else
+                    if (xhr.status === 0) {
+                        errorMsg = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+                    } else if (xhr.status >= 500) {
+                        errorMsg = 'Lỗi server. Vui lòng thử lại sau.';
+                    }
+                    $container.html('<div class="col-12 text-center"><p class="text-danger">' + errorMsg + '</p></div>');
+                    console.error('Search error:', xhr);
+                    $container.empty();
+                    let errorMsg = 'Lỗi khi tìm kiếm. Vui lòng thử lại.';
+                    if (xhr.responseJSON                     $('#comics-list').html('<div class="col-12 text-center"><p>Không tìm thấy truyện phù hợp!</p></div>');
+                    $('#comics-list').html('<div class="col-12 text-center"><p>Không tìm thấy truyện phù hợp!</p></div>');
+                    xhr.responseJSON.message
+                )
+                    {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                else
+                    if (xhr.status === 0) {
+                        errorMsg = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+                    } else if (xhr.status >= 500) {
+                        errorMsg = 'Lỗi server. Vui lòng thử lại sau.';
+                    }
+                    $container.html('<div class="col-12 text-center"><p class="text-danger">' + errorMsg + '</p></div>');
+                    console.error('Search error:', xhr);
+                }
+            }
+        ).
+            fail(function (xhr) {
+                $('#comics-list').html('<div class="col-12 text-center"><p>Lỗi khi tìm kiếm. Vui lòng thử lại.</p></div>');
+            });
+        }
+
+        function renderPagination(data) {
+            const totalPages = data.totalPages || 0;
+            const $container = $('#pagination-container');
+            $container.empty();
+
+            if (totalPages <= 1) return;
+
+            let paginationHtml = '<div class="pagination mt-4 mb20">';
+
+            if (currentPage > 0) {
+                const prevParams = new URLSearchParams(window.location.search);
+                prevParams.set('page', currentPage - 1);
+                paginationHtml += `<a class="page-item" href="?${prevParams.toString()}">«</a>`;
+            }
+
+            const maxPages = 5;
+            let startPage = Math.max(0, currentPage - Math.floor(maxPages / 2));
+            let endPage = Math.min(totalPages - 1, startPage + maxPages - 1);
+
+            if (endPage - startPage < maxPages - 1) {
+                startPage = Math.max(0, endPage - maxPages + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageParams = new URLSearchParams(window.location.search);
+                pageParams.set('page', i);
+                if (i === currentPage) {
+                    paginationHtml += `<a href="javascript:void(0)" class="page-item active">${i + 1}</a>`;
+                } else {
+                    paginationHtml += `<a href="?${pageParams.toString()}" class="page-item">${i + 1}</a>`;
+                }
+            }
+
+            if (currentPage < totalPages - 1) {
+                const nextParams = new URLSearchParams(window.location.search);
+                nextParams.set('page', currentPage + 1);
+                paginationHtml += `<a class="page-item" href="?${nextParams.toString()}">»</a>`;
+            }
+
+            paginationHtml += '</div>';
+            $container.html(paginationHtml);
+        }
+</script>
+</body>
+</html>

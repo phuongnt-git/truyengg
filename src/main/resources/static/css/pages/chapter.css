@@ -1,0 +1,68 @@
+/* Chapter page specific styles */
+
+/* BlurHash placeholder styles */
+.chapter-image {
+    transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out;
+}
+
+.chapter-image.blurhash-placeholder {
+    filter: blur(0);
+    object-fit: cover;
+}
+
+.chapter-image.loaded {
+    filter: none;
+}
+
+/* Image container styles */
+.chapter-image-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 2px;
+    background: #1a1a1a;
+}
+
+.chapter-image-container img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Loading state for images */
+.chapter-image-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.chapter-image-container:not(:has(.loaded))::before {
+    opacity: 1;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Smooth image appearance */
+.chapter-image {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.chapter-image.loaded,
+.chapter-image:not(.blurhash-placeholder) {
+    opacity: 1;
+}
+

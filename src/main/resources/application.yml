@@ -1,0 +1,116 @@
+spring:
+  application:
+    name: truyengg
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+    path: /graphql
+    websocket:
+      path: /graphql
+      connection-init-timeout: 60s
+  datasource:
+    url: jdbc:postgresql://localhost:5432/truyengg
+    username: ${DB_USERNAME:truyengg}
+    password: ${DB_PASSWORD:truyengg}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        time_zone: Asia/Ho_Chi_Minh
+        format_sql: false
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=10m
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+truyengg:
+  oauth2:
+    google:
+      client-id: ${GOOGLE_CLIENT_ID:}
+
+      redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8080/auth/google/callback}
+  jwt:
+    secret: ${JWT_SECRET:your-secret-key-change-in-production-min-256-bits}
+    access-token-expiration: 3600000
+    refresh-token-expiration: 604800000
+    refresh-token-cookie-max-age: 604800
+    max-refresh-tokens-per-user: 5
+  passkey:
+    rp-id: ${PASSKEY_RP_ID:localhost}
+    rp-name: ${PASSKEY_RP_NAME:TruyenGG Admin}
+    origins: ${PASSKEY_ORIGINS:http://localhost:8080}
+  crawl:
+    max-retries: 3
+    retry-delay: 2
+    request-timeout: 15
+    job:
+      limit:
+        per-admin: ${CRAWL_JOB_LIMIT_PER_ADMIN:5}
+        per-server: ${CRAWL_JOB_LIMIT_PER_SERVER:25}
+      queue:
+        cron-expression: ${CRAWL_JOB_QUEUE_CRON:0 */5 * * * *}
+  storage:
+    type: ${STORAGE_TYPE:local}                    # minio | local
+    local:
+      base-path: ${STORAGE_LOCAL_PATH:./uploads}   # Local storage directory
+      serve-path: /uploads                         # URL path for serving static files
+    minio:
+      endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+      access-key: ${MINIO_ACCESS_KEY:truyengg}
+      secret-key: ${MINIO_SECRET_KEY:truyengg}
+      bucket-name: ${MINIO_BUCKET_NAME:truyengg}
+  image:
+    compression:
+      enabled: ${IMAGE_COMPRESSION_ENABLED:true}
+      output-format: ${IMAGE_OUTPUT_FORMAT:webp}   # webp, jpeg, png
+      webp-quality: ${IMAGE_WEBP_QUALITY:0.85}     # 0.0-1.0 (85% is optimal for manga)
+      jpeg-quality: ${IMAGE_JPEG_QUALITY:0.90}     # Fallback quality
+      remove-metadata: ${IMAGE_REMOVE_METADATA:true}
+      grayscale-detection: ${IMAGE_GRAYSCALE_DETECTION:true}
+      grayscale-quality: ${IMAGE_GRAYSCALE_QUALITY:0.80}  # Lower quality for B/W manga
+    blurhash:
+      enabled: ${IMAGE_BLURHASH_ENABLED:true}
+      component-x: 4                               # Horizontal complexity (1-9)
+      component-y: 3                               # Vertical complexity (1-9)
+    adaptive-quality:
+      enabled: ${IMAGE_ADAPTIVE_QUALITY:true}
+      high: 0.85
+      medium: 0.75
+      low: 0.60
+    cache:
+      max-size: ${IMAGE_CACHE_MAX_SIZE:1000}
+      expire-after-write-hours: ${IMAGE_CACHE_EXPIRE_WRITE_HOURS:24}
+      expire-after-access-hours: ${IMAGE_CACHE_EXPIRE_ACCESS_HOURS:1}
+
+jobrunr:
+  miscellaneous:
+    allow-anonymous-data-usage: false
+  background-job-server:
+    enabled: true
+    worker-count: 2
+  dashboard:
+    enabled: ${JOBRUNR_DASHBOARD_ENABLED:true}
+    username: ${JOBRUNR_DASHBOARD_USERNAME:truyengg}
+    password: ${JOBRUNR_DASHBOARD_PASSWORD:truyengg}
+  database:
+    type: postgresql
+

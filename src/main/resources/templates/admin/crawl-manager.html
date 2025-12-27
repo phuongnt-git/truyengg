@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>TruyenGG - Crawl Manager</title>
+    <link rel="stylesheet" th:href="@{/voler/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/voler/css/app.css}">
+    <link rel="shortcut icon" th:href="@{/voler/images/favicon.png}" type="image/png">
+    <style>
+        :root {
+            --sidebar-width: 320px;
+            --header-height: 60px;
+            --status-pending: #6c757d;
+            --status-queued: #17a2b8;
+            --status-running: #007bff;
+            --status-paused: #fd7e14;
+            --status-completed: #28a745;
+            --status-failed: #dc3545;
+            --status-cancelled: #6c757d;
+            --type-category: #1976d2;
+            --type-comic: #7b1fa2;
+            --type-chapter: #388e3c;
+            --type-image: #f57c00;
+        }
+
+        /* Main Layout */
+        .crawl-manager {
+            display: flex;
+            height: calc(100vh - var(--header-height));
+            overflow: hidden;
+        }
+
+        /* Crawl Sidebar */
+        .crawl-sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            background: #fff;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .sidebar-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .sidebar-header .subtitle {
+            font-size: 0.8rem;
+            opacity: 0.85;
+        }
+
+        .sidebar-filters {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .sidebar-filters select {
+            flex: 1;
+            font-size: 0.85rem;
+        }
+
+        .sidebar-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+
+        .sidebar-footer {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+            font-size: 0.8rem;
+        }
+
+        .sidebar-footer .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-footer .stat-value {
+            font-weight: 600;
+        }
+
+        /* Tree Group */
+        .tree-group {
+            margin-bottom: 0.25rem;
+        }
+
+        .tree-group-header {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+
+        .tree-group-header:hover {
+            background: #f8f9fa;
+        }
+
+        .tree-group-header .expand-icon {
+            width: 16px;
+            margin-right: 0.5rem;
+            transition: transform 0.2s;
+        }
+
+        .tree-group-header.collapsed .expand-icon {
+            transform: rotate(-90deg);
+        }
+
+        .tree-group-header .group-label {
+            flex: 1;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .tree-group-header .group-count {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+
+        .tree-group-header.status-running .group-count {
+            background: var(--status-running);
+            color: white;
+        }
+
+        .tree-group-header.status-queued .group-count {
+            background: var(--status-queued);
+            color: white;
+        }
+
+        .tree-group-header.status-paused .group-count {
+            background: var(--status-paused);
+            color: white;
+        }
+
+        .tree-group-header.status-completed .group-count {
+            background: var(--status-completed);
+            color: white;
+        }
+
+        .tree-group-header.status-failed .group-count {
+            background: var(--status-failed);
+            color: white;
+        }
+
+        .tree-group-content {
+            display: none;
+        }
+
+        .tree-group-content.expanded {
+            display: block;
+        }
+
+        /* Tree Item */
+        .tree-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.15s;
+        }
+
+        .tree-item:hover {
+            background: #f8f9fa;
+        }
+
+        .tree-item.selected {
+            background: #e8f0fe;
+            border-left-color: #667eea;
+        }
+
+        .tree-item .item-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .tree-item .item-icon.type-category {
+            background: rgba(25, 118, 210, 0.1);
+            color: var(--type-category);
+        }
+
+        .tree-item .item-icon.type-comic {
+            background: rgba(123, 31, 162, 0.1);
+            color: var(--type-comic);
+        }
+
+        .tree-item .item-icon.type-chapter {
+            background: rgba(56, 142, 60, 0.1);
+            color: var(--type-chapter);
+        }
+
+        .tree-item .item-icon.type-image {
+            background: rgba(245, 124, 0, 0.1);
+            color: var(--type-image);
+        }
+
+        .tree-item .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tree-item .item-title {
+            font-size: 0.85rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tree-item .item-meta {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .tree-item .item-progress {
+            width: 40px;
+            text-align: right;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .tree-load-more {
+            padding: 0.5rem 2.5rem;
+        }
+
+        .tree-load-more button {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.75rem;
+        }
+
+        /* Main Panel */
+        .crawl-main-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f5f7fa;
+        }
+
+        .main-panel-header {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .main-panel-header .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .main-panel-header .search-box input {
+            padding-left: 2.5rem;
+        }
+
+        .main-panel-header .search-box .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #adb5bd;
+        }
+
+        .main-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .empty-state .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h4 {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .empty-state p {
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+        }
+
+        /* Job Detail */
+        .job-detail-header {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .job-detail-header .job-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-right: 0.5rem;
+        }
+
+        .job-type-badge.type-category {
+            background: rgba(25, 118, 210, 0.1);
+            color: var(--type-category);
+        }
+
+        .job-type-badge.type-comic {
+            background: rgba(123, 31, 162, 0.1);
+            color: var(--type-comic);
+        }
+
+        .job-type-badge.type-chapter {
+            background: rgba(56, 142, 60, 0.1);
+            color: var(--type-chapter);
+        }
+
+        .job-type-badge.type-image {
+            background: rgba(245, 124, 0, 0.1);
+            color: var(--type-image);
+        }
+
+        .job-detail-header .job-status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .job-status-badge.status-pending {
+            background: var(--status-pending);
+        }
+
+        .job-status-badge.status-queued {
+            background: var(--status-queued);
+        }
+
+        .job-status-badge.status-running {
+            background: var(--status-running);
+            animation: pulse 2s infinite;
+        }
+
+        .job-status-badge.status-paused {
+            background: var(--status-paused);
+        }
+
+        .job-status-badge.status-completed {
+            background: var(--status-completed);
+        }
+
+        .job-status-badge.status-failed {
+            background: var(--status-failed);
+        }
+
+        .job-status-badge.status-cancelled {
+            background: var(--status-cancelled);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .job-detail-header .job-url {
+            font-size: 0.9rem;
+            color: #6c757d;
+            word-break: break-all;
+            margin: 0.5rem 0;
+        }
+
+        .job-detail-header .job-progress {
+            margin-top: 1rem;
+        }
+
+        .job-detail-header .progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        .job-detail-header .job-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .job-detail-header .job-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Detail Tabs */
+        .detail-tabs {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .detail-tabs .nav-tabs {
+            border-bottom: 1px solid #e9ecef;
+            padding: 0 1rem;
+        }
+
+        .detail-tabs .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            padding: 1rem 1.25rem;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .detail-tabs .nav-tabs .nav-link:hover {
+            color: #667eea;
+        }
+
+        .detail-tabs .nav-tabs .nav-link.active {
+            color: #667eea;
+            background: transparent;
+        }
+
+        .detail-tabs .nav-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .detail-tabs .nav-tabs .badge {
+            margin-left: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .detail-tabs .tab-content {
+            padding: 1.5rem;
+            min-height: 300px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        /* Children List */
+        .children-list .child-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .children-list .child-item:hover {
+            background: #e9ecef;
+        }
+
+        /* Logs */
+        .logs-container {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.8rem;
+        }
+
+        .log-entry {
+            padding: 0.2rem 0;
+            color: #e0e0e0;
+        }
+
+        .log-entry .log-time {
+            color: #6c757d;
+            margin-right: 0.5rem;
+        }
+
+        .log-entry.log-error {
+            color: #e57373;
+        }
+
+        .log-entry.log-warning {
+            color: #ffb74d;
+        }
+
+        .log-entry.log-success {
+            color: #81c784;
+        }
+
+        /* Failed Items */
+        .failed-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background: #fff5f5;
+            border-radius: 8px;
+            border-left: 3px solid #dc3545;
+            margin-bottom: 0.5rem;
+        }
+
+        .failed-item .failed-info {
+            flex: 1;
+        }
+
+        .failed-item .failed-title {
+            font-weight: 500;
+        }
+
+        .failed-item .failed-error {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        /* Images Grid */
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .image-thumb {
+            aspect-ratio: 3/4;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #e9ecef;
+            position: relative;
+        }
+
+        .image-thumb canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-thumb .image-status {
+            position: absolute;
+            bottom: 0.25rem;
+            right: 0.25rem;
+            font-size: 0.65rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+
+        /* Wizard Drawer */
+        .wizard-drawer {
+            position: fixed;
+            top: 0;
+            right: -480px;
+            width: 480px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s ease;
+        }
+
+        .wizard-drawer.open {
+            right: 0;
+        }
+
+        .wizard-drawer-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+        }
+
+        .wizard-drawer-backdrop.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .wizard-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wizard-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .wizard-header .step-indicator {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .wizard-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .wizard-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Wizard Type Cards */
+        .type-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .type-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-card:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .type-card.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .type-card .type-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .type-card h6 {
+            margin-bottom: 0.25rem;
+        }
+
+        .type-card p {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        /* Duplicate Warning */
+        .duplicate-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .duplicate-warning .warning-icon {
+            color: #ffc107;
+            margin-right: 0.5rem;
+        }
+
+        /* Download Mode */
+        .mode-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .mode-option {
+            display: flex;
+            align-items: flex-start;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-option:hover {
+            border-color: #667eea;
+        }
+
+        .mode-option.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .mode-option input {
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .mode-option .mode-label {
+            font-weight: 500;
+        }
+
+        .mode-option .mode-desc {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        /* Settings Sections */
+        .settings-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .settings-section h6 {
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        /* Summary */
+        .summary-table {
+            width: 100%;
+        }
+
+        .summary-table tr td {
+            padding: 0.5rem 0;
+        }
+
+        .summary-table tr td:first-child {
+            color: #6c757d;
+            width: 120px;
+        }
+
+        /* Connection Status */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6c757d;
+        }
+
+        .connection-dot.connected {
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 0.5rem 0;
+            z-index: 1060;
+            min-width: 160px;
+            display: none;
+        }
+
+        .context-menu.show {
+            display: block;
+        }
+
+        .context-menu-item {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .context-menu-item:hover {
+            background: #f8f9fa;
+        }
+
+        .context-menu-item.danger {
+            color: #dc3545;
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 0.25rem 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .crawl-sidebar {
+                position: absolute;
+                left: -320px;
+                top: 0;
+                bottom: 0;
+                z-index: 1030;
+                transition: left 0.3s;
+            }
+
+            .crawl-sidebar.open {
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class='active' id="sidebar">
+        <th:block th:replace="~{admin/layouts/sidebar :: sidebar}"></th:block>
+    </div>
+    <div id="main">
+        <nav class="navbar navbar-header navbar-expand navbar-light">
+            <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
+            <button class="btn navbar-toggler" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse"
+                    type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav d-flex align-items-center navbar-light ms-auto">
+                    <li class="nav-item me-3">
+                        <div class="connection-status" id="connectionStatus">
+                            <span class="connection-dot"></span>
+                            <span>Disconnected</span>
+                        </div>
+                    </li>
+                    <li class="dropdown">
+                        <a aria-expanded="false" class="nav-link dropdown-toggle nav-link-lg nav-link-user" data-bs-toggle="dropdown"
+                           href="#">
+                            <div class="avatar me-1">
+                                <img alt="Avatar" th:src="@{/voler/images/avatar/avatar-s-1.png}">
+                            </div>
+                            <div class="d-none d-md-block d-lg-inline-block">
+                                <span sec:authentication="name">Admin</span>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" data-bs-target="#profileModal" data-bs-toggle="modal" href="#">
+                                <i data-feather="user"></i> Profile
+                            </a>
+                            <a class="dropdown-item" th:href="@{/}">
+                                <i data-feather="home"></i> Home
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="logout(); return false;">
+                                <i data-feather="log-out"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Crawl Manager Layout -->
+        <div class="crawl-manager">
+            <!-- Sidebar -->
+            <aside class="crawl-sidebar" id="crawlSidebar">
+                <div class="sidebar-header">
+                    <h5><i data-feather="download-cloud"></i> Crawl Manager</h5>
+                    <div class="subtitle">Manage all crawl jobs</div>
+                </div>
+
+                <div class="sidebar-filters">
+                    <select class="form-select form-select-sm" id="filterType">
+                        <option value="">All Types</option>
+                        <option value="CATEGORY">Category</option>
+                        <option value="COMIC">Comic</option>
+                        <option value="CHAPTER">Chapter</option>
+                        <option value="IMAGE">Image</option>
+                    </select>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="refreshSidebar()" title="Refresh">
+                        <i data-feather="refresh-cw"></i>
+                    </button>
+                </div>
+
+                <div class="sidebar-tree" id="sidebarTree">
+                    <!-- Tree groups will be rendered here -->
+                    <div class="text-center p-4 text-muted">
+                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                        <div class="mt-2">Loading jobs...</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-footer">
+                    <div class="stat-item">
+                        <span>Running</span>
+                        <span class="stat-value text-primary" id="footerRunning">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>In Queue</span>
+                        <span class="stat-value text-info" id="footerQueued">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Downloaded Today</span>
+                        <span class="stat-value text-success" id="footerDownloaded">0 MB</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Panel -->
+            <main class="crawl-main-panel">
+                <div class="main-panel-header">
+                    <div class="search-box">
+                        <i class="search-icon" data-feather="search"></i>
+                        <input class="form-control" id="searchInput" placeholder="Search jobs by URL or name..."
+                               type="text">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" onclick="openWizard()">
+                            <i data-feather="plus"></i> New Job
+                        </button>
+                    </div>
+                </div>
+
+                <div class="main-panel-content" id="mainPanelContent">
+                    <!-- Empty State -->
+                    <div class="empty-state" id="emptyState">
+                        <svg class="empty-icon" fill="none" stroke="currentColor" stroke-width="1.5"
+                             viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" x2="12" y1="15" y2="3"></line>
+                        </svg>
+                        <h4>Select a Job</h4>
+                        <p>Choose a job from the sidebar to view its details, or create a new crawl job to get
+                            started.</p>
+                        <button class="btn btn-primary" onclick="openWizard()">
+                            <i data-feather="plus"></i> Create New Job
+                        </button>
+                    </div>
+
+                    <!-- Job Detail (hidden by default) -->
+                    <div id="jobDetail" style="display: none;">
+                        <div class="job-detail-header">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <span class="job-type-badge" id="detailType">COMIC</span>
+                                    <span class="job-status-badge" id="detailStatus">RUNNING</span>
+                                </div>
+                                <div class="job-actions" id="detailActions">
+                                    <!-- Action buttons rendered dynamically -->
+                                </div>
+                            </div>
+                            <h4 class="mt-2 mb-1" id="detailTitle">Job Title</h4>
+                            <div class="job-url" id="detailUrl">https://example.com/...</div>
+                            <div class="job-progress">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span id="detailProgressText">0%</span>
+                                    <span class="text-muted" id="detailMessage">Loading...</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" id="detailProgressBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="job-stats">
+                                <span><i data-feather="clock"></i> Started: <span id="detailStarted">-</span></span>
+                                <span><i data-feather="activity"></i> ETA: <span id="detailEta">-</span></span>
+                                <span><i data-feather="download"></i> <span id="detailDownloaded">0 MB</span></span>
+                            </div>
+                        </div>
+
+                        <div class="detail-tabs">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <button class="nav-link active" data-bs-target="#tabOverview" data-bs-toggle="tab">
+                                        <i data-feather="grid"></i> Overview
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link" data-bs-target="#tabChildren" data-bs-toggle="tab">
+                                        <i data-feather="git-branch"></i> Children
+                                        <span class="badge bg-secondary" id="childrenCount">0</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link" data-bs-target="#tabLogs" data-bs-toggle="tab">
+                                        <i data-feather="file-text"></i> Logs
+                                        <span class="badge bg-secondary" id="logsCount">0</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link" data-bs-target="#tabFailed" data-bs-toggle="tab">
+                                        <i data-feather="alert-triangle"></i> Failed
+                                        <span class="badge bg-danger" id="failedCount">0</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link" data-bs-target="#tabImages" data-bs-toggle="tab">
+                                        <i data-feather="image"></i> Images
+                                    </button>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content">
+                                <!-- Overview Tab -->
+                                <div class="tab-pane fade show active" id="tabOverview">
+                                    <div class="stats-grid">
+                                        <div class="stat-card">
+                                            <div class="stat-value text-success" id="statCompleted">0</div>
+                                            <div class="stat-label">Completed</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-value text-danger" id="statFailed">0</div>
+                                            <div class="stat-label">Failed</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-value text-warning" id="statSkipped">0</div>
+                                            <div class="stat-label">Skipped</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-value text-info" id="statTotal">0</div>
+                                            <div class="stat-label">Total</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Job Information</h6>
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <td class="text-muted">Job ID</td>
+                                                    <td id="infoJobId">-</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Type</td>
+                                                    <td id="infoType">-</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Mode</td>
+                                                    <td id="infoMode">-</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Depth</td>
+                                                    <td id="infoDepth">-</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted">Created</td>
+                                                    <td id="infoCreated">-</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Hierarchy</h6>
+                                            <div id="hierarchyInfo">
+                                                <p class="text-muted">No parent job</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Children Tab -->
+                                <div class="tab-pane fade" id="tabChildren">
+                                    <div class="children-list" id="childrenList">
+                                        <div class="text-center text-muted py-4">
+                                            No child jobs
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Logs Tab -->
+                                <div class="tab-pane fade" id="tabLogs">
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-secondary active"
+                                                    onclick="filterLogs('all')">All
+                                            </button>
+                                            <button class="btn btn-outline-info" onclick="filterLogs('info')">Info
+                                            </button>
+                                            <button class="btn btn-outline-warning" onclick="filterLogs('warning')">
+                                                Warning
+                                            </button>
+                                            <button class="btn btn-outline-danger" onclick="filterLogs('error')">Error
+                                            </button>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="exportLogs()">
+                                            <i data-feather="download"></i> Export
+                                        </button>
+                                    </div>
+                                    <div class="logs-container" id="logsContainer">
+                                        <div class="text-center text-muted py-4">
+                                            No logs yet
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Failed Tab -->
+                                <div class="tab-pane fade" id="tabFailed">
+                                    <div class="d-flex justify-content-end mb-3">
+                                        <button class="btn btn-sm btn-outline-success me-2" onclick="retryAllFailed()">
+                                            <i data-feather="refresh-cw"></i> Retry All
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="skipAllFailed()">
+                                            <i data-feather="skip-forward"></i> Skip All
+                                        </button>
+                                    </div>
+                                    <div id="failedList">
+                                        <div class="text-center text-muted py-4">
+                                            <i data-feather="check-circle"
+                                               style="width: 48px; height: 48px; opacity: 0.5;"></i>
+                                            <div class="mt-2">No failed items</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Images Tab -->
+                                <div class="tab-pane fade" id="tabImages">
+                                    <div class="images-grid" id="imagesGrid">
+                                        <div class="text-center text-muted py-4" style="grid-column: 1/-1;">
+                                            No images available
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- Create Job Wizard Drawer -->
+<div class="wizard-drawer-backdrop" id="wizardBackdrop" onclick="closeWizard()"></div>
+<div class="wizard-drawer" id="wizardDrawer">
+    <div class="wizard-header">
+        <div>
+            <h5>New Crawl Job</h5>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="step-indicator">Step <span id="currentStep">1</span> of 4</span>
+            <button class="btn btn-sm btn-outline-secondary" onclick="closeWizard()">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="wizard-body">
+        <!-- Step 1: Select Type -->
+        <div class="wizard-step" id="wizardStep1">
+            <h6 class="mb-3">Select Crawl Type</h6>
+            <div class="type-cards">
+                <div class="type-card" data-type="CATEGORY" onclick="selectType('CATEGORY')">
+                    <div class="type-icon">📁</div>
+                    <h6>Category</h6>
+                    <p>Crawl multiple comics from a category page</p>
+                </div>
+                <div class="type-card selected" data-type="COMIC" onclick="selectType('COMIC')">
+                    <div class="type-icon">📚</div>
+                    <h6>Comic</h6>
+                    <p>Crawl all chapters from a single comic</p>
+                </div>
+                <div class="type-card" data-type="CHAPTER" onclick="selectType('CHAPTER')">
+                    <div class="type-icon">📄</div>
+                    <h6>Chapter</h6>
+                    <p>Crawl images from a specific chapter</p>
+                </div>
+                <div class="type-card" data-type="IMAGE" onclick="selectType('IMAGE')">
+                    <div class="type-icon">🖼️</div>
+                    <h6>Image</h6>
+                    <p>Download a single image</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Enter URL -->
+        <div class="wizard-step" id="wizardStep2" style="display: none;">
+            <h6 class="mb-3">Enter Target URL</h6>
+            <div class="mb-3">
+                <label class="form-label">URL <span class="text-danger">*</span></label>
+                <input class="form-control" id="wizardUrl" placeholder="https://example.com/..." type="url">
+                <div class="form-text">Enter the URL of the page you want to crawl</div>
+            </div>
+
+            <div class="duplicate-warning" id="duplicateWarning" style="display: none;">
+                <i class="warning-icon" data-feather="alert-triangle"></i>
+                <strong>Duplicate Detected</strong>
+                <p class="mb-0 mt-1" id="duplicateInfo"></p>
+            </div>
+
+            <h6 class="mt-4 mb-3">Download Mode</h6>
+            <div class="mode-options">
+                <label class="mode-option selected" data-mode="FULL">
+                    <input checked name="downloadMode" type="radio" value="FULL">
+                    <div>
+                        <div class="mode-label">Full Download</div>
+                        <div class="mode-desc">Download all content from scratch</div>
+                    </div>
+                </label>
+                <label class="mode-option" data-mode="UPDATE">
+                    <input name="downloadMode" type="radio" value="UPDATE">
+                    <div>
+                        <div class="mode-label">Update Only</div>
+                        <div class="mode-desc">Only download new chapters</div>
+                    </div>
+                </label>
+                <label class="mode-option" data-mode="NONE">
+                    <input name="downloadMode" type="radio" value="NONE">
+                    <div>
+                        <div class="mode-label">Metadata Only</div>
+                        <div class="mode-desc">Don't download images</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Step 3: Advanced Settings -->
+        <div class="wizard-step" id="wizardStep3" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">Advanced Settings</h6>
+                <button class="btn btn-sm btn-outline-secondary" onclick="resetSettings()">Use Defaults</button>
+            </div>
+
+            <div class="settings-section">
+                <h6>Download Settings</h6>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Parallel Downloads</label>
+                        <select class="form-select" id="settingParallel">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option selected value="3">3</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Timeout (seconds)</label>
+                        <select class="form-select" id="settingTimeout">
+                            <option value="15">15s</option>
+                            <option selected value="30">30s</option>
+                            <option value="60">60s</option>
+                            <option value="120">120s</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h6>Image Settings</h6>
+                <div class="form-check mb-2">
+                    <input checked class="form-check-input" id="settingCompress" type="checkbox">
+                    <label class="form-check-label" for="settingCompress">Compress Images</label>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <label class="form-label">Quality</label>
+                        <select class="form-select" id="settingQuality">
+                            <option value="70">70%</option>
+                            <option selected value="85">85%</option>
+                            <option value="95">95%</option>
+                            <option value="100">100%</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Max Width</label>
+                        <input class="form-control" id="settingMaxWidth" placeholder="0 = no limit" type="number"
+                               value="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h6>Range Settings</h6>
+                <div class="row">
+                    <div class="col-6">
+                        <label class="form-label">Start From</label>
+                        <input class="form-control" id="settingRangeStart" min="0" type="number" value="0">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">End At</label>
+                        <input class="form-control" id="settingRangeEnd" type="number" value="-1">
+                        <div class="form-text">-1 = download all</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Confirm -->
+        <div class="wizard-step" id="wizardStep4" style="display: none;">
+            <h6 class="mb-3">Confirm and Start</h6>
+            <div class="settings-section">
+                <table class="summary-table">
+                    <tr>
+                        <td>Type</td>
+                        <td><strong id="summaryType">COMIC</strong></td>
+                    </tr>
+                    <tr>
+                        <td>URL</td>
+                        <td id="summaryUrl" style="word-break: break-all;">-</td>
+                    </tr>
+                    <tr>
+                        <td>Mode</td>
+                        <td id="summaryMode">FULL</td>
+                    </tr>
+                    <tr>
+                        <td>Parallel</td>
+                        <td id="summaryParallel">3</td>
+                    </tr>
+                    <tr>
+                        <td>Quality</td>
+                        <td id="summaryQuality">85%</td>
+                    </tr>
+                    <tr>
+                        <td>Range</td>
+                        <td id="summaryRange">All</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="alert alert-info">
+                <i data-feather="info"></i>
+                The job will be added to the queue and start immediately.
+            </div>
+        </div>
+    </div>
+
+    <div class="wizard-footer">
+        <div>
+            <button class="btn btn-outline-secondary" id="wizardBackBtn" onclick="wizardBack()" style="display: none;">
+                <i data-feather="arrow-left"></i> Back
+            </button>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" onclick="closeWizard()">Cancel</button>
+            <button class="btn btn-primary" id="wizardNextBtn" onclick="wizardNext()">
+                Next <i data-feather="arrow-right"></i>
+            </button>
+            <button class="btn btn-success" id="wizardStartBtn" onclick="startCrawl()" style="display: none;">
+                <i data-feather="play"></i> Start Crawl
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Context Menu -->
+<div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" onclick="contextAction('view')">
+        <i data-feather="eye"></i> View Details
+    </div>
+    <div class="context-menu-item" id="ctxPause" onclick="contextAction('pause')">
+        <i data-feather="pause"></i> Pause
+    </div>
+    <div class="context-menu-item" id="ctxResume" onclick="contextAction('resume')" style="display: none;">
+        <i data-feather="play"></i> Resume
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" onclick="contextAction('copy')">
+        <i data-feather="copy"></i> Copy URL
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item danger" onclick="contextAction('cancel')">
+        <i data-feather="x"></i> Cancel
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/voler/js/feather-icons/feather.min.js}"></script>
+<script th:src="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:src="@{/voler/js/app.js}"></script>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/passkey.js}"></script>
+<script th:src="@{/js/admin-profile.js}"></script>
+<script th:src="@{/js/admin-auth.js}"></script>
+<script th:src="@{/js/admin/voler-init.js}"></script>
+<!-- Crawl Manager Modules -->
+<script th:src="@{/js/admin/crawl-manager/index.js}" type="module"></script>
+<script th:src="@{/voler/js/main.js}"></script>
+</body>
+</html>
+

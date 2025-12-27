@@ -1,0 +1,253 @@
+/**
+ * Setting Manager - Custom Styles
+ * Extends Voler theme with specific styling for settings UI
+ */
+
+/* CSS Variables for value types */
+:root {
+    --type-string: #2196f3;
+    --type-int: #4caf50;
+    --type-boolean: #ff9800;
+    --type-secret: #e91e63;
+    --type-url: #9c27b0;
+    --type-json: #607d8b;
+}
+
+/* Layout */
+.setting-layout {
+    display: flex;
+    min-height: calc(100vh - 120px);
+}
+
+.setting-sidebar-col {
+    width: 320px;
+    min-width: 320px;
+    max-width: 320px;
+}
+
+.setting-main-col {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Sidebar Tree */
+.category-tree .list-group-item {
+    border: none;
+    border-radius: 0;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    border-left: 3px solid transparent;
+}
+
+.category-tree .list-group-item:hover {
+    background: var(--bs-light);
+}
+
+.category-tree .list-group-item.active {
+    background: rgba(102, 126, 234, 0.1);
+    border-left-color: #667eea;
+    color: inherit;
+}
+
+.category-tree .list-group-item.level-1 {
+    padding-left: 2rem;
+}
+
+.category-tree .list-group-item.level-2 {
+    padding-left: 3rem;
+}
+
+.tree-toggle {
+    width: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.tree-toggle.collapsed {
+    transform: rotate(-90deg);
+}
+
+.tree-children {
+    display: none;
+}
+
+.tree-children.show {
+    display: block;
+}
+
+/* Type Badges */
+.badge-type {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 0.25rem 0.5rem;
+}
+
+.badge-type-string {
+    background: rgba(33, 150, 243, 0.15);
+    color: var(--type-string);
+}
+
+.badge-type-int,
+.badge-type-long {
+    background: rgba(76, 175, 80, 0.15);
+    color: var(--type-int);
+}
+
+.badge-type-double {
+    background: rgba(76, 175, 80, 0.15);
+    color: var(--type-int);
+}
+
+.badge-type-boolean {
+    background: rgba(255, 152, 0, 0.15);
+    color: var(--type-boolean);
+}
+
+.badge-type-secret,
+.badge-type-password {
+    background: rgba(233, 30, 99, 0.15);
+    color: var(--type-secret);
+}
+
+.badge-type-url,
+.badge-type-email {
+    background: rgba(156, 39, 176, 0.15);
+    color: var(--type-url);
+}
+
+.badge-type-json {
+    background: rgba(96, 125, 139, 0.15);
+    color: var(--type-json);
+}
+
+/* Status Indicators */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot-required {
+    background: #dc3545;
+}
+
+.status-dot-sensitive {
+    background: #ffc107;
+}
+
+.status-dot-readonly {
+    background: #6c757d;
+}
+
+/* Settings Table */
+.settings-table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.settings-table th:hover {
+    background: var(--bs-gray-200);
+}
+
+.settings-table .key-cell {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 0.85rem;
+}
+
+.settings-table .value-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 0.85rem;
+}
+
+/* Modal Enhancements */
+.modal-header-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.modal-header-gradient .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.detail-label {
+    font-weight: 500;
+    color: var(--bs-gray-600);
+    min-width: 120px;
+}
+
+.detail-value {
+    flex: 1;
+    word-break: break-word;
+}
+
+.detail-value-mono {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 0.9rem;
+}
+
+/* Constraint Box */
+.constraint-box {
+    background: var(--bs-gray-100);
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+/* Validation Status */
+.validation-status {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.85rem;
+}
+
+.validation-status.valid {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.validation-status.invalid {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* Category Breadcrumb */
+.category-path {
+    font-size: 0.85rem;
+}
+
+.category-path .separator {
+    color: var(--bs-gray-400);
+    margin: 0 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .setting-sidebar-col {
+        position: fixed;
+        left: -320px;
+        top: 0;
+        bottom: 0;
+        z-index: 1030;
+        background: white;
+        transition: left 0.3s;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .setting-sidebar-col.show {
+        left: 0;
+    }
+
+    .setting-main-col {
+        width: 100%;
+    }
+}
+

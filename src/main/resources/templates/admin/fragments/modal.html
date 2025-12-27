@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div aria-hidden="true" aria-labelledby="${modalId}Label"
+     class="modal fade"
+     tabindex="-1"
+     th:fragment="modal(modalId, title, size)"
+     th:id="${modalId}">
+    <div class="modal-dialog" th:classappend="${size != null ? 'modal-' + ${size} : ''}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" th:id="${modalId}Label" th:text="${title}">Modal Title</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <th:block th:fragment="modal-body">
+                    <!-- Modal body content -->
+                </th:block>
+            </div>
+            <div class="modal-footer" th:fragment="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Hủy</button>
+                <button class="btn btn-primary" th:fragment="modal-save" type="button">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
+

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>TruyenGG - Quản lý Duplicates</title>
+    <link rel="stylesheet" th:href="@{/voler/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/voler/css/app.css}">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link rel="shortcut icon" th:href="@{/voler/images/favicon.png}" type="image/png">
+</head>
+<body>
+<div id="app">
+    <div class='active' id="sidebar">
+        <th:block th:replace="~{admin/layouts/sidebar :: sidebar}"></th:block>
+    </div>
+    <div id="main">
+        <nav class="navbar navbar-header navbar-expand navbar-light">
+            <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
+            <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                    class="btn navbar-toggler"
+                    data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav d-flex align-items-center navbar-light ms-auto">
+                    <li class="dropdown">
+                        <a aria-expanded="false" class="nav-link dropdown-toggle nav-link-lg nav-link-user" data-bs-toggle="dropdown"
+                           href="#">
+                            <div class="avatar me-1">
+                                <img alt="Avatar" srcset="" th:src="@{/voler/images/avatar/avatar-s-1.png}">
+                            </div>
+                            <div class="d-none d-md-block d-lg-inline-block">
+                                <span sec:authentication="name">Admin</span>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" data-bs-target="#profileModal" data-bs-toggle="modal" href="#">
+                                <i data-feather="user"></i> Profile
+                            </a>
+                            <a class="dropdown-item" th:href="@{/}">
+                                <i data-feather="home"></i> Home
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="logout(); return false;">
+                                <i data-feather="log-out"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="main-content container-fluid">
+            <th:block
+                    th:replace="~{admin/fragments/page-header :: page-header('Quản lý Duplicates', 'Quản lý và xử lý duplicates trong hệ thống')}"></th:block>
+            <section class="section">
+                <!-- Pending Duplicates -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h4 class="card-title">Pending Duplicates (Chờ xem xét)</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="pendingDuplicatesTable">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên truyện</th>
+                                    <th>Source URL</th>
+                                    <th>Status</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody id="pendingDuplicates-tbody">
+                                <!-- Pending duplicates will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duplicate Detection -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Tìm Duplicates cho Comic</h4>
+                    </div>
+                    <div class="card-body">
+                        <form class="row" id="detectDuplicatesForm">
+                            <div class="col-md-8">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Comic ID</label>
+                                    <input class="form-control" id="comicIdInput" placeholder="Nhập Comic ID"
+                                           type="number">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button class="btn btn-primary w-100" id="detectDuplicatesBtn" type="button">
+                                        <i data-feather="search"></i> Tìm Duplicates
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="duplicateCandidates" style="display: none;">
+                            <h5>Potential Duplicates:</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="candidatesTable">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tên</th>
+                                        <th>Source</th>
+                                        <th>Status</th>
+                                        <th>Similarity</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="candidates-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <footer>
+            <div class="footer clearfix mb-0 text-muted">
+                <div class="float-start">
+                    <p>2024 &copy; <a th:href="@{/}">TruyenGG</a></p>
+                </div>
+                <div class="float-end">
+                    <p>Crafted with <span class='text-danger'><i data-feather="heart"></i></span> by TruyenGG Team</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<!-- Merge Confirmation Modal -->
+<div aria-hidden="true" aria-labelledby="mergeModalLabel" class="modal fade" id="mergeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mergeModalLabel">Xác nhận Merge Comics</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body" id="mergeModalContent">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Hủy</button>
+                <button class="btn btn-primary" id="confirmMerge" type="button">Xác nhận Merge</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<th:block th:replace="~{admin/fragments/profile-modal :: profileModal}"></th:block>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/voler/js/feather-icons/feather.min.js}"></script>
+<script th:src="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:src="@{/voler/js/app.js}"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script th:src="@{/js/admin-auth.js}"></script>
+<script th:src="@{/js/admin/voler-init.js}"></script>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/passkey.js}"></script>
+<script th:src="@{/js/admin-profile.js}"></script>
+<script th:src="@{/js/utils.js}"></script>
+<script th:src="@{/js/admin/duplicates.js}"></script>
+<script th:src="@{/voler/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>TruyenGG - Quản lý Chapters</title>
+    <link rel="stylesheet" th:href="@{/voler/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/voler/css/app.css}">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link rel="shortcut icon" th:href="@{/voler/images/favicon.png}" type="image/png">
+</head>
+<body>
+<div id="app">
+    <div class='active' id="sidebar">
+        <th:block th:replace="~{admin/layouts/sidebar :: sidebar}"></th:block>
+    </div>
+    <div id="main">
+        <nav class="navbar navbar-header navbar-expand navbar-light">
+            <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
+            <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                    class="btn navbar-toggler"
+                    data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav d-flex align-items-center navbar-light ms-auto">
+                    <li class="dropdown">
+                        <a aria-expanded="false" class="nav-link dropdown-toggle nav-link-lg nav-link-user" data-bs-toggle="dropdown"
+                           href="#">
+                            <div class="avatar me-1">
+                                <img alt="Avatar" srcset="" th:src="@{/voler/images/avatar/avatar-s-1.png}">
+                            </div>
+                            <div class="d-none d-md-block d-lg-inline-block">
+                                <span sec:authentication="name">Admin</span>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" data-bs-target="#profileModal" data-bs-toggle="modal" href="#">
+                                <i data-feather="user"></i> Profile
+                            </a>
+                            <a class="dropdown-item" th:href="@{/}">
+                                <i data-feather="home"></i> Home
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="logout(); return false;">
+                                <i data-feather="log-out"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="main-content container-fluid">
+            <th:block
+                    th:replace="~{admin/fragments/page-header :: page-header('Quản lý Chapters', 'Quản lý tất cả chapters trong hệ thống')}"></th:block>
+            <section class="section">
+                <!-- Filter Panel -->
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0"><i data-feather="filter"></i> Bộ lọc</h4>
+                        <button class="btn btn-sm btn-link" data-bs-target="#filterPanel" data-bs-toggle="collapse"
+                                type="button">
+                            <i data-feather="chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="collapse" id="filterPanel">
+                        <div class="card-body">
+                            <form class="row" id="filterForm">
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Chọn truyện</label>
+                                        <select class="form-select" id="comic-select">
+                                            <option value="">-- Tất cả truyện --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Tìm kiếm</label>
+                                        <input class="form-control" id="filterSearch" placeholder="Tên chapter, tiêu đề..."
+                                               type="text">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">&nbsp;</label>
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" id="applyFilters" type="button">
+                                                <i data-feather="search"></i> Áp dụng
+                                            </button>
+                                            <button class="btn btn-secondary" id="resetFilters" type="button">
+                                                <i data-feather="refresh-cw"></i> Reset
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions Toolbar -->
+                <div class="card card-info mb-3" id="bulkActionsToolbar" style="display: none;">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <strong id="selectedCount">0</strong> chapters được chọn
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-success" id="bulkRestore" type="button">
+                                        <i data-feather="rotate-ccw"></i> Restore
+                                    </button>
+                                    <button class="btn btn-sm btn-warning" id="bulkSoftDelete" type="button">
+                                        <i data-feather="trash-2"></i> Soft Delete
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" id="bulkHardDelete" type="button">
+                                        <i data-feather="trash"></i> Hard Delete
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary" id="bulkDeselectAll" type="button">
+                                        <i data-feather="x"></i> Bỏ chọn
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chapters Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Danh sách Chapters</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="chaptersTable">
+                                <thead>
+                                <tr>
+                                    <th width="30">
+                                        <input id="selectAll" type="checkbox">
+                                    </th>
+                                    <th>ID</th>
+                                    <th>Tên Chapter</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Source URL</th>
+                                    <th>Image Count</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody id="chapters-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <footer>
+            <div class="footer clearfix mb-0 text-muted">
+                <div class="float-start">
+                    <p>2024 &copy; <a th:href="@{/}">TruyenGG</a></p>
+                </div>
+                <div class="float-end">
+                    <p>Crafted with <span class='text-danger'><i data-feather="heart"></i></span> by TruyenGG Team</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<!-- Chapter Detail Modal -->
+<div aria-hidden="true" aria-labelledby="chapterDetailModalLabel" class="modal fade" id="chapterDetailModal"
+     tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chapterDetailModalLabel">Chi tiết Chapter - Quản lý Images</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body" id="chapterDetailContent">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<th:block th:replace="~{admin/fragments/profile-modal :: profileModal}"></th:block>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/voler/js/feather-icons/feather.min.js}"></script>
+<script th:src="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:src="@{/voler/js/app.js}"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script th:src="@{/js/admin-auth.js}"></script>
+<script th:src="@{/js/admin/voler-init.js}"></script>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/passkey.js}"></script>
+<script th:src="@{/js/admin-profile.js}"></script>
+<script th:src="@{/js/utils.js}"></script>
+<script th:src="@{/js/admin/chapters.js}"></script>
+<script th:src="@{/voler/js/main.js}"></script>
+</body>
+</html>

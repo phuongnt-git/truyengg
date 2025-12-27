@@ -1,0 +1,72 @@
+---
+alwaysApply: true
+---
+# JAVA & SPRING BOOT DEVELOPMENT GUIDELINES
+
+You are an Expert Senior Java Developer. When generating code or providing solutions, strictly adhere to the following context and rules:
+
+## 1. LANGUAGE & DOCUMENTATION
+- **Pure English:** Use English for all code components, including variable names, class names, comments, log messages, exception messages, and commit messages. **No Vietnamese allowed in the source code.**
+- **Code Comments:** Write meaningful comments only when logic is complex. Avoid commenting on obvious code (e.g., getters/setters).
+
+## 2. CORE SYNTAX & CODING STANDARDS
+- **Java Version:** Use **Java 21** features (Records, Pattern Matching, etc.).
+- **Local Variables:** Use `var` for local variable type inference whenever the type is obvious from the right-hand side.
+- **Static Imports:** Prioritize `import static` for Enums and static utility methods to improve code readability.
+- **Text Blocks:** Use Java Text Blocks (`"""`) for multi-line SQL/JPQL queries and JSON strings.
+- **Logging:** - Use **SLF4J** with placeholders `{}`.
+    - **Selective Logging:** Log only when strictly necessary (e.g., critical business flows, errors, or significant state changes). Avoid "noise" logs in high-frequency loops.
+    - No `System.out.println`.
+- **Null & Collection Checks:** - Use **Apache Commons Collections (`CollectionUtils`)** to check for null, existence, and empty status for all collection types.
+    - Use standard utility methods (e.g., `StringUtils.hasText`, `Objects.isNull`) from Spring Framework or Apache Commons.
+
+## 3. ARCHITECTURE & BEST PRACTICES
+- **Dependency Injection:** Always use **Constructor Injection** (avoid `@Autowired` on fields).
+- **Lombok Usage:** Reduce boilerplate using Lombok:
+    - `@RequiredArgsConstructor` for constructor injection.
+    - `@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)` for encapsulation.
+    - `@UtilityClass` for static helper classes.
+- **DTOs:** Use Java `record` types for DTOs (Data Transfer Objects) regarding immutable data.
+- **Mapping:** Use **MapStruct** for type-safe and efficient mapping between Entities and DTOs.
+- **Validation:** Use **Jakarta Validation** (`@NotNull`, `@Size`, etc.) in DTOs and `@Valid` in Controllers.
+- **Exception Handling:** Implement `@ControllerAdvice` for global exception handling to return standardized error responses.
+
+## 4. SPRING BOOT & WEB
+- **Framework:** Use the latest stable version of **Spring Boot**.
+- **Template Engine:** Default to **Thymeleaf** for server-side rendering unless a specific frontend context is provided.
+- **REST Standards:** Follow RESTful conventions (plural nouns for endpoints, correct HTTP status codes like 201, 204, 400).
+- **Documentation:** Integrate **SpringDoc OpenAPI** (Swagger) for API documentation.
+
+## 5. DATABASE & PERSISTENCE
+- **Database:** Default to **PostgreSQL**.
+- **Migrations:** Use **Flyway** for database schema migrations.
+- **Querying:** Use Spring Data JPA **Specifications** for complex/dynamic queries.
+- **Caching:** Use **Caffeine** as the local cache implementation.
+- **Time Zones:** Use `ZonedDateTime` for audit fields (`createdAt`, `updatedAt`), defaulting to the **Asia/Ho_Chi_Minh (GMT+7)** time zone.
+- **Mock Data:** Generate comprehensive SQL scripts (or `@Sql` tests) with realistic mock data to provide context.
+
+## 6. DEVOPS & BUILD TOOLS
+- **Build Tool:** Use **Gradle** (Kotlin or Groovy DSL) with the Gradle Wrapper.
+- **Containerization:** Always provide a `Dockerfile` and `docker-compose.yml` (including DB, generic services) for project containerization.
+
+## 7. QUALITY ASSURANCE
+- **Testing:** Write comprehensive unit tests for each class, aiming for high code coverage.
+- **Documentation:** Create a detailed `README.md` that summarizes the project, explains the architecture, and lists setup instructions.
+
+## 8. SECURITY & PERFORMANCE
+- **Data Protection:** Never expose JPA Entities directly via API; always use DTOs.
+- **Lazy Loading:** Default to `FetchType.LAZY` for all JPA relationships to avoid N+1 issues.
+- **Pagination:** Always implement `Pageable` for collection-based endpoints.
+- **Passwords:** Use `BCrypt` for password hashing and ensure sensitive fields are excluded from `@ToString`.
+
+## 9. ARCHITECTURE & LOGIC
+- **Layered Architecture:** Enforce strict separation: Controller (Request/Response) -> Service (Business Logic) -> Repository (Data Access).
+- **Service Interfaces:** Use Interface-based design for Service layers.
+- **API Wrapper:** Wrap responses in a consistent `ApiResponse<T>` structure.
+- **Configuration:** Use `@ConfigurationProperties` for type-safe environment variable mapping.
+
+## 10. SONARQUBE & QUALITY ASSURANCE
+- **SonarQube Compliance:** Follow SonarQube rules strictly to ensure Clean Code and Security.
+- **Cognitive Complexity:** Keep methods simple. Avoid deep nesting. Break down complex logic into smaller, private methods.
+- **Resource Management:** Always use **try-with-resources** for `AutoCloseable` resources.
+- **Testing:** Write comprehensive unit tests for each class using **JUnit 5** and **Mockito**, aiming for high code coverage.
