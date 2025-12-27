@@ -1,12 +1,15 @@
-package com.truyengg.security;
+package com.truyengg.security.jwt;
 
-import com.truyengg.service.TokenBlacklistService;
+import com.truyengg.security.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -21,14 +24,17 @@ import static org.springframework.util.StringUtils.hasText;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  private final JwtTokenProvider tokenProvider;
-  private final CustomUserDetailsService customUserDetailsService;
-  private final TokenBlacklistService blacklistService;
+  JwtTokenProvider tokenProvider;
+  UserDetailsServiceImpl userDetailsServiceImpl;
+  TokenBlacklistService blacklistService;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+  protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                  @NonNull HttpServletResponse response,
+                                  @NonNull FilterChain filterChain)
       throws ServletException, IOException {
     try {
       var jwt = getJwtFromRequest(request);

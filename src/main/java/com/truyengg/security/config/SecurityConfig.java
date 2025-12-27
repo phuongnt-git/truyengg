@@ -1,9 +1,10 @@
-package com.truyengg.config;
+package com.truyengg.security.config;
 
-import com.truyengg.security.CustomAccessDeniedHandler;
-import com.truyengg.security.CustomAuthenticationEntryPoint;
-import com.truyengg.security.JwtAuthenticationFilter;
+import com.truyengg.security.jwt.JwtAuthenticationFilter;
+import com.truyengg.security.qsc.filter.QSCHPKEFilter;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,49 +13,56 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
+
+import static java.util.Collections.singletonList;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SecurityConfig {
 
-  private final JwtAuthenticationFilter jwtAuthenticationFilter;
-  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-  private final CustomAccessDeniedHandler customAccessDeniedHandler;
+  JwtAuthenticationFilter jwtAuthenticationFilter;
+  QSCHPKEFilter qscHpkeFilter;
+  AuthenticationEntryPoint authenticationEntryPoint;
+  AccessDeniedHandler accessDeniedHandler;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return http
         .csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**", "/auth/**", "/", "/api/comics/**", "/api/chapters/**",
                 "/api/categories/**", "/api/search/**", "/swagger-ui/**", "/v3/api-docs/**",
                 "/webjars/**", "/css/**", "/js/**", "/img/**", "/fonts/**",
-                "/ws/**", "/ws").permitAll() // WebSocket endpoints
-            .requestMatchers("/jobrunr/**").hasRole("ADMIN") // JobRunr dashboard requires ADMIN role
+                "/ws/**", "/ws", "/api/qsc/public-key", "/graphiql",
+                "/graphql", "/api/passkey/login/**").permitAll()
+            .requestMatchers("/jobrunr/**").hasRole("ADMIN")
             .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/translator/**").hasAnyRole("TRANSLATOR", "ADMIN")
             .anyRequest().authenticated()
-        )
-        .exceptionHandling(exceptions -> exceptions
-            .authenticationEntryPoint(customAuthenticationEntryPoint)
-            .accessDeniedHandler(customAccessDeniedHandler)
+        ).
+        exceptionHandling(exceptions -> exceptions
+            .authenticationEntryPoint(authenticationEntryPoint)
+            .accessDeniedHandler(accessDeniedHandler)
         )
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(qscHpkeFilter, JwtAuthenticationFilter.class)
         .build();
   }
 

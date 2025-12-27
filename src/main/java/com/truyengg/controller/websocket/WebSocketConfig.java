@@ -1,7 +1,9 @@
-package com.truyengg.config;
+package com.truyengg.controller.websocket;
 
-import com.truyengg.security.WebSocketAuthenticationInterceptor;
+import com.truyengg.security.qsc.HPKEWebSocketInterceptor;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -18,9 +20,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-  private final WebSocketAuthenticationInterceptor authenticationInterceptor;
+  WebSocketAuthenticationInterceptor authenticationInterceptor;
+  HPKEWebSocketInterceptor hpkeWebSocketInterceptor;
 
   @Override
   public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -49,7 +53,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void configureClientInboundChannel(ChannelRegistration registration) {
-    registration.interceptors(authenticationInterceptor);
+    registration.interceptors(authenticationInterceptor, hpkeWebSocketInterceptor);
   }
 
 }
