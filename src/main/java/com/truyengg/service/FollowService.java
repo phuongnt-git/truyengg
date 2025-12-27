@@ -6,7 +6,7 @@ import com.truyengg.domain.entity.UserFollow;
 import com.truyengg.domain.repository.ComicRepository;
 import com.truyengg.domain.repository.UserFollowRepository;
 import com.truyengg.domain.repository.UserRepository;
-import com.truyengg.exception.ResourceNotFoundException;
+import com.truyengg.domain.exception.ResourceNotFoundException;
 import com.truyengg.model.mapper.ComicMapper;
 import com.truyengg.model.response.ComicResponse;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +73,7 @@ public class FollowService {
   }
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "followedComics", key = "#userId + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
+  @Cacheable(value = "user:follows#15m", key = "#userId + '-' + #pageable.pageNumber + '-' + #pageable.pageSize")
   public Page<ComicResponse> getFollowedComics(Long userId, Pageable pageable) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException("User not found"));

@@ -6,7 +6,7 @@ import com.truyengg.domain.entity.User;
 import com.truyengg.domain.repository.ComicRepository;
 import com.truyengg.domain.repository.CommentRepository;
 import com.truyengg.domain.repository.UserRepository;
-import com.truyengg.exception.ResourceNotFoundException;
+import com.truyengg.domain.exception.ResourceNotFoundException;
 import com.truyengg.model.mapper.CommentMapper;
 import com.truyengg.model.request.CommentRequest;
 import com.truyengg.model.response.CommentResponse;
@@ -31,7 +31,7 @@ public class CommentService {
   private final CommentMapper commentMapper;
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "commentsByComic", key = "#comicId")
+  @Cacheable(value = "comment:byComic#15m", key = "#comicId")
   public List<CommentResponse> getCommentsByComicId(Long comicId) {
     var comic = comicRepository.findById(comicId)
         .orElseThrow(() -> new ResourceNotFoundException("Comic not found"));

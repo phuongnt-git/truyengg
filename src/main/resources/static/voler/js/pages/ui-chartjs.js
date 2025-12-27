@@ -1,4 +1,3 @@
-
 var chartColors = {
     red: 'rgb(255, 99, 132)',
     orange: 'rgb(255, 159, 64)',
@@ -364,7 +363,7 @@ var myline = new Chart(line, {
             data: [20, 35, 45, 75, 37, 86, 45, 65, 25, 53],
             backgroundColor: "rgba(253, 183, 90,.6)",
             borderWidth: 3,
-                borderColor: 'rgba(253, 183, 90,.6)',
+            borderColor: 'rgba(253, 183, 90,.6)',
             pointBorderWidth: 0,
             pointBorderColor: 'transparent',
             pointRadius: 3,

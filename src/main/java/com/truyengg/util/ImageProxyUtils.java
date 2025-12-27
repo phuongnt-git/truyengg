@@ -3,13 +3,15 @@ package com.truyengg.util;
 import lombok.experimental.UtilityClass;
 
 import java.net.URI;
-import java.security.MessageDigest;
 import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Locale;
 
+import static java.lang.String.format;
+import static java.security.MessageDigest.getInstance;
+import static java.time.ZonedDateTime.parse;
+import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Locale.ENGLISH;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 @UtilityClass
@@ -17,11 +19,11 @@ public class ImageProxyUtils {
 
   public static String generateETag(byte[] data) {
     try {
-      var md = MessageDigest.getInstance("MD5");
+      var md = getInstance("MD5");
       var hash = md.digest(data);
       var sb = new StringBuilder();
       for (byte b : hash) {
-        sb.append(String.format("%02x", b));
+        sb.append(format("%02x", b));
       }
       return "\"" + sb + "\"";
     } catch (Exception e) {
@@ -32,13 +34,12 @@ public class ImageProxyUtils {
   public static Instant parseHttpDate(String httpDate) {
     try {
       // Parse HTTP date format: "Wed, 21 Oct 2015 07:28:00 GMT"
-      var formatter = DateTimeFormatter.RFC_1123_DATE_TIME;
-      return ZonedDateTime.parse(httpDate, formatter).toInstant();
+      return parse(httpDate, RFC_1123_DATE_TIME).toInstant();
     } catch (Exception e) {
       try {
         // Try alternative format: "Wed, 21 Oct 2015 07:28:00 +0000"
-        var formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
-        return ZonedDateTime.parse(httpDate, formatter).toInstant();
+        var formatter = ofPattern("EEE, dd MMM yyyy HH:mm:ss Z", ENGLISH);
+        return parse(httpDate, formatter).toInstant();
       } catch (Exception e2) {
         return null;
       }

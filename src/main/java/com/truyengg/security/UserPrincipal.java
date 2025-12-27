@@ -2,7 +2,6 @@ package com.truyengg.security;
 
 import com.truyengg.domain.entity.User;
 import com.truyengg.domain.enums.UserRole;
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,27 +12,24 @@ import java.util.Collection;
 import static java.time.ZonedDateTime.now;
 import static java.util.Collections.singletonList;
 
-@Getter
-public class UserPrincipal implements UserDetails {
-
-  private final Long id;
-  private final String email;
-  private final String password;
-  private final UserRole role;
-  private final ZonedDateTime bannedUntil;
-  private final Collection<? extends GrantedAuthority> authorities;
-
-  public UserPrincipal(User user) {
-    this.id = user.getId();
-    this.email = user.getEmail();
-    this.password = user.getPassword();
-    this.role = user.getRoles();
-    this.bannedUntil = user.getBannedUntil();
-    this.authorities = singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRoles().name()));
-  }
+public record UserPrincipal(
+    Long id,
+    String email,
+    String password,
+    UserRole role,
+    ZonedDateTime bannedUntil,
+    Collection<? extends GrantedAuthority> authorities
+) implements UserDetails {
 
   public static UserPrincipal create(User user) {
-    return new UserPrincipal(user);
+    return new UserPrincipal(
+        user.getId(),
+        user.getEmail(),
+        user.getPassword(),
+        user.getRoles(),
+        user.getBannedUntil(),
+        singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRoles().name()))
+    );
   }
 
   @Override
@@ -71,4 +67,3 @@ public class UserPrincipal implements UserDetails {
     return isAccountNonLocked();
   }
 }
-

@@ -21,7 +21,7 @@ public class LoginPageController {
                       @AuthenticationPrincipal UserPrincipal userPrincipal,
                       Model model) {
     if (userPrincipal != null) {
-      if (userPrincipal.getRole().equals(ADMIN)) {
+      if (userPrincipal.role().equals(ADMIN)) {
         return "redirect:/admin/dashboard";
       } else {
         return "redirect:/";

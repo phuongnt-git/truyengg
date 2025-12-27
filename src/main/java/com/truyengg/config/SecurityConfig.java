@@ -3,6 +3,7 @@ package com.truyengg.config;
 import com.truyengg.security.CustomAccessDeniedHandler;
 import com.truyengg.security.CustomAuthenticationEntryPoint;
 import com.truyengg.security.JwtAuthenticationFilter;
+import com.truyengg.security.qsc.filter.QSCHPKEFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,7 @@ import java.util.List;
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final QSCHPKEFilter qscHpkeFilter;
   private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
   private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
@@ -44,7 +46,7 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/**", "/auth/**", "/", "/api/comics/**", "/api/chapters/**",
                 "/api/categories/**", "/api/search/**", "/swagger-ui/**", "/v3/api-docs/**",
                 "/webjars/**", "/css/**", "/js/**", "/img/**", "/fonts/**",
-                "/ws/**", "/ws").permitAll() // WebSocket endpoints
+                "/ws/**", "/ws", "/api/qsc/public-key").permitAll() // WebSocket + QSC public key
             .requestMatchers("/jobrunr/**").hasRole("ADMIN") // JobRunr dashboard requires ADMIN role
             .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/translator/**").hasAnyRole("TRANSLATOR", "ADMIN")
@@ -55,6 +57,7 @@ public class SecurityConfig {
             .accessDeniedHandler(customAccessDeniedHandler)
         )
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(qscHpkeFilter, JwtAuthenticationFilter.class)
         .build();
   }
 

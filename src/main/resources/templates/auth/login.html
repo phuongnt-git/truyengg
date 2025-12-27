@@ -1,451 +1,563 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>TruyenGG - Đăng Nhập</title>
-  <link href="https://st.truyengg.net/template/frontend/styles/style.css?v=1.9.4" rel="stylesheet" type="text/css">
-  <link href="https://st.truyengg.net/template/frontend/styles/dark_style.css?v=1.3.4" rel="stylesheet"
-        type="text/css">
-  <link href="https://st.truyengg.net/template/frontend/icon/css/font-awesome.min.css?v=1.2.3" rel="stylesheet"
-        type="text/css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <style>
-      body {
-          background-color: #1e2125;
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-      }
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>TruyenGG - Đăng Nhập</title>
+    <link href="https://st.truyengg.net/template/frontend/styles/style.css?v=1.9.4" rel="stylesheet" type="text/css">
+    <link href="https://st.truyengg.net/template/frontend/styles/dark_style.css?v=1.3.4" rel="stylesheet"
+          type="text/css">
+    <link href="https://st.truyengg.net/template/frontend/icon/css/font-awesome.min.css?v=1.2.3" rel="stylesheet"
+          type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1e2125;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-      .login-container {
-          background-color: #2a2d32;
-          border-radius: 10px;
-          padding: 40px;
-          max-width: 450px;
-          width: 100%;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-      }
+        .login-container {
+            background-color: #2a2d32;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
 
-      .login-header {
-          text-align: center;
-          margin-bottom: 30px;
-      }
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-      .login-header h1 {
-          color: #e0e0e0;
-          margin-bottom: 10px;
-      }
+        .login-header h1 {
+            color: #e0e0e0;
+            margin-bottom: 10px;
+        }
 
-      .login-header p {
-          color: #999;
-      }
+        .login-header p {
+            color: #999;
+        }
 
-      .tab-container {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 20px;
-          border-bottom: 2px solid #3a3d42;
-      }
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3a3d42;
+        }
 
-      .tab {
-          padding: 10px 20px;
-          cursor: pointer;
-          color: #999;
-          border-bottom: 2px solid transparent;
-          margin-bottom: -2px;
-          transition: all 0.3s;
-      }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #999;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
 
-      .tab.active {
-          color: #007bff;
-          border-bottom-color: #007bff;
-      }
+        .tab.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
 
-      .form-section {
-          display: none;
-      }
+        .form-section {
+            display: none;
+        }
 
-      .form-section.active {
-          display: block;
-      }
+        .form-section.active {
+            display: block;
+        }
 
-      .form-group {
-          margin-bottom: 20px;
-      }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-      .form-group input {
-          width: 100%;
-          padding: 12px;
-          background-color: #1e2125;
-          border: 1px solid #3a3d42;
-          border-radius: 5px;
-          color: #e0e0e0;
-          font-size: 14px;
-      }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background-color: #1e2125;
+            border: 1px solid #3a3d42;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
 
-      .form-group input:focus {
-          outline: none;
-          border-color: #007bff;
-      }
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
 
-      .btn-submit {
-          width: 100%;
-          padding: 12px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          font-size: 16px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: background-color 0.3s;
-      }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-      .btn-submit:hover {
-          background-color: #0056b3;
-      }
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
 
-      .btn-submit:disabled {
-          background-color: #555;
-          cursor: not-allowed;
-      }
+        .btn-submit:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
 
-      .google-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          width: 100%;
-          padding: 12px;
-          background-color: #fff;
-          color: #333;
-          border: 1px solid #ddd;
-          border-radius: 5px;
-          text-decoration: none;
-          margin-top: 15px;
-          transition: background-color 0.3s;
-      }
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
 
-      .google-btn:hover {
-          background-color: #f5f5f5;
-      }
+        .google-btn:hover {
+            background-color: #f5f5f5;
+        }
 
-      .forgot-link {
-          text-align: center;
-          margin-top: 15px;
-      }
+        .passkey-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
 
-      .forgot-link a {
-          color: #007bff;
-          text-decoration: none;
-      }
+        .passkey-btn:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
 
-      .forgot-link a:hover {
-          text-decoration: underline;
-      }
+        .passkey-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
 
-      .message {
-          padding: 10px;
-          border-radius: 5px;
-          margin-bottom: 20px;
-          text-align: center;
-      }
+        .passkey-btn i {
+            font-size: 20px;
+        }
 
-      .message.error {
-          background-color: #dc3545;
-          color: white;
-      }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #666;
+        }
 
-      .message.success {
-          background-color: #28a745;
-          color: white;
-      }
-  </style>
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #3a3d42;
+        }
+
+        .divider span {
+            padding: 0 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .passkey-section {
+            margin-bottom: 20px;
+        }
+
+        .passkey-unavailable {
+            display: none;
+        }
+
+        .forgot-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .message.error {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .message.success {
+            background-color: #28a745;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 <div class="login-container">
-  <div class="login-header">
-    <h1>TruyenGG</h1>
-    <p>Đăng nhập để tiếp tục</p>
-  </div>
+    <div class="login-header">
+        <h1>TruyenGG</h1>
+        <p>Đăng nhập để tiếp tục</p>
+    </div>
 
-  <div class="tab-container">
-    <a class="tab active" href="javascript:void(0);" id="tab-login">Đăng Nhập</a>
-    <a class="tab" href="javascript:void(0);" id="tab-register">Đăng Ký</a>
-  </div>
+    <div class="tab-container">
+        <a class="tab active" href="javascript:void(0);" id="tab-login">Đăng Nhập</a>
+        <a class="tab" href="javascript:void(0);" id="tab-register">Đăng Ký</a>
+    </div>
 
-  <div id="message-container"></div>
+    <div id="message-container"></div>
 
-  <!-- Login Form -->
-  <div class="form-section active" id="login-section">
-    <form id="loginForm">
-      <div class="form-group">
-        <input id="email_login" name="email" placeholder="Email" required type="email">
-      </div>
-      <div class="form-group">
-        <input id="password_login" name="password" placeholder="Mật Khẩu" required type="password">
-      </div>
-      <div class="form-group">
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAABeu2BlY4OucEEOI"></div>
-      </div>
-      <button class="btn-submit" id="login-btn" type="submit">Đăng Nhập</button>
-      <a class="google-btn" href="#" id="google-login-btn">
-        <i data-feather="chrome" style="width: 20px; height: 20px;"></i>
-        <span>Đăng nhập bằng Google</span>
-      </a>
-      <div class="forgot-link">
-        <a href="javascript:void(0);" id="forgot-password-link">Quên mật khẩu?</a>
-      </div>
-    </form>
-  </div>
+    <!-- Login Form -->
+    <div class="form-section active" id="login-section">
+        <!-- Passkey Login Section -->
+        <div class="passkey-section" id="passkey-section">
+            <button class="passkey-btn" id="passkey-login-btn" type="button">
+                <i class="bi bi-fingerprint"></i>
+                <span>Đăng nhập bằng Passkey</span>
+            </button>
+            <div class="divider"><span>hoặc</span></div>
+        </div>
 
-  <!-- Register Form -->
-  <div class="form-section" id="register-section">
-    <form id="registerForm">
-      <div class="form-group">
-        <input id="email_register" name="email" placeholder="Email" required type="email">
-      </div>
-      <div class="form-group">
-        <input id="password_register" name="password" placeholder="Mật Khẩu" required type="password">
-      </div>
-      <div class="form-group">
-        <div class="cf-turnstile" data-sitekey="0x4AAAAAABeu8RABJqGv7KK4"></div>
-      </div>
-      <button class="btn-submit" id="register-btn" type="submit">Đăng Ký</button>
-    </form>
-  </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <input id="email_login" name="email" placeholder="Email" required type="email">
+            </div>
+            <div class="form-group">
+                <input id="password_login" name="password" placeholder="Mật Khẩu" required type="password">
+            </div>
+            <button class="btn-submit" id="login-btn" type="submit">Đăng Nhập</button>
+            <a class="google-btn" href="#" id="google-login-btn">
+                <i data-feather="chrome" style="width: 20px; height: 20px;"></i>
+                <span>Đăng nhập bằng Google</span>
+            </a>
+            <div class="forgot-link">
+                <a href="javascript:void(0);" id="forgot-password-link">Quên mật khẩu?</a>
+            </div>
+        </form>
+    </div>
 
-  <!-- Forgot Password Form -->
-  <div class="form-section" id="forgot-section">
-    <form id="forgotForm">
-      <div class="form-group">
-        <input id="email_forgot" name="email" placeholder="Email" required type="email">
-      </div>
-      <button class="btn-submit" id="forgot-btn" type="submit">Gửi</button>
-      <div class="forgot-link">
-        <a href="javascript:void(0);" id="back-to-login">Quay lại đăng nhập</a>
-      </div>
-    </form>
-  </div>
+    <!-- Register Form -->
+    <div class="form-section" id="register-section">
+        <form id="registerForm">
+            <div class="form-group">
+                <input id="email_register" name="email" placeholder="Email" required type="email">
+            </div>
+            <div class="form-group">
+                <input id="password_register" name="password" placeholder="Mật Khẩu" required type="password">
+            </div>
+            <button class="btn-submit" id="register-btn" type="submit">Đăng Ký</button>
+        </form>
+    </div>
+
+    <!-- Forgot Password Form -->
+    <div class="form-section" id="forgot-section">
+        <form id="forgotForm">
+            <div class="form-group">
+                <input id="email_forgot" name="email" placeholder="Email" required type="email">
+            </div>
+            <button class="btn-submit" id="forgot-btn" type="submit">Gửi</button>
+            <div class="forgot-link">
+                <a href="javascript:void(0);" id="back-to-login">Quay lại đăng nhập</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
 <script th:src="@{/js/api.js}"></script>
 <script th:src="@{/js/utils.js}"></script>
+<script th:src="@{/js/passkey.js}"></script>
 <script>
-  // Check if user is already logged in
-  $(document).ready(function () {
-    const accessToken = ApiClient.getToken();
-    const refreshToken = ApiClient.getRefreshToken();
+    // Check if user is already logged in
+    $(document).ready(function () {
+        const accessToken = ApiClient.getToken();
+        const refreshToken = ApiClient.getRefreshToken();
 
-    // If user has tokens, redirect them away from login page
-    if (accessToken || refreshToken) {
-      // Try to get user info to determine redirect destination
-      ApiClient.get('/auth/me', null, true).done(function (response) {
-        if (response.success && response.data) {
-          const user = response.data;
-          // If admin, redirect to admin dashboard
-          if (user.role === 'ADMIN') {
-            window.location.href = '/admin/dashboard';
-          } else {
-            // Otherwise redirect to home
-            window.location.href = '/';
-          }
+        // If user has tokens, redirect them away from login page
+        if (accessToken || refreshToken) {
+            // Try to get user info to determine redirect destination
+            ApiClient.get('/auth/me', null, true).done(function (response) {
+                if (response.success && response.data) {
+                    const user = response.data;
+                    // If admin, redirect to admin dashboard
+                    if (user.role === 'ADMIN') {
+                        window.location.href = '/admin/dashboard';
+                    } else {
+                        // Otherwise redirect to home
+                        window.location.href = '/';
+                    }
+                } else {
+                    // If can't get user info, just redirect to home
+                    window.location.href = '/';
+                }
+            }).fail(function () {
+                // If API call fails, clear tokens and stay on login page
+                ApiClient.clearTokens();
+            });
+        }
+    });
+
+    // Get redirect URL from query parameter and validate it
+    const urlParams = new URLSearchParams(window.location.search);
+    let redirectUrl = urlParams.get('redirect') || '/admin';
+
+    // Validate redirect URL to prevent open redirect vulnerability
+    // Only allow relative URLs or URLs from the same origin
+    function validateRedirectUrl(url) {
+        if (!url) return '/admin';
+        // Remove leading slash for comparison
+        const cleanUrl = url.startsWith('/') ? url : '/' + url;
+        // Only allow relative paths starting with /admin, /, or other safe paths
+        if (cleanUrl.startsWith('/admin') || cleanUrl.startsWith('/') && !cleanUrl.startsWith('//')) {
+            return cleanUrl;
+        }
+        return '/admin'; // Default to admin if invalid
+    }
+
+    redirectUrl = validateRedirectUrl(redirectUrl);
+
+    // Tab switching
+    $('#tab-login').on('click', function () {
+        $('.tab').removeClass('active');
+        $(this).addClass('active');
+        $('.form-section').removeClass('active');
+        $('#login-section').addClass('active');
+    });
+
+    $('#tab-register').on('click', function () {
+        $('.tab').removeClass('active');
+        $(this).addClass('active');
+        $('.form-section').removeClass('active');
+        $('#register-section').addClass('active');
+    });
+
+    $('#forgot-password-link').on('click', function (e) {
+        e.preventDefault();
+        $('.form-section').removeClass('active');
+        $('#forgot-section').addClass('active');
+    });
+
+    $('#back-to-login').on('click', function (e) {
+        e.preventDefault();
+        $('.tab').removeClass('active');
+        $('#tab-login').addClass('active');
+        $('.form-section').removeClass('active');
+        $('#login-section').addClass('active');
+    });
+
+    function showMessage(message, isError) {
+        const container = $('#message-container');
+        container.html('<div class="message ' + (isError ? 'error' : 'success') + '">' + message + '</div>');
+        setTimeout(function () {
+            container.empty();
+        }, 5000);
+    }
+
+    // Login form
+    $('#loginForm').on('submit', function (e) {
+        e.preventDefault();
+        const email = $('#email_login').val().trim();
+        const password = $('#password_login').val().trim();
+        const $btn = $('#login-btn');
+        const originalText = $btn.text();
+
+        if (!email || !validateEmail(email)) {
+            showMessage('Email không hợp lệ', true);
+            return;
+        }
+
+        if (!password) {
+            showMessage('Mật khẩu là bắt buộc', true);
+            return;
+        }
+
+        $btn.prop('disabled', true).text('Đang đăng nhập...');
+
+        ApiClient.post('/auth/login', {
+            email: email,
+            password: password
+        }, false).done(function (response) {
+            if (response.success && response.data) {
+                const tokenData = response.data;
+                // Handle new TokenResponse format (accessToken, refreshToken)
+                if (tokenData.accessToken && tokenData.refreshToken) {
+                    ApiClient.setToken(tokenData.accessToken, tokenData.refreshToken);
+                }
+
+                showMessage('Đăng nhập thành công!', false);
+                setTimeout(function () {
+                    window.location.href = redirectUrl;
+                }, 1000);
+            } else {
+                showMessage(response.message || 'Đăng nhập thất bại', true);
+                $btn.prop('disabled', false).text(originalText);
+            }
+        }).fail(function (xhr) {
+            const errorMsg = xhr.responseJSON?.message || 'Đã xảy ra lỗi khi đăng nhập';
+            showMessage(errorMsg, true);
+            $btn.prop('disabled', false).text(originalText);
+        });
+    });
+
+    // Register form
+    $('#registerForm').on('submit', function (e) {
+        e.preventDefault();
+        const email = $('#email_register').val().trim();
+        const password = $('#password_register').val().trim();
+        const $btn = $('#register-btn');
+        const originalText = $btn.text();
+
+        if (!email || !validateEmail(email)) {
+            showMessage('Email không hợp lệ', true);
+            return;
+        }
+
+        if (!password || password.length < 6) {
+            showMessage('Mật khẩu phải có ít nhất 6 ký tự', true);
+            return;
+        }
+
+        $btn.prop('disabled', true).text('Đang đăng ký...');
+
+        ApiClient.post('/auth/register', {
+            email: email,
+            password: password
+        }, false).done(function (response) {
+            if (response.success) {
+                showMessage('Đăng ký thành công! Vui lòng đăng nhập', false);
+                setTimeout(function () {
+                    $('#tab-login').click();
+                }, 2000);
+            } else {
+                showMessage(response.message || 'Đăng ký thất bại', true);
+            }
+            $btn.prop('disabled', false).text(originalText);
+        }).fail(function (xhr) {
+            const errorMsg = xhr.responseJSON?.message || 'Đã xảy ra lỗi khi đăng ký';
+            showMessage(errorMsg, true);
+            $btn.prop('disabled', false).text(originalText);
+        });
+    });
+
+    // Forgot password form
+    $('#forgotForm').on('submit', function (e) {
+        e.preventDefault();
+        const email = $('#email_forgot').val().trim();
+        const $btn = $('#forgot-btn');
+        const originalText = $btn.text();
+
+        if (!email || !validateEmail(email)) {
+            showMessage('Email không hợp lệ', true);
+            return;
+        }
+
+        $btn.prop('disabled', true).text('Đang gửi...');
+
+        ApiClient.post('/auth/forgot-password', {email: email}, false, true).done(function (response) {
+            if (response.success) {
+                showMessage('Email đặt lại mật khẩu đã được gửi!', false);
+            } else {
+                showMessage(response.message || 'Gửi email thất bại', true);
+            }
+            $btn.prop('disabled', false).text(originalText);
+        }).fail(function (xhr) {
+            const errorMsg = xhr.responseJSON?.message || 'Đã xảy ra lỗi';
+            showMessage(errorMsg, true);
+            $btn.prop('disabled', false).text(originalText);
+        });
+    });
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // Passkey authentication
+    $(document).ready(function () {
+        // Check if WebAuthn is supported
+        if (typeof PasskeyClient !== 'undefined' && PasskeyClient.isSupported()) {
+            $('#passkey-section').show();
+
+            // Check for platform authenticator availability
+            PasskeyClient.isPlatformAuthenticatorAvailable().then(function (available) {
+                if (available) {
+                    $('#passkey-login-btn').find('span').text('Đăng nhập bằng Passkey');
+                } else {
+                    $('#passkey-login-btn').find('span').text('Đăng nhập bằng Security Key');
+                }
+            });
         } else {
-          // If can't get user info, just redirect to home
-          window.location.href = '/';
+            $('#passkey-section').hide();
         }
-      }).fail(function () {
-        // If API call fails, clear tokens and stay on login page
-        ApiClient.clearTokens();
-      });
-    }
-  });
+    });
 
-  // Get redirect URL from query parameter and validate it
-  const urlParams = new URLSearchParams(window.location.search);
-  let redirectUrl = urlParams.get('redirect') || '/admin';
+    // Passkey login handler
+    $('#passkey-login-btn').on('click', async function () {
+        const $btn = $(this);
+        const originalHtml = $btn.html();
 
-  // Validate redirect URL to prevent open redirect vulnerability
-  // Only allow relative URLs or URLs from the same origin
-  function validateRedirectUrl(url) {
-    if (!url) return '/admin';
-    // Remove leading slash for comparison
-    const cleanUrl = url.startsWith('/') ? url : '/' + url;
-    // Only allow relative paths starting with /admin, /, or other safe paths
-    if (cleanUrl.startsWith('/admin') || cleanUrl.startsWith('/') && !cleanUrl.startsWith('//')) {
-      return cleanUrl;
-    }
-    return '/admin'; // Default to admin if invalid
-  }
+        $btn.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> <span>Đang xác thực...</span>');
 
-  redirectUrl = validateRedirectUrl(redirectUrl);
+        try {
+            // Get email if user has entered it (optional for discoverable credentials)
+            const email = $('#email_login').val().trim() || null;
 
-  // Tab switching
-  $('#tab-login').on('click', function () {
-    $('.tab').removeClass('active');
-    $(this).addClass('active');
-    $('.form-section').removeClass('active');
-    $('#login-section').addClass('active');
-  });
+            // Authenticate with passkey
+            const tokenResponse = await PasskeyClient.authenticate(email);
 
-  $('#tab-register').on('click', function () {
-    $('.tab').removeClass('active');
-    $(this).addClass('active');
-    $('.form-section').removeClass('active');
-    $('#register-section').addClass('active');
-  });
+            // Store tokens
+            if (tokenResponse.accessToken && tokenResponse.refreshToken) {
+                ApiClient.setToken(tokenResponse.accessToken, tokenResponse.refreshToken);
+            }
 
-  $('#forgot-password-link').on('click', function (e) {
-    e.preventDefault();
-    $('.form-section').removeClass('active');
-    $('#forgot-section').addClass('active');
-  });
+            showMessage('Đăng nhập thành công!', false);
 
-  $('#back-to-login').on('click', function (e) {
-    e.preventDefault();
-    $('.tab').removeClass('active');
-    $('#tab-login').addClass('active');
-    $('.form-section').removeClass('active');
-    $('#login-section').addClass('active');
-  });
+            // Redirect to admin dashboard (passkey is only available for admin users)
+            setTimeout(function () {
+                window.location.replace('/admin/dashboard');
+            }, 500);
 
-  function showMessage(message, isError) {
-    const container = $('#message-container');
-    container.html('<div class="message ' + (isError ? 'error' : 'success') + '">' + message + '</div>');
-    setTimeout(function () {
-      container.empty();
-    }, 5000);
-  }
-
-  // Login form
-  $('#loginForm').on('submit', function (e) {
-    e.preventDefault();
-    const email = $('#email_login').val().trim();
-    const password = $('#password_login').val().trim();
-    const $btn = $('#login-btn');
-    const originalText = $btn.text();
-
-    if (!email || !validateEmail(email)) {
-      showMessage('Email không hợp lệ', true);
-      return;
-    }
-
-    if (!password) {
-      showMessage('Mật khẩu là bắt buộc', true);
-      return;
-    }
-
-    $btn.prop('disabled', true).text('Đang đăng nhập...');
-
-    const turnstileResponse = $('.cf-turnstile').first().data('cf-turnstile-response');
-
-    ApiClient.post('/auth/login', {
-      email: email,
-      password: password,
-      turnstileResponse: turnstileResponse
-    }, false).done(function (response) {
-      if (response.success && response.data) {
-        const tokenData = response.data;
-        // Handle new TokenResponse format (accessToken, refreshToken)
-        if (tokenData.accessToken && tokenData.refreshToken) {
-          ApiClient.setToken(tokenData.accessToken, tokenData.refreshToken);
+        } catch (error) {
+            console.error('Passkey authentication error:', error);
+            showMessage(error.message || 'Xác thực passkey thất bại', true);
+            $btn.prop('disabled', false).html(originalHtml);
         }
-
-        showMessage('Đăng nhập thành công!', false);
-        setTimeout(function () {
-          window.location.href = redirectUrl;
-        }, 1000);
-      } else {
-        showMessage(response.message || 'Đăng nhập thất bại', true);
-        $btn.prop('disabled', false).text(originalText);
-      }
-    }).fail(function (xhr) {
-      const errorMsg = xhr.responseJSON?.message || 'Đã xảy ra lỗi khi đăng nhập';
-      showMessage(errorMsg, true);
-      $btn.prop('disabled', false).text(originalText);
     });
-  });
-
-  // Register form
-  $('#registerForm').on('submit', function (e) {
-    e.preventDefault();
-    const email = $('#email_register').val().trim();
-    const password = $('#password_register').val().trim();
-    const $btn = $('#register-btn');
-    const originalText = $btn.text();
-
-    if (!email || !validateEmail(email)) {
-      showMessage('Email không hợp lệ', true);
-      return;
-    }
-
-    if (!password || password.length < 6) {
-      showMessage('Mật khẩu phải có ít nhất 6 ký tự', true);
-      return;
-    }
-
-    $btn.prop('disabled', true).text('Đang đăng ký...');
-
-    const turnstileResponse = $('.cf-turnstile').last().data('cf-turnstile-response');
-
-    ApiClient.post('/auth/register', {
-      email: email,
-      password: password,
-      turnstileResponse: turnstileResponse
-    }, false).done(function (response) {
-      if (response.success) {
-        showMessage('Đăng ký thành công! Vui lòng đăng nhập', false);
-        setTimeout(function () {
-          $('#tab-login').click();
-        }, 2000);
-      } else {
-        showMessage(response.message || 'Đăng ký thất bại', true);
-      }
-      $btn.prop('disabled', false).text(originalText);
-    }).fail(function (xhr) {
-      const errorMsg = xhr.responseJSON?.message || 'Đã xảy ra lỗi khi đăng ký';
-      showMessage(errorMsg, true);
-      $btn.prop('disabled', false).text(originalText);
-    });
-  });
-
-  // Forgot password form
-  $('#forgotForm').on('submit', function (e) {
-    e.preventDefault();
-    const email = $('#email_forgot').val().trim();
-    const $btn = $('#forgot-btn');
-    const originalText = $btn.text();
-
-    if (!email || !validateEmail(email)) {
-      showMessage('Email không hợp lệ', true);
-      return;
-    }
-
-    $btn.prop('disabled', true).text('Đang gửi...');
-
-    ApiClient.post('/auth/forgot-password', {email: email}, false, true).done(function (response) {
-      if (response.success) {
-        showMessage('Email đặt lại mật khẩu đã được gửi!', false);
-      } else {
-        showMessage(response.message || 'Gửi email thất bại', true);
-      }
-      $btn.prop('disabled', false).text(originalText);
-    }).fail(function (xhr) {
-      const errorMsg = xhr.responseJSON?.message || 'Đã xảy ra lỗi';
-      showMessage(errorMsg, true);
-      $btn.prop('disabled', false).text(originalText);
-    });
-  });
-
-  function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  }
 </script>
 </body>
 </html>

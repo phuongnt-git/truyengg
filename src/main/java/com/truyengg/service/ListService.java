@@ -29,7 +29,7 @@ public class ListService {
   private final ComicMapper comicMapper;
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "newComics", unless = "#result.isEmpty()")
+  @Cacheable(value = "comic:new#15m", unless = "#result.isEmpty()")
   public Page<ComicResponse> getNewComics(Pageable pageable) {
     var since = ZonedDateTime.now(of("Asia/Ho_Chi_Minh")).minusDays(7);
     Specification<Comic> spec = (root, query, cb) ->
@@ -40,7 +40,7 @@ public class ListService {
   }
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "newReleases", unless = "#result.isEmpty()")
+  @Cacheable(value = "comic:releases#15m", unless = "#result.isEmpty()")
   public Page<ComicResponse> getNewReleases(Pageable pageable) {
     var since = ZonedDateTime.now(of("Asia/Ho_Chi_Minh")).minusDays(30);
     Specification<Comic> spec = (root, query, cb) ->
@@ -51,7 +51,7 @@ public class ListService {
   }
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "completedComics", unless = "#result.isEmpty()")
+  @Cacheable(value = "comic:completed#30m", unless = "#result.isEmpty()")
   public Page<ComicResponse> getCompletedComics(Pageable pageable) {
     Specification<Comic> spec = (root, query, cb) -> cb.and(
         cb.equal(root.get("status"), ACTIVE),
@@ -64,7 +64,7 @@ public class ListService {
   }
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "upcomingComics", unless = "#result.isEmpty()")
+  @Cacheable(value = "comic:upcoming#30m", unless = "#result.isEmpty()")
   public Page<ComicResponse> getUpcomingComics(Pageable pageable) {
     Specification<Comic> spec = (root, query, cb) -> cb.and(
         cb.equal(root.get("status"), ACTIVE),

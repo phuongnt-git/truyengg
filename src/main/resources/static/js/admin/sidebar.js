@@ -2,14 +2,14 @@
  * Admin Sidebar Navigation
  * Handles active state highlighting based on current URL
  */
-(function() {
+(function () {
     'use strict';
 
     function initSidebarActiveState() {
         const currentPath = window.location.pathname;
-        
+
         // Remove active class from all sidebar links
-        document.querySelectorAll('.sidebar-link').forEach(function(link) {
+        document.querySelectorAll('.sidebar-link').forEach(function (link) {
             link.classList.remove('active');
         });
 
@@ -37,7 +37,7 @@
             if (currentPath === path || currentPath.startsWith(path + '/')) {
                 // Special handling for crawl to avoid matching category-crawl or jobs
                 if (path === '/admin/crawl') {
-                    if (!currentPath.includes('/admin/category-crawl') && 
+                    if (!currentPath.includes('/admin/category-crawl') &&
                         !currentPath.includes('/admin/jobs') &&
                         !currentPath.includes('/admin/crawl-job-detail')) {
                         activePage = page;

@@ -4,8 +4,9 @@ import com.truyengg.domain.entity.Chapter;
 import com.truyengg.domain.entity.Comic;
 import com.truyengg.domain.repository.ChapterRepository;
 import com.truyengg.domain.repository.ComicRepository;
-import com.truyengg.exception.ResourceNotFoundException;
+import com.truyengg.domain.exception.ResourceNotFoundException;
 import com.truyengg.model.response.ChapterResponse;
+import com.truyengg.service.image.ChapterImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class ChapterService {
   ChapterImageService chapterImageService;
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "chaptersByComic", key = "#comicSlug")
+  @Cacheable(value = "chapter:byComic#1h", key = "#comicSlug")
   public List<ChapterResponse> getChaptersByComicSlug(String comicSlug) {
     Comic comic = comicRepository.findBySlug(comicSlug)
         .orElseThrow(() -> new ResourceNotFoundException("Comic not found"));
@@ -41,7 +42,7 @@ public class ChapterService {
   }
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "chapterByComicAndName", key = "#comicSlug + '-' + #chapterName")
+  @Cacheable(value = "chapter:details#2h", key = "#comicSlug + '-' + #chapterName")
   public ChapterResponse getChapterByComicAndChapterName(String comicSlug, String chapterName) {
     Comic comic = comicRepository.findBySlug(comicSlug)
         .orElseThrow(() -> new ResourceNotFoundException("Comic not found"));

@@ -3,10 +3,7 @@ package com.truyengg.controller.web;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin")
@@ -53,14 +50,19 @@ public class AdminPageController {
     return "admin/settings";
   }
 
+  @GetMapping("/setting")
+  public String setting() {
+    return "admin/setting";
+  }
+
+  @GetMapping("/cache")
+  public String cache() {
+    return "admin/cache";
+  }
+
   @GetMapping("/reports")
   public String reports() {
     return "admin/reports";
-  }
-
-  @GetMapping("/crawl")
-  public String crawl() {
-    return "admin/crawl";
   }
 
   @GetMapping("/backup")
@@ -68,18 +70,13 @@ public class AdminPageController {
     return "admin/backup";
   }
 
-  @GetMapping("/jobs")
-  public String jobs() {
-    return "admin/jobs";
-  }
-
-  @GetMapping("/crawl/jobs/{jobId}")
-  public String crawlJobDetail(@PathVariable UUID jobId) {
-    return "admin/crawl-job-detail";
-  }
-
   @GetMapping("/images")
   public String images() {
     return "admin/images";
+  }
+
+  @GetMapping("/passkeys")
+  public String passkeys() {
+    return "admin/passkey-settings";
   }
 }

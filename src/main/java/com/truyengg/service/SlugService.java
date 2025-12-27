@@ -61,10 +61,5 @@ public class SlugService {
 
     return slug;
   }
-
-  @Transactional(readOnly = true)
-  public boolean isSlugUnique(String slug) {
-    return !comicRepository.existsBySlug(slug);
-  }
 }
 

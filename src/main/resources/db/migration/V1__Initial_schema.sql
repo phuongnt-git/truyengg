@@ -8,10 +8,11 @@ CREATE TYPE backup_status_enum AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'F
 CREATE TYPE story_status_enum AS ENUM ('ONGOING', 'COMPLETED');
 CREATE TYPE recharge_status_enum AS ENUM ('PENDING', 'COMPLETED', 'FAILED');
 CREATE TYPE payment_type_enum AS ENUM ('RECHARGE', 'PURCHASE', 'OTHER');
-CREATE TYPE comic_crawl_download_mode AS ENUM('NONE', 'PARTIAL', 'FULL');
-CREATE TYPE comic_crawl_status_enum AS ENUM ('PENDING', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED', 'PAUSED');
-CREATE TYPE chapter_crawl_status_enum AS ENUM ('PENDING', 'DOWNLOADING', 'COMPLETED', 'FAILED');
-CREATE TYPE crawl_event_type_enum AS ENUM ('START', 'PAUSE', 'RESUME', 'CANCEL', 'RETRY', 'ERROR', 'STATUS_CHANGE');
+CREATE TYPE crawl_type AS ENUM ('CATEGORY', 'COMIC', 'CHAPTER', 'IMAGE');
+CREATE TYPE crawl_status AS ENUM ('PENDING', 'RUNNING', 'PAUSED', 'COMPLETED', 'FAILED', 'CANCELLED');
+CREATE TYPE queue_status AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', 'SKIPPED', 'DELAYED');
+CREATE TYPE download_mode AS ENUM ('FULL', 'UPDATE', 'PARTIAL', 'NONE');
+CREATE TYPE setting_value_type AS ENUM ('STRING', 'INT', 'LONG', 'DOUBLE', 'BOOLEAN', 'JSON', 'URL', 'EMAIL', 'PASSWORD', 'SECRET');
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -20,7 +21,7 @@ CREATE TABLE IF NOT EXISTS users
     password        VARCHAR(255)        NOT NULL,
     username        VARCHAR(255),
     avatar          VARCHAR(255),
-    roles           user_role_enum       NOT NULL DEFAULT 'USER',
+    roles           user_role_enum      NOT NULL DEFAULT 'USER',
     banned_until    TIMESTAMP WITH TIME ZONE,
     xu              BIGINT              NOT NULL DEFAULT 0,
     points          BIGINT              NOT NULL DEFAULT 0,
@@ -43,32 +44,34 @@ CREATE INDEX IF NOT EXISTS idx_users_roles ON users (roles);
 CREATE TABLE IF NOT EXISTS comics
 (
     id                      BIGSERIAL PRIMARY KEY,
-    name                    VARCHAR(255)        NOT NULL,
-    slug                    VARCHAR(255) UNIQUE NOT NULL,
+    name                    VARCHAR(255)         NOT NULL,
+    slug                    VARCHAR(255) UNIQUE  NOT NULL,
     origin_name             TEXT,
     content                 TEXT,
-    status                  status_enum         NOT NULL DEFAULT 'PENDING',
+    status                  status_enum          NOT NULL DEFAULT 'PENDING',
     progress_status         progress_status_enum NOT NULL DEFAULT 'ONGOING',
     thumb_url               VARCHAR(255),
-    views                   BIGINT              NOT NULL DEFAULT 0,
+    views                   BIGINT               NOT NULL DEFAULT 0,
     author                  TEXT,
-    is_backed_up            BOOLEAN             NOT NULL DEFAULT FALSE,
-    is_hot                  BOOLEAN             NOT NULL DEFAULT FALSE,
+    is_backed_up            BOOLEAN              NOT NULL DEFAULT FALSE,
+    is_hot                  BOOLEAN              NOT NULL DEFAULT FALSE,
     backup_data             TEXT,
-    likes                   BIGINT              NOT NULL DEFAULT 0,
-    follows                 BIGINT              NOT NULL DEFAULT 0,
-    total_chapters          INTEGER             NOT NULL DEFAULT 0,
+    likes                   BIGINT               NOT NULL DEFAULT 0,
+    follows                 BIGINT               NOT NULL DEFAULT 0,
+    total_chapters          INTEGER              NOT NULL DEFAULT 0,
     last_chapter_updated_at TIMESTAMP WITH TIME ZONE,
     source                  VARCHAR(500) UNIQUE,
+    cover_hash              VARCHAR(64),
+    cover_blurhash          VARCHAR(50),
     alternative_names       TEXT[],
     age_rating              age_rating_enum,
     gender                  comic_gender_enum,
     country                 VARCHAR(50),
-    merged_comic_id         BIGINT REFERENCES comics(id),
+    merged_comic_id         BIGINT REFERENCES comics (id),
     content_search_vector   tsvector,
     updated_at              TIMESTAMP WITH TIME ZONE,
-    created_at              TIMESTAMP WITH TIME ZONE     DEFAULT CURRENT_TIMESTAMP,
-    updated_at_local        TIMESTAMP WITH TIME ZONE     DEFAULT CURRENT_TIMESTAMP
+    created_at              TIMESTAMP WITH TIME ZONE      DEFAULT CURRENT_TIMESTAMP,
+    updated_at_local        TIMESTAMP WITH TIME ZONE      DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_comics_slug ON comics (slug);
@@ -131,8 +134,9 @@ CREATE TABLE IF NOT EXISTS chapter_images
     original_url  VARCHAR(500),
     image_order   INTEGER      NOT NULL,
     manual_order  INTEGER,
-    is_downloaded BOOLEAN      NOT NULL DEFAULT FALSE,
-    is_visible    BOOLEAN      NOT NULL DEFAULT TRUE,
+    is_downloaded BOOLEAN      NOT NULL    DEFAULT FALSE,
+    is_visible    BOOLEAN      NOT NULL    DEFAULT TRUE,
+    blurhash      VARCHAR(50),
     deleted_at    TIMESTAMP WITH TIME ZONE,
     created_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -195,13 +199,21 @@ CREATE INDEX IF NOT EXISTS idx_reading_history_last_read_at ON reading_history (
 CREATE TABLE IF NOT EXISTS settings
 (
     id            BIGSERIAL PRIMARY KEY,
-    setting_key   VARCHAR(100) UNIQUE NOT NULL,
-    setting_value TEXT                NOT NULL,
-    description   VARCHAR(255),
-    updated_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    category_id   INT,
+    key           VARCHAR(100)       NOT NULL,
+    full_key      VARCHAR(255) UNIQUE,
+    value         TEXT               NOT NULL,
+    value_type    setting_value_type NOT NULL DEFAULT 'STRING',
+    default_value TEXT,
+    constraints   JSONB,
+    is_required   BOOLEAN                     DEFAULT false,
+    is_sensitive  BOOLEAN                     DEFAULT false,
+    is_readonly   BOOLEAN                     DEFAULT false,
+    description   TEXT,
+    updated_by    BIGINT,
+    created_at    TIMESTAMPTZ                 DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ                 DEFAULT NOW()
 );
-
-CREATE INDEX IF NOT EXISTS idx_settings_setting_key ON settings (setting_key);
 
 CREATE TABLE IF NOT EXISTS chapter_errors
 (
@@ -230,13 +242,13 @@ CREATE INDEX IF NOT EXISTS idx_comic_view_logs_log_date ON comic_view_logs (log_
 CREATE TABLE IF NOT EXISTS backup_logs
 (
     id           BIGSERIAL PRIMARY KEY,
-    comic_id     BIGINT      NOT NULL REFERENCES comics (id) ON DELETE CASCADE,
+    comic_id     BIGINT             NOT NULL REFERENCES comics (id) ON DELETE CASCADE,
     status       backup_status_enum NOT NULL DEFAULT 'PENDING',
     message      TEXT,
-    progress     INTEGER     NOT NULL     DEFAULT 0,
+    progress     INTEGER            NOT NULL DEFAULT 0,
     started_at   TIMESTAMP WITH TIME ZONE,
     completed_at TIMESTAMP WITH TIME ZONE,
-    created_at   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    created_at   TIMESTAMP WITH TIME ZONE    DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_backup_logs_comic_id ON backup_logs (comic_id);
@@ -245,15 +257,15 @@ CREATE INDEX IF NOT EXISTS idx_backup_logs_status ON backup_logs (status);
 CREATE TABLE IF NOT EXISTS stories
 (
     id          BIGSERIAL PRIMARY KEY,
-    title       VARCHAR(255) NOT NULL,
-    slug        VARCHAR(255) NOT NULL,
+    title       VARCHAR(255)      NOT NULL,
+    slug        VARCHAR(255)      NOT NULL,
     description TEXT,
     thumbnail   VARCHAR(255),
     categories  VARCHAR(255),
     status      story_status_enum NOT NULL DEFAULT 'ONGOING',
-    user_id     BIGINT       NOT NULL    DEFAULT 0,
-    created_at  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    user_id     BIGINT            NOT NULL DEFAULT 0,
+    created_at  TIMESTAMP WITH TIME ZONE   DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP WITH TIME ZONE   DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_stories_user_id ON stories (user_id);
@@ -262,13 +274,13 @@ CREATE INDEX IF NOT EXISTS idx_stories_slug ON stories (slug);
 CREATE TABLE IF NOT EXISTS recharge_history
 (
     id             BIGSERIAL PRIMARY KEY,
-    user_id        BIGINT      NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    amount         BIGINT      NOT NULL,
+    user_id        BIGINT               NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    amount         BIGINT               NOT NULL,
     payment_method VARCHAR(50),
     transaction_id VARCHAR(255),
     status         recharge_status_enum NOT NULL DEFAULT 'PENDING',
-    created_at     TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    created_at     TIMESTAMP WITH TIME ZONE      DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP WITH TIME ZONE      DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_recharge_history_user_id ON recharge_history (user_id);
@@ -278,8 +290,8 @@ CREATE INDEX IF NOT EXISTS idx_recharge_history_created_at ON recharge_history (
 CREATE TABLE IF NOT EXISTS payment_history
 (
     id           BIGSERIAL PRIMARY KEY,
-    user_id      BIGINT      NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    amount       BIGINT      NOT NULL,
+    user_id      BIGINT            NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    amount       BIGINT            NOT NULL,
     payment_type payment_type_enum NOT NULL,
     description  TEXT,
     created_at   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -298,12 +310,16 @@ CREATE TABLE IF NOT EXISTS refresh_tokens
     created_at   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_used_at TIMESTAMP WITH TIME ZONE,
     ip_address   VARCHAR(45),
-    user_agent   TEXT
+    user_agent   TEXT,
+    jti          VARCHAR(64) UNIQUE,
+    is_revoked   BOOLEAN                  DEFAULT false
 );
 
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens (user_id);
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token ON refresh_tokens (token);
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_at ON refresh_tokens (expires_at);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_jti ON refresh_tokens (jti) WHERE jti IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_revoked ON refresh_tokens (is_revoked) WHERE is_revoked = false;
 
 CREATE TABLE IF NOT EXISTS token_blacklist
 (
@@ -318,267 +334,383 @@ CREATE TABLE IF NOT EXISTS token_blacklist
 CREATE INDEX IF NOT EXISTS idx_token_blacklist_token_hash ON token_blacklist (token_hash);
 CREATE INDEX IF NOT EXISTS idx_token_blacklist_expires_at ON token_blacklist (expires_at);
 
-CREATE TABLE IF NOT EXISTS comic_crawl
+CREATE TABLE IF NOT EXISTS crawl_jobs
 (
-    id                                      UUID PRIMARY KEY                  DEFAULT gen_random_uuid(),
-    status                                  comic_crawl_status_enum    NOT NULL,
-    url                                     TEXT                     NOT NULL,
-    download_mode                           comic_crawl_download_mode  NOT NULL DEFAULT 'FULL',
-    download_chapters                       JSONB,
-    part_start                              INTEGER,
-    part_end                                INTEGER,
-    total_chapters                          INTEGER                  NOT NULL DEFAULT 0,
-    downloaded_chapters                     INTEGER                  NOT NULL DEFAULT 0,
-    start_time                              TIMESTAMP WITH TIME ZONE NOT NULL,
-    end_time                                TIMESTAMP WITH TIME ZONE,
-    message                                 TEXT,
-    checkpoint_data                         TEXT,
-    deleted_at                              TIMESTAMP WITH TIME ZONE,
-    deleted_by                              BIGINT REFERENCES users (id),
-    created_by                              BIGINT                   NOT NULL REFERENCES users (id),
-    total_file_size_bytes                   BIGINT                            DEFAULT 0,
-    total_download_time_seconds             BIGINT                            DEFAULT 0,
-    total_request_count                     INTEGER                           DEFAULT 0,
-    total_error_count                       INTEGER                           DEFAULT 0,
-    average_download_speed_bytes_per_second DECIMAL(15, 2),
-    chapter_urls                            JSONB,
-    chapter_image_urls                      JSONB,
-    created_at                              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at                              TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id              UUID PRIMARY KEY       DEFAULT gen_random_uuid(),
+    crawl_type      crawl_type    NOT NULL,
+    parent_job_id   UUID REFERENCES crawl_jobs (id) ON DELETE CASCADE,
+    root_job_id     UUID REFERENCES crawl_jobs (id) ON DELETE CASCADE,
+    depth           INT           NOT NULL DEFAULT 0,
+    target_url      TEXT          NOT NULL,
+    target_slug     VARCHAR(255),
+    target_name     VARCHAR(500),
+    item_index      INT           NOT NULL DEFAULT 0,
+    content_id      BIGINT        NOT NULL DEFAULT -1,
+    status          crawl_status  NOT NULL DEFAULT 'PENDING',
+    download_mode   download_mode NOT NULL DEFAULT 'FULL',
+    total_items     INT           NOT NULL DEFAULT 0,
+    completed_items INT           NOT NULL DEFAULT 0,
+    failed_items    INT           NOT NULL DEFAULT 0,
+    skipped_items   INT           NOT NULL DEFAULT 0,
+    error_message   TEXT,
+    retry_count     INT           NOT NULL DEFAULT 0,
+    started_at      TIMESTAMPTZ,
+    completed_at    TIMESTAMPTZ,
+    deleted_at      TIMESTAMPTZ,
+    created_by      BIGINT REFERENCES users (id),
+    created_at      TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    updated_at      TIMESTAMPTZ   NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_comic_crawl_created_by ON comic_crawl (created_by);
-CREATE INDEX IF NOT EXISTS idx_comic_crawl_status ON comic_crawl (status);
-CREATE INDEX IF NOT EXISTS idx_comic_crawl_created_at ON comic_crawl (created_at);
-CREATE INDEX IF NOT EXISTS idx_comic_crawl_deleted_at ON comic_crawl (deleted_at) WHERE deleted_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_crawl_jobs_type ON crawl_jobs (crawl_type);
+CREATE INDEX IF NOT EXISTS idx_crawl_jobs_status ON crawl_jobs (status) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_crawl_jobs_parent ON crawl_jobs (parent_job_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_crawl_jobs_root ON crawl_jobs (root_job_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_crawl_jobs_url ON crawl_jobs (target_url);
+CREATE INDEX IF NOT EXISTS idx_crawl_jobs_created_by ON crawl_jobs (created_by);
+CREATE INDEX IF NOT EXISTS idx_crawl_jobs_active ON crawl_jobs (status)
+    WHERE status IN ('PENDING', 'RUNNING', 'PAUSED') AND deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_crawl_jobs_deleted ON crawl_jobs (deleted_at) WHERE deleted_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_crawl_jobs_content ON crawl_jobs (content_id) WHERE content_id > 0;
 
-CREATE TABLE IF NOT EXISTS chapter_crawl
+CREATE TABLE IF NOT EXISTS crawl_settings
 (
-    id                              BIGSERIAL PRIMARY KEY,
-    crawl_id                        UUID NOT NULL REFERENCES comic_crawl(id) ON DELETE CASCADE,
-    chapter_index                   INTEGER NOT NULL,
-    chapter_url                     TEXT NOT NULL,
-    chapter_name                    VARCHAR(255),
-    status                          chapter_crawl_status_enum NOT NULL,
-    total_images                    INTEGER NOT NULL DEFAULT 0,
-    downloaded_images               INTEGER NOT NULL DEFAULT 0,
-    file_size_bytes                 BIGINT DEFAULT 0,
-    download_time_seconds           BIGINT DEFAULT 0,
-    request_count                   INTEGER DEFAULT 0,
-    error_count                     INTEGER DEFAULT 0,
-    download_speed_bytes_per_second DECIMAL(15,2),
-    retry_count                     INTEGER NOT NULL DEFAULT 0,
-    error_messages                  TEXT[],
-    image_paths                     JSONB,
-    original_image_paths            JSONB,
-    started_at                      TIMESTAMP WITH TIME ZONE,
-    completed_at                    TIMESTAMP WITH TIME ZONE,
-    created_at                      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at                      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(crawl_id, chapter_index)
+    id                UUID PRIMARY KEY REFERENCES crawl_jobs (id) ON DELETE CASCADE,
+    parallel_limit    INT         NOT NULL DEFAULT 3,
+    image_quality     INT         NOT NULL DEFAULT 85,
+    timeout_seconds   INT         NOT NULL DEFAULT 30,
+    skip_items        INT[],
+    redownload_items  INT[],
+    range_start       INT         NOT NULL DEFAULT -1,
+    range_end         INT         NOT NULL DEFAULT -1,
+    per_item_settings JSONB,
+    custom_headers    JSONB,
+    deleted_at        TIMESTAMPTZ,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-
-CREATE INDEX IF NOT EXISTS idx_chapter_crawl_id ON chapter_crawl(crawl_id);
-CREATE INDEX IF NOT EXISTS idx_chapter_crawl_status ON chapter_crawl(status);
-CREATE INDEX IF NOT EXISTS idx_chapter_crawl_id_status ON chapter_crawl(crawl_id, status);
-CREATE INDEX IF NOT EXISTS idx_chapter_crawl_created_at ON chapter_crawl(created_at);
 
 CREATE TABLE IF NOT EXISTS crawl_progress
 (
-    id                BIGSERIAL PRIMARY KEY,
-    crawl_id          UUID NOT NULL REFERENCES comic_crawl(id) ON DELETE CASCADE,
-    current_chapter   INTEGER NOT NULL DEFAULT 0,
-    total_chapters    INTEGER NOT NULL DEFAULT 0,
-    downloaded_images INTEGER NOT NULL DEFAULT 0,
-    total_images      INTEGER NOT NULL DEFAULT 0,
-    current_message   TEXT,
-    messages          TEXT[],
-    start_time        TIMESTAMP WITH TIME ZONE NOT NULL,
-    last_update       TIMESTAMP WITH TIME ZONE NOT NULL,
-    elapsed_seconds   BIGINT NOT NULL DEFAULT 0,
-    created_at        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(crawl_id)
+    id                          UUID PRIMARY KEY REFERENCES crawl_jobs (id) ON DELETE CASCADE,
+    item_index                  INT         NOT NULL DEFAULT 0,
+    item_name                   VARCHAR(500),
+    item_url                    TEXT,
+    total_items                 INT         NOT NULL DEFAULT 0,
+    completed_items             INT         NOT NULL DEFAULT 0,
+    failed_items                INT         NOT NULL DEFAULT 0,
+    skipped_items               INT         NOT NULL DEFAULT 0,
+    bytes_downloaded            BIGINT      NOT NULL DEFAULT 0,
+    percent                     INT         NOT NULL DEFAULT 0,
+    message                     TEXT,
+    messages                    TEXT[]               DEFAULT '{}',
+    started_at                  TIMESTAMPTZ,
+    last_update_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    estimated_remaining_seconds INT         NOT NULL DEFAULT 0,
+    deleted_at                  TIMESTAMPTZ,
+    created_at                  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_crawl_progress_crawl_id ON crawl_progress(crawl_id);
-CREATE INDEX IF NOT EXISTS idx_crawl_progress_last_update ON crawl_progress(last_update);
+CREATE INDEX IF NOT EXISTS idx_crawl_progress_update ON crawl_progress (last_update_at);
 
-CREATE TABLE IF NOT EXISTS comic_crawl_checkpoints
+CREATE TABLE IF NOT EXISTS crawl_checkpoints
 (
-    id                   BIGSERIAL PRIMARY KEY,
-    crawl_id             UUID NOT NULL REFERENCES comic_crawl(id) ON DELETE CASCADE,
-    current_chapter_index INTEGER NOT NULL,
-    current_image_index  INTEGER,
-    current_image_url    TEXT,
-    crawled_chapters     TEXT[],
-    chapter_progress     JSONB,
-    image_urls           JSONB,
-    created_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(crawl_id)
+    id                  UUID PRIMARY KEY REFERENCES crawl_jobs (id) ON DELETE CASCADE,
+    last_item_index     INT         NOT NULL DEFAULT -1,
+    failed_item_indices INT[],
+    failed_nested_items JSONB,
+    resume_count        INT         NOT NULL DEFAULT 0,
+    paused_at           TIMESTAMPTZ,
+    resumed_at          TIMESTAMPTZ,
+    state_snapshot      JSONB,
+    deleted_at          TIMESTAMPTZ,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_checkpoints_crawl_id ON comic_crawl_checkpoints(crawl_id);
-
-CREATE TABLE IF NOT EXISTS crawl_events
+CREATE TABLE IF NOT EXISTS crawl_queue
 (
-    id          BIGSERIAL PRIMARY KEY,
-    crawl_id    UUID NOT NULL REFERENCES comic_crawl(id) ON DELETE CASCADE,
-    event_type  crawl_event_type_enum NOT NULL,
-    reason      TEXT,
-    created_at  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id            UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
+    crawl_job_id  UUID         NOT NULL REFERENCES crawl_jobs (id) ON DELETE CASCADE,
+    crawl_type    crawl_type   NOT NULL,
+    target_url    TEXT         NOT NULL,
+    target_name   VARCHAR(500),
+    item_index    INT          NOT NULL DEFAULT 0,
+    priority      INT          NOT NULL DEFAULT 0,
+    status        queue_status NOT NULL DEFAULT 'PENDING',
+    retry_count   INT          NOT NULL DEFAULT 0,
+    max_retries   INT          NOT NULL DEFAULT 3,
+    next_retry_at TIMESTAMPTZ,
+    error_message TEXT,
+    started_at    TIMESTAMPTZ,
+    completed_at  TIMESTAMPTZ,
+    deleted_at    TIMESTAMPTZ,
+    created_at    TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at    TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_crawl_events_crawl_id ON crawl_events(crawl_id);
-CREATE INDEX IF NOT EXISTS idx_crawl_events_event_type ON crawl_events(event_type);
-CREATE INDEX IF NOT EXISTS idx_crawl_events_created_at ON crawl_events(created_at);
-CREATE INDEX IF NOT EXISTS idx_crawl_events_crawl_type ON crawl_events(crawl_id, event_type);
+CREATE INDEX IF NOT EXISTS idx_crawl_queue_job ON crawl_queue (crawl_job_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_crawl_queue_status ON crawl_queue (status) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_crawl_queue_pending ON crawl_queue (status, priority DESC)
+    WHERE status = 'PENDING' AND deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_crawl_queue_delayed ON crawl_queue (next_retry_at)
+    WHERE status = 'DELAYED' AND deleted_at IS NULL;
 
-CREATE TABLE IF NOT EXISTS category_crawl_jobs
+CREATE OR REPLACE FUNCTION update_crawl_updated_at()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_crawl_jobs_updated_at
+    BEFORE UPDATE
+    ON crawl_jobs
+    FOR EACH ROW
+EXECUTE FUNCTION update_crawl_updated_at();
+
+CREATE TRIGGER trigger_crawl_settings_updated_at
+    BEFORE UPDATE
+    ON crawl_settings
+    FOR EACH ROW
+EXECUTE FUNCTION update_crawl_updated_at();
+
+CREATE TRIGGER trigger_crawl_checkpoints_updated_at
+    BEFORE UPDATE
+    ON crawl_checkpoints
+    FOR EACH ROW
+EXECUTE FUNCTION update_crawl_updated_at();
+
+CREATE TRIGGER trigger_crawl_queue_updated_at
+    BEFORE UPDATE
+    ON crawl_queue
+    FOR EACH ROW
+EXECUTE FUNCTION update_crawl_updated_at();
+
+CREATE TABLE setting_categories
 (
-    id            UUID PRIMARY KEY,
-    category_url  TEXT                        NOT NULL,
-    source        VARCHAR(50)                 NOT NULL,
-    status        VARCHAR(20)                 NOT NULL,
-    total_pages   INTEGER                     NOT NULL DEFAULT 0,
-    crawled_pages INTEGER                     NOT NULL DEFAULT 0,
-    total_stories INTEGER                     NOT NULL DEFAULT 0,
-    crawled_stories INTEGER                   NOT NULL DEFAULT 0,
-    created_by    BIGINT REFERENCES users (id) NOT NULL,
-    created_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    id          SERIAL PRIMARY KEY,
+    parent_id   INT REFERENCES setting_categories (id) ON DELETE CASCADE,
+    code        VARCHAR(50)  NOT NULL,
+    name        VARCHAR(100) NOT NULL,
+    description TEXT,
+    level       INT          NOT NULL DEFAULT 0,
+    path        VARCHAR(255) NOT NULL UNIQUE,
+    path_ids    INT[]        NOT NULL,
+    is_system   BOOLEAN               DEFAULT false,
+    is_active   BOOLEAN               DEFAULT true,
+    created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_category_parent_code UNIQUE (parent_id, code)
 );
 
-CREATE INDEX IF NOT EXISTS idx_category_crawl_jobs_status ON category_crawl_jobs(status);
-CREATE INDEX IF NOT EXISTS idx_category_crawl_jobs_created_by ON category_crawl_jobs(created_by);
-CREATE INDEX IF NOT EXISTS idx_category_crawl_jobs_created_at ON category_crawl_jobs(created_at);
+CREATE INDEX idx_category_parent ON setting_categories (parent_id);
+CREATE INDEX idx_category_path ON setting_categories (path);
+CREATE INDEX idx_category_path_ids ON setting_categories USING GIN (path_ids);
+CREATE INDEX idx_category_level ON setting_categories (level);
 
-CREATE TABLE IF NOT EXISTS category_crawl_details
-(
-    id                      BIGSERIAL PRIMARY KEY,
-    category_crawl_job_id   UUID REFERENCES category_crawl_jobs (id) ON DELETE CASCADE NOT NULL,
-    story_url               TEXT                                    NOT NULL,
-    story_title             VARCHAR(255),
-    story_slug              VARCHAR(255),
-    total_chapters          INTEGER                                 NOT NULL DEFAULT 0,
-    crawled_chapters        INTEGER                                 NOT NULL DEFAULT 0,
-    failed_chapters         INTEGER                                 NOT NULL DEFAULT 0,
-    status                  VARCHAR(20)                             NOT NULL,
-    error_message           TEXT,
-    created_at              TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at              TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (category_crawl_job_id, story_url)
-);
+ALTER TABLE settings
+    ADD CONSTRAINT fk_settings_category FOREIGN KEY (category_id) REFERENCES setting_categories (id) ON DELETE RESTRICT;
+ALTER TABLE settings
+    ADD CONSTRAINT fk_settings_updated_by FOREIGN KEY (updated_by) REFERENCES users (id);
+ALTER TABLE settings
+    ADD CONSTRAINT uq_settings_category_key UNIQUE (category_id, key);
 
-CREATE INDEX IF NOT EXISTS idx_category_crawl_details_job_id ON category_crawl_details(category_crawl_job_id);
-CREATE INDEX IF NOT EXISTS idx_category_crawl_details_status ON category_crawl_details(status);
-CREATE INDEX IF NOT EXISTS idx_category_crawl_details_story_url ON category_crawl_details(story_url);
-
-CREATE TABLE IF NOT EXISTS story_crawl_queue
-(
-    id                      BIGSERIAL PRIMARY KEY,
-    category_crawl_job_id   UUID REFERENCES category_crawl_jobs (id) ON DELETE CASCADE NOT NULL,
-    category_crawl_detail_id BIGINT REFERENCES category_crawl_details (id) ON DELETE CASCADE,
-    story_url               TEXT                                    NOT NULL,
-    status                  VARCHAR(20)                             NOT NULL,
-    created_at              TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at              TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_story_crawl_queue_job_id ON story_crawl_queue(category_crawl_job_id);
-CREATE INDEX IF NOT EXISTS idx_story_crawl_queue_status ON story_crawl_queue(status);
-CREATE INDEX IF NOT EXISTS idx_story_crawl_queue_status_created ON story_crawl_queue(status, created_at);
-
-CREATE TABLE IF NOT EXISTS category_crawl_progress
-(
-    category_crawl_job_id   UUID PRIMARY KEY REFERENCES category_crawl_jobs (id) ON DELETE CASCADE NOT NULL,
-    current_page            INTEGER                                 NOT NULL DEFAULT 0,
-    current_story_index     INTEGER                                 NOT NULL DEFAULT 0,
-    total_stories           INTEGER                                 NOT NULL DEFAULT 0,
-    crawled_stories         INTEGER                                 NOT NULL DEFAULT 0,
-    total_chapters          INTEGER                                 NOT NULL DEFAULT 0,
-    crawled_chapters        INTEGER                                 NOT NULL DEFAULT 0,
-    total_images            INTEGER                                 NOT NULL DEFAULT 0,
-    downloaded_images       INTEGER                                 NOT NULL DEFAULT 0,
-    updated_at              TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_category_crawl_progress_job_id ON category_crawl_progress(category_crawl_job_id);
+CREATE INDEX idx_settings_category ON settings (category_id);
+CREATE INDEX idx_settings_full_key ON settings (full_key);
+CREATE INDEX idx_settings_key ON settings (key);
+CREATE INDEX idx_settings_type ON settings (value_type);
+CREATE INDEX idx_settings_sensitive ON settings (is_sensitive) WHERE is_sensitive = true;
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
-CREATE OR REPLACE FUNCTION comics_content_search_vector_update()
-RETURNS TRIGGER AS $$
-DECLARE
-  search_config regconfig := 'simple';
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'vietnamese') THEN
-    search_config := 'vietnamese';
-  END IF;
+CREATE INDEX idx_settings_key_trgm ON settings USING GIN (key gin_trgm_ops);
+CREATE INDEX idx_settings_desc_trgm ON settings USING GIN (description gin_trgm_ops);
 
-  NEW.content_search_vector :=
-    setweight(to_tsvector(search_config, COALESCE(NEW.name, '')), 'A') ||
-    setweight(to_tsvector(search_config, COALESCE(NEW.origin_name, '')), 'A') ||
-    setweight(to_tsvector(search_config, array_to_string(COALESCE(NEW.alternative_names, ARRAY[]::TEXT[]), ' ')), 'B') ||
-    setweight(to_tsvector(search_config, COALESCE(NEW.author, '')), 'B') ||
-    setweight(to_tsvector(search_config, COALESCE(NEW.content, '')), 'C');
-  RETURN NEW;
+CREATE TABLE qsc_key_pairs
+(
+    id             BIGSERIAL PRIMARY KEY,
+    key_type       VARCHAR(20)  NOT NULL CHECK (key_type IN ('KYBER', 'DILITHIUM')),
+    algorithm      VARCHAR(50)  NOT NULL,
+    key_usage      VARCHAR(50)  NOT NULL,
+    public_key     BYTEA        NOT NULL,
+    private_key    BYTEA        NOT NULL,
+    fingerprint    VARCHAR(128) NOT NULL,
+    created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    expires_at     TIMESTAMPTZ  NOT NULL,
+    is_active      BOOLEAN               DEFAULT TRUE,
+    rotation_count INT                   DEFAULT 0
+);
+
+CREATE UNIQUE INDEX uq_qsc_key_type_usage_active ON qsc_key_pairs (key_type, key_usage) WHERE is_active = TRUE;
+CREATE INDEX idx_qsc_keys_active ON qsc_key_pairs (key_type, is_active) WHERE is_active = TRUE;
+CREATE INDEX idx_qsc_keys_usage ON qsc_key_pairs (key_usage, is_active);
+CREATE INDEX idx_qsc_keys_expires ON qsc_key_pairs (expires_at);
+CREATE INDEX idx_qsc_keys_type ON qsc_key_pairs (key_type);
+CREATE INDEX idx_qsc_keys_fingerprint ON qsc_key_pairs (fingerprint);
+
+CREATE OR REPLACE FUNCTION comics_content_search_vector_update()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    search_config regconfig := 'simple';
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'vietnamese') THEN
+        search_config := 'vietnamese';
+    END IF;
+    NEW.content_search_vector :=
+            setweight(to_tsvector(search_config, COALESCE(NEW.name, '')), 'A') ||
+            setweight(to_tsvector(search_config, COALESCE(NEW.origin_name, '')), 'A') ||
+            setweight(
+                    to_tsvector(search_config, array_to_string(COALESCE(NEW.alternative_names, ARRAY []::TEXT[]), ' ')),
+                    'B') ||
+            setweight(to_tsvector(search_config, COALESCE(NEW.author, '')), 'B') ||
+            setweight(to_tsvector(search_config, COALESCE(NEW.content, '')), 'C');
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS comics_content_search_vector_trigger ON comics;
 CREATE TRIGGER comics_content_search_vector_trigger
-  BEFORE INSERT OR UPDATE ON comics
-  FOR EACH ROW
-  EXECUTE FUNCTION comics_content_search_vector_update();
+    BEFORE INSERT OR UPDATE
+    ON comics
+    FOR EACH ROW
+EXECUTE FUNCTION comics_content_search_vector_update();
 
-DO $$
-DECLARE
-  search_config_name TEXT := 'simple';
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'vietnamese') THEN
-    search_config_name := 'vietnamese';
-  END IF;
-
-  EXECUTE format('UPDATE comics SET content_search_vector =
+DO
+$$
+    DECLARE
+        search_config_name TEXT := 'simple';
+    BEGIN
+        IF EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'vietnamese') THEN
+            search_config_name := 'vietnamese';
+        END IF;
+        EXECUTE format('UPDATE comics SET content_search_vector =
     setweight(to_tsvector(%L::regconfig, COALESCE(name, '''')), ''A'') ||
     setweight(to_tsvector(%L::regconfig, COALESCE(origin_name, '''')), ''A'') ||
     setweight(to_tsvector(%L::regconfig, array_to_string(COALESCE(alternative_names, ARRAY[]::TEXT[]), '' '')), ''B'') ||
     setweight(to_tsvector(%L::regconfig, COALESCE(author, '''')), ''B'') ||
     setweight(to_tsvector(%L::regconfig, COALESCE(content, '''')), ''C'')',
-    search_config_name, search_config_name, search_config_name, search_config_name, search_config_name);
-END $$;
+                       search_config_name, search_config_name, search_config_name, search_config_name,
+                       search_config_name);
+    END
+$$;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS comics_search_cache AS
-SELECT
-  c.id,
-  c.name,
-  c.origin_name,
-  c.slug,
-  c.status,
-  c.progress_status,
-  c.thumb_url,
-  c.views,
-  c.likes,
-  c.follows,
-  c.content_search_vector,
-  ts_rank(c.content_search_vector, plainto_tsquery('simple', '')) as search_rank
+SELECT c.id,
+       c.name,
+       c.origin_name,
+       c.slug,
+       c.status,
+       c.progress_status,
+       c.thumb_url,
+       c.views,
+       c.likes,
+       c.follows,
+       c.content_search_vector,
+       ts_rank(c.content_search_vector, plainto_tsquery('simple', '')) as search_rank
 FROM comics c
-WHERE c.status = 'ACTIVE' AND c.merged_comic_id IS NULL;
+WHERE c.status = 'ACTIVE'
+  AND c.merged_comic_id IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_comics_search_cache_vector ON comics_search_cache USING GIN (content_search_vector);
 
-CREATE TABLE IF NOT EXISTS comic_duplicates
+CREATE OR REPLACE FUNCTION build_category_path()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    parent_path  VARCHAR(255);
+    parent_ids   INT[];
+    parent_level INT;
+BEGIN
+    IF NEW.parent_id IS NULL THEN
+        NEW.path := NEW.code;
+        NEW.path_ids := ARRAY [NEW.id];
+        NEW.level := 0;
+    ELSE
+        SELECT path, path_ids, level
+        INTO parent_path, parent_ids, parent_level
+        FROM setting_categories
+        WHERE id = NEW.parent_id;
+        NEW.path := parent_path || '.' || NEW.code;
+        NEW.path_ids := parent_ids || NEW.id;
+        NEW.level := parent_level + 1;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_category_path
+    BEFORE INSERT OR UPDATE
+    ON setting_categories
+    FOR EACH ROW
+EXECUTE FUNCTION build_category_path();
+
+CREATE OR REPLACE FUNCTION build_setting_full_key()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    category_path VARCHAR(255);
+BEGIN
+    IF NEW.category_id IS NOT NULL AND NEW.key IS NOT NULL THEN
+        SELECT path
+        INTO category_path
+        FROM setting_categories
+        WHERE id = NEW.category_id;
+        NEW.full_key := category_path || '.' || NEW.key;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_setting_full_key
+    BEFORE INSERT OR UPDATE
+    ON settings
+    FOR EACH ROW
+    WHEN (NEW.category_id IS NOT NULL AND NEW.key IS NOT NULL)
+EXECUTE FUNCTION build_setting_full_key();
+
+CREATE OR REPLACE VIEW v_settings_hierarchical AS
+SELECT s.id,
+       s.category_id,
+       c.path     AS category_path,
+       c.name     AS category_name,
+       c.level    AS category_level,
+       s.key,
+       s.full_key,
+       s.value,
+       s.value_type,
+       s.default_value,
+       s.constraints,
+       s.is_required,
+       s.is_sensitive,
+       s.is_readonly,
+       s.description,
+       s.created_at,
+       s.updated_at,
+       u.username AS updated_by_username
+FROM settings s
+         JOIN setting_categories c ON s.category_id = c.id
+         LEFT JOIN users u ON s.updated_by = u.id
+ORDER BY c.path, s.key;
+
+CREATE TABLE IF NOT EXISTS user_passkeys
 (
-    id                BIGSERIAL PRIMARY KEY,
-    primary_comic_id   BIGINT NOT NULL REFERENCES comics(id) ON DELETE CASCADE,
-    duplicate_comic_id BIGINT NOT NULL REFERENCES comics(id) ON DELETE CASCADE,
-    similarity_score   DECIMAL(5, 4) NOT NULL,
-    merge_reason       TEXT,
-    merged_at          TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    merged_by          BIGINT REFERENCES users(id),
-    UNIQUE (primary_comic_id, duplicate_comic_id)
+    id              UUID PRIMARY KEY                  DEFAULT gen_random_uuid(),
+    user_id         BIGINT                   NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    credential_id   BYTEA                    NOT NULL UNIQUE,
+    public_key      BYTEA                    NOT NULL,
+    sign_count      BIGINT                   NOT NULL DEFAULT 0,
+    aaguid          BYTEA,
+    device_name     VARCHAR(255)             NOT NULL,
+    transports      TEXT[],
+    is_discoverable BOOLEAN                  NOT NULL DEFAULT FALSE,
+    last_used_at    TIMESTAMP WITH TIME ZONE,
+    created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_comic_duplicates_primary ON comic_duplicates(primary_comic_id);
-CREATE INDEX IF NOT EXISTS idx_comic_duplicates_duplicate ON comic_duplicates(duplicate_comic_id);
+CREATE INDEX IF NOT EXISTS idx_user_passkeys_user_id ON user_passkeys (user_id);
+CREATE INDEX IF NOT EXISTS idx_user_passkeys_credential_id ON user_passkeys (credential_id);
+CREATE INDEX IF NOT EXISTS idx_user_passkeys_last_used ON user_passkeys (last_used_at);

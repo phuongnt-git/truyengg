@@ -26,7 +26,7 @@ public class ComicSearchService {
   private final ComicRepository comicRepository;
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "comicSearch", key = "#query + '-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result.isEmpty()")
+  @Cacheable(value = "search:comic#5m", key = "#query + '-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result.isEmpty()")
   public Page<Comic> fuzzySearch(String query, Pageable pageable) {
     if (isBlank(query)) {
       return empty(pageable);
@@ -58,13 +58,13 @@ public class ComicSearchService {
   }
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "comicSearchByFulltext", key = "#query + '-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result.isEmpty()")
+  @Cacheable(value = "search:fulltext#10m", key = "#query + '-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result.isEmpty()")
   public Page<Comic> searchByFulltext(String query, Pageable pageable) {
     return comicRepository.searchByFulltext(query, pageable);
   }
 
   @Transactional(readOnly = true)
-  @Cacheable(value = "comicSearchByFuzzy", key = "#query + '-' + #threshold + '-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result.isEmpty()")
+  @Cacheable(value = "search:fuzzy#5m", key = "#query + '-' + #threshold + '-' + #pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result.isEmpty()")
   public Page<Comic> searchByFuzzy(String query, double threshold, Pageable pageable) {
     return comicRepository.searchByFuzzySimilarity(query, threshold, pageable);
   }

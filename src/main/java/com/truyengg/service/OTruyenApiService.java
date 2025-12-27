@@ -53,24 +53,24 @@ public class OTruyenApiService {
     return response;
   }
 
-  @Cacheable(value = "homeComics", key = "#page + '-' + #perPage")
+  @Cacheable(value = "comic:home#10m", key = "#page + '-' + #perPage")
   public Map<String, Object> getHomeComics(int page, int perPage) {
     var url = "/home?page=" + page + "&limit=" + perPage;
     return fetchData(url);
   }
 
-  @Cacheable("categories")
+  @Cacheable("api:otruyen-categories#1h")
   public Map<String, Object> getCategories() {
     return fetchData("/the-loai");
   }
 
-  @Cacheable(value = "categoryComics", key = "#slug + '-' + #page + '-' + #perPage")
+  @Cacheable(value = "comic:category#30m", key = "#slug + '-' + #page + '-' + #perPage")
   public Map<String, Object> getComicsByCategory(String slug, int page, int perPage) {
     var url = "/the-loai/" + slug + "?page=" + page + "&limit=" + perPage;
     return fetchData(url);
   }
 
-  @Cacheable(value = "comicDetails", key = "#slug")
+  @Cacheable(value = "comic:details#1h", key = "#slug")
   public Map<String, Object> getComicDetails(String slug) {
     return fetchData("/truyen-tranh/" + slug);
   }
@@ -80,7 +80,7 @@ public class OTruyenApiService {
     return fetchData(url);
   }
 
-  @Cacheable(value = "comicList", key = "#type + '-' + #page + '-' + #perPage")
+  @Cacheable(value = "comic:list#30m", key = "#type + '-' + #page + '-' + #perPage")
   public Map<String, Object> getComicList(String type, int page, int perPage) {
     var url = "/danh-sach/" + type + "?page=" + page + "&limit=" + perPage;
     return fetchData(url);

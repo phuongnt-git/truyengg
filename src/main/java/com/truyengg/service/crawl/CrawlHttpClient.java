@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.compressors.brotli.BrotliCompressorInputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -16,11 +15,12 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import static com.truyengg.service.crawl.CrawlConstants.DATA_BUFFER_MAX_SIZE_BYTES;
-import static com.truyengg.service.crawl.CrawlConstants.DEFAULT_DOMAIN;
-import static com.truyengg.service.crawl.CrawlConstants.PROTOCOL_HTTP;
-import static com.truyengg.service.crawl.CrawlConstants.PROTOCOL_HTTPS;
-import static com.truyengg.service.crawl.CrawlConstants.USER_AGENTS;
+import static com.truyengg.domain.constant.AppConstants.DATA_BUFFER_MAX_SIZE_BYTES;
+import static com.truyengg.domain.constant.AppConstants.DEFAULT_DOMAIN;
+import static com.truyengg.domain.constant.AppConstants.PROTOCOL_HTTP;
+import static com.truyengg.domain.constant.AppConstants.PROTOCOL_HTTPS;
+import static com.truyengg.domain.constant.AppConstants.USER_AGENTS;
+import static java.lang.Math.pow;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Duration.ofSeconds;
 import static java.util.concurrent.ThreadLocalRandom.current;
@@ -28,6 +28,8 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.springframework.core.io.buffer.DataBufferUtils.join;
 import static org.springframework.core.io.buffer.DataBufferUtils.release;
 import static reactor.core.publisher.Mono.delay;
 
@@ -42,7 +44,7 @@ public class CrawlHttpClient {
   @Value("${truyengg.crawl.max-retries:3}")
   private int maxRetries;
 
-  @Value("${truyengg.crawl.retry-delay:2}")
+  @Value("${truyengg.crawl.retry-delay:5}")
   private int retryDelay;
 
   @Value("${truyengg.crawl.request-timeout:15}")
@@ -66,6 +68,10 @@ public class CrawlHttpClient {
   }
 
   public String fetchUrl(String url, List<String> headers, boolean isJson) {
+    // Add initial random delay to avoid burst requests (1-3 seconds)
+    var initialDelay = 1 + current().nextInt(3);
+    waitBeforeRetry(initialDelay);
+
     for (var attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         return executeRequest(url, headers, isJson);
@@ -97,7 +103,7 @@ public class CrawlHttpClient {
         try {
           return objectMapper.writeValueAsString(response);
         } catch (Exception e) {
-          log.error("Failed to serialize JSON response from: {}", url, e);
+          log.warn("Failed to serialize JSON response from {}: {}", url, getRootCauseMessage(e));
           return EMPTY;
         }
       }
@@ -126,20 +132,29 @@ public class CrawlHttpClient {
 
   private WebClient.RequestHeadersSpec<?> buildRequestSpec(WebClient webClient, String url,
                                                            List<String> headers, boolean isJson) {
+    var userAgent = getRandomUserAgent();
+    var isFirefox = userAgent.contains("Firefox");
+
     var requestSpec = webClient.get()
         .uri(url)
+        .header("Host", extractHostFromUrl(url))
         .header("Connection", "keep-alive")
         .header("Cache-Control", "max-age=0")
         .header("Upgrade-Insecure-Requests", "1")
-        .header("User-Agent", getRandomUserAgent())
-        .header("Accept", isJson ? "application/json" : "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-        .header("Accept-Encoding", "gzip, deflate, br")
-        .header("Accept-Language", "en-US,en;q=0.9,vi;q=0.8")
+        .header("User-Agent", userAgent)
+        .header("Accept", isJson ? "application/json" : "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8")
+        .header("Accept-Encoding", "gzip, deflate, br, zstd")
+        .header("Accept-Language", "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7")
+        .header("Sec-Ch-Ua", isFirefox ? null : "\"Google Chrome\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"")
+        .header("Sec-Ch-Ua-Mobile", "?0")
+        .header("Sec-Ch-Ua-Platform", isFirefox ? null : "\"Windows\"")
         .header("Sec-Fetch-Dest", "document")
         .header("Sec-Fetch-Mode", "navigate")
         .header("Sec-Fetch-Site", "none")
-        .header("Sec-Fetch-User", "?1");
+        .header("Sec-Fetch-User", "?1")
+        .header("Priority", "u=0, i");
 
+    // Add referer from headers
     for (var header : headers) {
       if (header.startsWith("Referer:")) {
         requestSpec.header("Referer", header.substring(9).trim());
@@ -148,6 +163,22 @@ public class CrawlHttpClient {
     }
 
     return requestSpec;
+  }
+
+  private String extractHostFromUrl(String url) {
+    try {
+      if (url.startsWith(PROTOCOL_HTTP) || url.startsWith(PROTOCOL_HTTPS)) {
+        var start = url.indexOf("://") + 3;
+        var end = url.indexOf("/", start);
+        if (end == -1) {
+          end = url.length();
+        }
+        return url.substring(start, end);
+      }
+    } catch (Exception e) {
+      log.warn("Failed to extract host from {}: {}", url, getRootCauseMessage(e));
+    }
+    return "localhost";
   }
 
   private byte[] readDataBuffer(DataBuffer dataBuffer) {
@@ -174,7 +205,7 @@ public class CrawlHttpClient {
         waitBeforeRetry(delaySeconds);
         return true;
       }
-      log.error("Rate limit exceeded after {} attempts for URL: {}", maxRetries, url);
+      log.warn("Rate limit exceeded after {} attempts for URL: {}", maxRetries, url);
       return false;
     }
 
@@ -183,16 +214,16 @@ public class CrawlHttpClient {
         waitBeforeRetry(calculateExponentialDelay(attempt));
         return true;
       }
-      log.error("Blocked after {} attempts for URL: {}", maxRetries, url);
+      log.warn("Blocked after {} attempts for URL: {}", maxRetries, url);
       return false;
     }
 
-    log.error("HTTP Error {} for URL: {}", statusCode, url);
+    log.warn("HTTP Error {} for URL: {}", statusCode, url);
     return false;
   }
 
   private boolean handleGenericError(Exception e, String url, int attempt) {
-    log.error("Error fetching URL: {}", url, e);
+    log.warn("Error fetching URL: {}", url, e);
     if (attempt < maxRetries) {
       waitBeforeRetry(retryDelay);
       return true;
@@ -201,7 +232,10 @@ public class CrawlHttpClient {
   }
 
   private int calculateExponentialDelay(int attempt) {
-    return retryDelay * (int) Math.pow(2, attempt - 1.0);
+    var baseDelay = retryDelay * (int) pow(2, attempt - 1.0);
+    // Add random jitter (0-50% of base delay) to appear more human
+    var jitter = current().nextInt(baseDelay / 2 + 1);
+    return baseDelay + jitter;
   }
 
   private void waitBeforeRetry(int delaySeconds) {
@@ -224,7 +258,7 @@ public class CrawlHttpClient {
             .bodyToFlux(DataBuffer.class)
             .timeout(ofSeconds(requestTimeout));
 
-        var dataBuffer = DataBufferUtils.join(dataBufferFlux, DATA_BUFFER_MAX_SIZE_BYTES)
+        var dataBuffer = join(dataBufferFlux, DATA_BUFFER_MAX_SIZE_BYTES)
             .block();
 
         if (isNotEmpty(dataBuffer)) {
@@ -246,7 +280,7 @@ public class CrawlHttpClient {
             waitBeforeRetry(delaySeconds);
             continue;
           }
-          log.error("Rate limit exceeded after {} attempts for image: {}", maxRetries, imageUrl);
+          log.warn("Rate limit exceeded after {} attempts for image: {}", maxRetries, imageUrl);
           return new byte[0];
         }
         if ((statusCode == 403 || statusCode == 503) && attempt < maxRetries) {
@@ -254,15 +288,15 @@ public class CrawlHttpClient {
           continue;
         }
 
-        log.error("HTTP Error {} downloading image: {}", statusCode, imageUrl);
+        log.warn("HTTP Error {} downloading image: {}", statusCode, imageUrl);
         return new byte[0];
       } catch (Exception e) {
         if (attempt < maxRetries) {
-          log.warn("Error downloading image: {}, retrying (attempt {}/{})", imageUrl, attempt, maxRetries);
+          log.warn("Error downloading image {}, retrying (attempt {}/{}): {}", imageUrl, attempt, maxRetries, getRootCauseMessage(e));
           waitBeforeRetry(retryDelay);
           continue;
         }
-        log.error("Error downloading image: {}", imageUrl, e);
+        log.warn("Error downloading image {}: {}", imageUrl, getRootCauseMessage(e));
         return new byte[0];
       }
     }
@@ -290,7 +324,7 @@ public class CrawlHttpClient {
 
       return outputStream.toByteArray();
     } catch (Exception e) {
-      log.error("Error decompressing Brotli data", e);
+      log.warn("Error decompressing Brotli data: {}", getRootCauseMessage(e));
       return new byte[0];
     }
   }
@@ -310,7 +344,7 @@ public class CrawlHttpClient {
         return domain;
       }
     } catch (Exception e) {
-      // Fallback to default domain
+      log.warn("Error decompressing URL: {}", getRootCauseMessage(e));
     }
     return DEFAULT_DOMAIN;
   }

@@ -4,10 +4,10 @@
     <div class="card-header">
         <h4 class="card-title" th:text="${title}">Data Table</h4>
         <div class="card-tools" th:if="${searchPlaceholder != null}">
-            <input class="form-control d-inline-block" 
-                   th:id="'search-' + ${tableId}" 
+            <input class="form-control d-inline-block"
+                   style="width: 250px; margin-right: 10px;"
+                   th:id="'search-' + ${tableId}"
                    th:placeholder="${searchPlaceholder}"
-                   style="width: 250px; margin-right: 10px;" 
                    type="text">
         </div>
     </div>

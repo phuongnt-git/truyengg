@@ -14,45 +14,38 @@ public class PauseStateService {
   private final Map<UUID, Boolean> pauseFlags = new ConcurrentHashMap<>();
   private final Map<UUID, Boolean> cancelFlags = new ConcurrentHashMap<>();
 
-  public void setPaused(UUID crawlId) {
-    pauseFlags.put(crawlId, true);
+  public void setPaused(UUID jobId) {
+    pauseFlags.put(jobId, true);
   }
 
-  public void clearPaused(UUID crawlId) {
-    pauseFlags.remove(crawlId);
+  public void clearPaused(UUID jobId) {
+    pauseFlags.remove(jobId);
   }
 
-  public Boolean isPaused(UUID crawlId) {
-    return pauseFlags.get(crawlId);
+  public Boolean isPaused(UUID jobId) {
+    return pauseFlags.get(jobId);
   }
 
-  public void setCancelled(UUID crawlId) {
-    cancelFlags.put(crawlId, true);
+  public void setCancelled(UUID jobId) {
+    cancelFlags.put(jobId, true);
   }
 
-  public void clearCancelled(UUID crawlId) {
-    cancelFlags.remove(crawlId);
+  public void clearCancelled(UUID jobId) {
+    cancelFlags.remove(jobId);
   }
 
-  public Boolean isCancelled(UUID crawlId) {
-    return cancelFlags.get(crawlId);
+  public Boolean isCancelled(UUID jobId) {
+    return cancelFlags.get(jobId);
   }
 
-  public void remove(UUID crawlId) {
-    pauseFlags.remove(crawlId);
-    cancelFlags.remove(crawlId);
+  public void remove(UUID jobId) {
+    pauseFlags.remove(jobId);
+    cancelFlags.remove(jobId);
   }
 
-  /**
-   * Cleanup flags for completed/failed crawls.
-   * This method is now called by JobRunr instead of @Scheduled
-   */
   public void cleanup() {
-    var pauseSize = pauseFlags.size();
-    var cancelSize = cancelFlags.size();
-    if (pauseSize > 0 || cancelSize > 0) {
-      log.debug("Crawl state flags cleanup: {} pause flags, {} cancel flags in memory", pauseSize, cancelSize);
-    }
+    pauseFlags.clear();
+    cancelFlags.clear();
   }
 }
 

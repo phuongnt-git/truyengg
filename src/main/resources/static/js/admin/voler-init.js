@@ -3,7 +3,7 @@
  * Handles Feather icons initialization and common admin functionality
  */
 
-(function() {
+(function () {
     'use strict';
 
     // Initialize Feather icons when DOM is ready
@@ -29,9 +29,9 @@
     // Initialize sidebar active state
     function initSidebarActiveState() {
         const currentPath = window.location.pathname;
-        
+
         // Remove active class from all sidebar links
-        document.querySelectorAll('.sidebar-link').forEach(function(link) {
+        document.querySelectorAll('.sidebar-link').forEach(function (link) {
             link.classList.remove('active');
         });
 
@@ -59,7 +59,7 @@
             if (currentPath === path || currentPath.startsWith(path + '/')) {
                 // Special handling for crawl to avoid matching category-crawl or jobs
                 if (path === '/admin/crawl') {
-                    if (!currentPath.includes('/admin/category-crawl') && 
+                    if (!currentPath.includes('/admin/category-crawl') &&
                         !currentPath.includes('/admin/jobs') &&
                         !currentPath.includes('/admin/crawl-job-detail')) {
                         activePage = page;
@@ -83,7 +83,7 @@
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             initFeatherIcons();
             initPerfectScrollbar();
             initSidebarActiveState();
@@ -96,9 +96,9 @@
 
     // Re-initialize Feather icons after dynamic content updates
     if (typeof MutationObserver !== 'undefined') {
-        const observer = new MutationObserver(function(mutations) {
+        const observer = new MutationObserver(function (mutations) {
             let shouldReplace = false;
-            mutations.forEach(function(mutation) {
+            mutations.forEach(function (mutation) {
                 if (mutation.addedNodes.length > 0) {
                     shouldReplace = true;
                 }

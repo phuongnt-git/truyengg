@@ -11,9 +11,9 @@ public record ChapterImageInfo(
     Integer manualOrder,
     Boolean isDownloaded,
     Boolean isVisible,
+    String blurhash,
     ZonedDateTime deletedAt,
     ZonedDateTime createdAt,
     ZonedDateTime updatedAt
 ) {
 }
-

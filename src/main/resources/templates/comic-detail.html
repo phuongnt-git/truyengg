@@ -1,140 +1,144 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: head">
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1" name="viewport">
-  <title id="page-title">Chi tiết truyện - TruyenGG</title>
-  <link href="https://st.truyengg.net/template/frontend/styles/style.css?v=1.9.4" rel="stylesheet">
-  <link href="https://st.truyengg.net/template/frontend/styles/dark_style.css?v=1.3.4" rel="stylesheet">
-  <link href="https://st.truyengg.net/template/frontend/icon/css/font-awesome.min.css?v=1.2.3" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css" rel="stylesheet">
+<head th:replace="~{fragments/header :: head}">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title id="page-title">Chi tiết truyện - TruyenGG</title>
+    <link href="https://st.truyengg.net/template/frontend/styles/style.css?v=1.9.4" rel="stylesheet">
+    <link href="https://st.truyengg.net/template/frontend/styles/dark_style.css?v=1.3.4" rel="stylesheet">
+    <link href="https://st.truyengg.net/template/frontend/icon/css/font-awesome.min.css?v=1.2.3" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css" rel="stylesheet">
 </head>
-<body class="dark-style" th:replace="fragments/header :: header-body">
+<body class="dark-style" th:replace="~{fragments/header :: header-body}">
 <div class="container container-background container_info mb15">
-  <ol class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
-    <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-      <a itemprop="item" th:href="@{/}">
-        <span itemprop="name">Trang Chủ</span>
-      </a>
-      <meta content="1" itemprop="position"/>
-    </li>
-    <li class="breadcrumb-item active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-      <a id="breadcrumb-link" itemprop="item">
-        <span id="breadcrumb-name" itemprop="name">Chi tiết truyện</span>
-      </a>
-      <meta content="2" itemprop="position"/>
-    </li>
-  </ol>
-
-  <section class="mt-4" id="comic-detail-section">
-    <div class="d-flex box_info_tale">
-      <div class="thumbblock thumb170x220">
-        <img alt=""
-             class="lazy-image"
-             data-src=""
-             id="comic-thumb"
-             onerror="this.src='https://st.truyengg.net/template/frontend/img/placeholder.jpg';"
-             src="https://st.truyengg.net/template/frontend/img/loading.jpg"
-             style="width: 230px; height: 300px; object-fit: cover;"/>
-      </div>
-      <div class="info_tale fs15">
-        <div class="title_tale">
-          <h1 id="comic-name" itemprop="name">Đang tải...</h1>
-        </div>
-        <div class="mb-2 row">
-          <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-person-badge-fill"></i> Tác Giả:</p>
-          <p class="col-lg-10 col-md-8 col-8" id="comic-author">Đang Cập Nhật</p>
-        </div>
-        <div class="mb-2 row">
-          <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-bar-chart-line-fill"></i> Trạng Thái:</p>
-          <p class="col-lg-10 col-md-8 col-8" id="comic-status">Đang cập nhật</p>
-        </div>
-        <div class="mb-2 row">
-          <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-eye-fill"></i> Lượt Xem:</p>
-          <p class="col-lg-10 col-md-8 col-8" id="comic-views">0</p>
-        </div>
-        <div class="mb-2 row">
-          <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-bookmark-plus-fill"></i> Theo Dõi:</p>
-          <p class="col-lg-10 col-md-8 col-8"><span id="follow-count">0</span></p>
-        </div>
-        <div class="mb-2 row">
-          <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-list-stars"></i> Tên gốc:</p>
-          <p class="col-lg-10 col-md-8 col-8" id="comic-origin-name">N/A</p>
-        </div>
-        <div class="mb-2 row">
-          <p class="col-lg-12 col-md-12 col-12" id="comic-categories">
-            <!-- Categories will be loaded here -->
-          </p>
-        </div>
-        <div class="mb-2 row">
-          <p class="col-lg-12 col-md-12 col-8"><span data-rateyo-half-star="true" id="rating"></span></p>
-        </div>
-        <div>
-          <a class="btn_tale firt_button" href="#" id="read-first-btn"><i class="bi bi-door-open-fill"></i> Đọc Từ
-            Đầu</a>
-          <a class="btn_tale subscribe_button"
-             href="javascript:void(0);"
-             id="follow-button">
-            <i class="bi bi-bookmark-plus-fill"></i>
-            <span>Theo Dõi</span>
-          </a>
-        </div>
-      </div>
-    </div>
-    <div class="fs15 mt-5 story-detail-info">
-      <a id="comic-description-link" title="">
-        Truyện tranh <span id="comic-description-name"></span> được cập nhật nhanh và đầy đủ nhất tại TruyenGG. Bạn đọc
-        đừng quên để lại bình luận và chia sẻ để ủng hộ TruyenGG ra các chương mới nhanh hơn.
-      </a>
-    </div>
-    <div class="mt-5">
-      <div class="box_list_chap">
-        <div class="title_cate mr-auto"><i class="bi bi-list-task"></i> Danh Sách Chương</div>
-        <div class="sorting_chap">
-          <input class="finchap_list" onkeyup="findList()" placeholder="Số Chương" type="text">
-          <i class="bi bi-sort-down"></i>
-        </div>
-      </div>
-      <ul class="list_chap" id="chapters-list">
-        <li class="item_chap">
-          <div class="wc110">
-            <p>Đang tải danh sách chương...</p>
-          </div>
+    <ol class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li class="breadcrumb-item" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" th:href="@{/}">
+                <span itemprop="name">Trang Chủ</span>
+            </a>
+            <meta content="1" itemprop="position"/>
         </li>
-      </ul>
-    </div>
-  </section>
+        <li class="breadcrumb-item active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a id="breadcrumb-link" itemprop="item">
+                <span id="breadcrumb-name" itemprop="name">Chi tiết truyện</span>
+            </a>
+            <meta content="2" itemprop="position"/>
+        </li>
+    </ol>
 
-  <section class="mt-4">
-    <div class="d-flex">
-      <span class="title_comment mr-auto"><i class="bi bi-chat-left-dots-fill"></i> Bình Luận (<span
-          class="chapter-count" id="comment-count">0</span>)</span>
-    </div>
-    <input id="comic_id" type="hidden" value=""/>
-    <div class="comment-container" id="comment_list">
-      <div class="comments-container">
-        <div class="form-comment main_comment">
-          <div class="message-content">
-            <div class="comment-placeholder" onclick="openComment();">Nội Dung Bình Luận</div>
-            <div class="mess-input hidden">
-              <textarea class="textarea" id="content_comment" placeholder="Nội dung bình luận"></textarea>
-              <div class="control-comment">
-                <button class="button is-info is-rounded submit_comment" onclick="sendComment(0);" type="submit">Gửi
-                </button>
-              </div>
+    <section class="mt-4" id="comic-detail-section">
+        <div class="d-flex box_info_tale">
+            <div class="thumbblock thumb170x220">
+                <img alt=""
+                     class="lazy-image"
+                     data-src=""
+                     id="comic-thumb"
+                     onerror="this.src='https://st.truyengg.net/template/frontend/img/placeholder.jpg';"
+                     src="https://st.truyengg.net/template/frontend/img/loading.jpg"
+                     style="width: 230px; height: 300px; object-fit: cover;"/>
             </div>
-          </div>
+            <div class="info_tale fs15">
+                <div class="title_tale">
+                    <h1 id="comic-name" itemprop="name">Đang tải...</h1>
+                </div>
+                <div class="mb-2 row">
+                    <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-person-badge-fill"></i> Tác Giả:</p>
+                    <p class="col-lg-10 col-md-8 col-8" id="comic-author">Đang Cập Nhật</p>
+                </div>
+                <div class="mb-2 row">
+                    <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-bar-chart-line-fill"></i> Trạng Thái:
+                    </p>
+                    <p class="col-lg-10 col-md-8 col-8" id="comic-status">Đang cập nhật</p>
+                </div>
+                <div class="mb-2 row">
+                    <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-eye-fill"></i> Lượt Xem:</p>
+                    <p class="col-lg-10 col-md-8 col-8" id="comic-views">0</p>
+                </div>
+                <div class="mb-2 row">
+                    <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-bookmark-plus-fill"></i> Theo Dõi:</p>
+                    <p class="col-lg-10 col-md-8 col-8"><span id="follow-count">0</span></p>
+                </div>
+                <div class="mb-2 row">
+                    <p class="name-title col-lg-2 col-md-4 col-4"><i class="bi bi-list-stars"></i> Tên gốc:</p>
+                    <p class="col-lg-10 col-md-8 col-8" id="comic-origin-name">N/A</p>
+                </div>
+                <div class="mb-2 row">
+                    <p class="col-lg-12 col-md-12 col-12" id="comic-categories">
+                        <!-- Categories will be loaded here -->
+                    </p>
+                </div>
+                <div class="mb-2 row">
+                    <p class="col-lg-12 col-md-12 col-8"><span data-rateyo-half-star="true" id="rating"></span></p>
+                </div>
+                <div>
+                    <a class="btn_tale firt_button" href="#" id="read-first-btn"><i class="bi bi-door-open-fill"></i>
+                        Đọc Từ
+                        Đầu</a>
+                    <a class="btn_tale subscribe_button"
+                       href="javascript:void(0);"
+                       id="follow-button">
+                        <i class="bi bi-bookmark-plus-fill"></i>
+                        <span>Theo Dõi</span>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="list-comment" id="comments-container">
-          <!-- Comments will be loaded here -->
+        <div class="fs15 mt-5 story-detail-info">
+            <a id="comic-description-link" title="">
+                Truyện tranh <span id="comic-description-name"></span> được cập nhật nhanh và đầy đủ nhất tại TruyenGG.
+                Bạn đọc
+                đừng quên để lại bình luận và chia sẻ để ủng hộ TruyenGG ra các chương mới nhanh hơn.
+            </a>
         </div>
-      </div>
-    </div>
-  </section>
+        <div class="mt-5">
+            <div class="box_list_chap">
+                <div class="title_cate mr-auto"><i class="bi bi-list-task"></i> Danh Sách Chương</div>
+                <div class="sorting_chap">
+                    <input class="finchap_list" onkeyup="findList()" placeholder="Số Chương" type="text">
+                    <i class="bi bi-sort-down"></i>
+                </div>
+            </div>
+            <ul class="list_chap" id="chapters-list">
+                <li class="item_chap">
+                    <div class="wc110">
+                        <p>Đang tải danh sách chương...</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="mt-4">
+        <div class="d-flex">
+      <span class="title_comment mr-auto"><i class="bi bi-chat-left-dots-fill"></i> Bình Luận (<span
+              class="chapter-count" id="comment-count">0</span>)</span>
+        </div>
+        <input id="comic_id" type="hidden" value=""/>
+        <div class="comment-container" id="comment_list">
+            <div class="comments-container">
+                <div class="form-comment main_comment">
+                    <div class="message-content">
+                        <div class="comment-placeholder" onclick="openComment();">Nội Dung Bình Luận</div>
+                        <div class="mess-input hidden">
+                            <textarea class="textarea" id="content_comment" placeholder="Nội dung bình luận"></textarea>
+                            <div class="control-comment">
+                                <button class="button is-info is-rounded submit_comment" onclick="sendComment(0);"
+                                        type="submit">Gửi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-comment" id="comments-container">
+                    <!-- Comments will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
-<footer th:replace="fragments/footer :: footer"></footer>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 <script th:src="@{/js/jquery.lazy.min.js}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
 <script th:src="@{/js/app.js}"></script>
@@ -144,120 +148,120 @@
 <script th:src="@{/js/comments.js}"></script>
 <script th:src="@{/js/follow.js}"></script>
 <script>
-  let currentComicSlug = '';
-  let currentComicId = null;
-  let currentComic = null;
+    let currentComicSlug = '';
+    let currentComicId = null;
+    let currentComic = null;
 
-  $(document).ready(function () {
-    // Get slug from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    currentComicSlug = urlParams.get('slug');
+    $(document).ready(function () {
+        // Get slug from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        currentComicSlug = urlParams.get('slug');
 
-    if (!currentComicSlug) {
-      showToast('Không tìm thấy truyện', false);
-      return;
-    }
-
-    // Load comic detail
-    loadComicDetail();
-
-    // Initialize rating
-    $("#rating").rateYo({
-      rating: 2.6,
-      halfStar: true,
-      onSet: function (rating) {
-        // TODO: Implement rating API
-        console.log('Rating:', rating);
-      }
-    });
-  });
-
-  function loadComicDetail() {
-    // Show loading state
-    showLoading('#comic-detail-section', 'Đang tải thông tin truyện...');
-
-    ApiClient.get('/comics/' + currentComicSlug, null, false).done(function (response) {
-      if (response.success && response.data) {
-        currentComic = response.data;
-        currentComicId = currentComic.id;
-
-        // Update page title
-        document.getElementById('page-title').textContent = currentComic.name + ' - TruyenGG';
-        document.getElementById('breadcrumb-name').textContent = currentComic.name;
-        document.getElementById('breadcrumb-link').href = '/truyen-tranh?slug=' + currentComicSlug;
-
-        // Update comic info
-        $('#comic-name').text(currentComic.name);
-        $('#comic-thumb').attr('data-src', currentComic.thumbUrl || '/img/placeholder.jpg').attr('alt', currentComic.name);
-        $('#comic-author').text(currentComic.author && currentComic.author.length > 0 ? currentComic.author[0] : 'Đang Cập Nhật');
-        $('#comic-views').text(formatNumber(currentComic.viewCount || 0));
-        $('#comic-origin-name').text(currentComic.originName || 'N/A');
-        $('#comic-description-name').text(currentComic.name);
-        $('#comic_id').val(currentComicId);
-
-        // Update status
-        const statusMap = {
-          'ongoing': '<span style="color: #28a745;">Đang Tiến Hành</span>',
-          'completed': '<span style="color: #dc3545;">Hoàn Thành</span>',
-          'coming_soon': '<span style="color: #007bff;">Sắp Ra Mắt</span>',
-          'onhold': '<span style="color: #ffc107;">Tạm Dừng</span>',
-          'dropped': '<span style="color: #6c757d;">Đã Hủy</span>'
-        };
-        $('#comic-status').html(statusMap[currentComic.status] || '<span style="color: #6c757d;">Không Xác Định</span>');
-
-        // Update categories
-        const categoriesHtml = (currentComic.categories || []).map(function (cat) {
-          return `<a class="clblue" title="${cat.name}" href="/the-loai?slug=${cat.slug}">${cat.name}</a>`;
-        }).join(' ');
-        $('#comic-categories').html(categoriesHtml || '<span>Chưa có thể loại</span>');
-
-        // Update read first button
-        const firstChapter = currentComic.firstChapter || '1';
-        $('#read-first-btn').attr('href', '/chapter?slug=' + currentComicSlug + '&chapter=' + firstChapter);
-
-        // Load chapters
-        loadChapters();
-
-        // Load comments
-        loadComments();
-
-        // Check follow status
-        if (ApiClient.getToken()) {
-          checkFollowStatus();
-        }
-
-        // Initialize lazy loading
-        if (typeof $.fn.lazy !== 'undefined') {
-          $('.lazy-image').lazy({
-            effect: 'fadeIn',
-            effectTime: 300,
-            threshold: 0
-          });
-        }
-      }
-    ).
-      fail(function (xhr) {
-        showToast('Không thể tải thông tin truyện', false);
-      });
-    }
-
-    function loadChapters() {
-      showLoading('#chapters-list', 'Đang tải danh sách chương...');
-      ApiClient.get('/chapters/comic/' + currentComicSlug, null, false).done(function (response) {
-        if (response.success && response.data) {
-          const chapters = response.data;
-          const $list = $('#chapters-list');
-          $list.empty();
-
-          if (chapters.length === 0) {
-            $list.append('<li class="item_chap"><div class="wc110"><p>Chưa có chương nào được hiển thị.</p></div></li>');
+        if (!currentComicSlug) {
+            showToast('Không tìm thấy truyện', false);
             return;
-          }
+        }
 
-          // Reverse to show newest first
-          chapters.reverse().forEach(function (chapter) {
-            const timeAgoText = timeAgo(chapter.createdAt || chapter.created_at);
-            const li = `
+        // Load comic detail
+        loadComicDetail();
+
+        // Initialize rating
+        $("#rating").rateYo({
+            rating: 2.6,
+            halfStar: true,
+            onSet: function (rating) {
+                // TODO: Implement rating API
+                console.log('Rating:', rating);
+            }
+        });
+    });
+
+    function loadComicDetail() {
+        // Show loading state
+        showLoading('#comic-detail-section', 'Đang tải thông tin truyện...');
+
+        ApiClient.get('/comics/' + currentComicSlug, null, false).done(function (response) {
+            if (response.success && response.data) {
+                currentComic = response.data;
+                currentComicId = currentComic.id;
+
+                // Update page title
+                document.getElementById('page-title').textContent = currentComic.name + ' - TruyenGG';
+                document.getElementById('breadcrumb-name').textContent = currentComic.name;
+                document.getElementById('breadcrumb-link').href = '/truyen-tranh?slug=' + currentComicSlug;
+
+                // Update comic info
+                $('#comic-name').text(currentComic.name);
+                $('#comic-thumb').attr('data-src', currentComic.thumbUrl || '/img/placeholder.jpg').attr('alt', currentComic.name);
+                $('#comic-author').text(currentComic.author && currentComic.author.length > 0 ? currentComic.author[0] : 'Đang Cập Nhật');
+                $('#comic-views').text(formatNumber(currentComic.viewCount || 0));
+                $('#comic-origin-name').text(currentComic.originName || 'N/A');
+                $('#comic-description-name').text(currentComic.name);
+                $('#comic_id').val(currentComicId);
+
+                // Update status
+                const statusMap = {
+                    'ongoing': '<span style="color: #28a745;">Đang Tiến Hành</span>',
+                    'completed': '<span style="color: #dc3545;">Hoàn Thành</span>',
+                    'coming_soon': '<span style="color: #007bff;">Sắp Ra Mắt</span>',
+                    'onhold': '<span style="color: #ffc107;">Tạm Dừng</span>',
+                    'dropped': '<span style="color: #6c757d;">Đã Hủy</span>'
+                };
+                $('#comic-status').html(statusMap[currentComic.status] || '<span style="color: #6c757d;">Không Xác Định</span>');
+
+                // Update categories
+                const categoriesHtml = (currentComic.categories || []).map(function (cat) {
+                    return `<a class="clblue" title="${cat.name}" href="/the-loai?slug=${cat.slug}">${cat.name}</a>`;
+                }).join(' ');
+                $('#comic-categories').html(categoriesHtml || '<span>Chưa có thể loại</span>');
+
+                // Update read first button
+                const firstChapter = currentComic.firstChapter || '1';
+                $('#read-first-btn').attr('href', '/chapter?slug=' + currentComicSlug + '&chapter=' + firstChapter);
+
+                // Load chapters
+                loadChapters();
+
+                // Load comments
+                loadComments();
+
+                // Check follow status
+                if (ApiClient.getToken()) {
+                    checkFollowStatus();
+                }
+
+                // Initialize lazy loading
+                if (typeof $.fn.lazy !== 'undefined') {
+                    $('.lazy-image').lazy({
+                        effect: 'fadeIn',
+                        effectTime: 300,
+                        threshold: 0
+                    });
+                }
+            }
+        ).
+            fail(function (xhr) {
+                showToast('Không thể tải thông tin truyện', false);
+            });
+        }
+
+        function loadChapters() {
+            showLoading('#chapters-list', 'Đang tải danh sách chương...');
+            ApiClient.get('/chapters/comic/' + currentComicSlug, null, false).done(function (response) {
+                if (response.success && response.data) {
+                    const chapters = response.data;
+                    const $list = $('#chapters-list');
+                    $list.empty();
+
+                    if (chapters.length === 0) {
+                        $list.append('<li class="item_chap"><div class="wc110"><p>Chưa có chương nào được hiển thị.</p></div></li>');
+                        return;
+                    }
+
+                    // Reverse to show newest first
+                    chapters.reverse().forEach(function (chapter) {
+                        const timeAgoText = timeAgo(chapter.createdAt || chapter.created_at);
+                        const li = `
                             <li class="item_chap">
                     showError('#chapters-list', 'Không thể tải danh sách chương', xhr);
                                     </a>
@@ -267,129 +271,129 @@
                                 </div>
                             </li>
                         `;
-            $list.append(li);
-          });
+                        $list.append(li);
+                    });
+                }
+            }).fail(function (xhr) {
+                $('#chapters-list').html('<li class="item_chap"><div class="wc110"><p>Lỗi khi tải danh sách chương.</p></div></li>');
+            });
         }
-      }).fail(function (xhr) {
-        $('#chapters-list').html('<li class="item_chap"><div class="wc110"><p>Lỗi khi tải danh sách chương.</p></div></li>');
-      });
-    }
 
-    function loadComments() {
-      if (!currentComicId) return;
+        function loadComments() {
+            if (!currentComicId) return;
 
-      CommentsModule.loadComments(currentComicId, '#comments-container', {
-        page: 0,
-        size: 20,
-        onLoad: function (comments, data) {
-          $('#comment-count').text(data.totalElements || comments.length);
+            CommentsModule.loadComments(currentComicId, '#comments-container', {
+                page: 0,
+                size: 20,
+                onLoad: function (comments, data) {
+                    $('#comment-count').text(data.totalElements || comments.length);
+                }
+            });
         }
-      });
-    }
 
-    function checkFollowStatus() {
-      if (!currentComicId || !ApiClient.getToken()) return;
+        function checkFollowStatus() {
+            if (!currentComicId || !ApiClient.getToken()) return;
 
-      ApiClient.get('/follows/comic/' + currentComicId, null, true).done(function (response) {
-        if (response.success && response.data) {
-          const isFollowing = response.data.isFollowing;
-          const followCount = response.data.followCount;
+            ApiClient.get('/follows/comic/' + currentComicId, null, true).done(function (response) {
+                if (response.success && response.data) {
+                    const isFollowing = response.data.isFollowing;
+                    const followCount = response.data.followCount;
 
-          $('#follow-count').text(followCount);
-          const $button = $('#follow-button');
-          if (isFollowing) {
-            $button.addClass('following').find('span').text('Hủy Theo Dõi');
-          } else {
-            $button.removeClass('following').find('span').text('Theo Dõi');
-          }
+                    $('#follow-count').text(followCount);
+                    const $button = $('#follow-button');
+                    if (isFollowing) {
+                        $button.addClass('following').find('span').text('Hủy Theo Dõi');
+                    } else {
+                        $button.removeClass('following').find('span').text('Theo Dõi');
+                    }
+                }
+            });
         }
-      });
-    }
 
-    $('#follow-button').on('click', function () {
-      if (!ApiClient.getToken()) {
-        showToast('Vui lòng đăng nhập để theo dõi truyện', false);
-        popup('login');
-        return;
-      }
+        $('#follow-button').on('click', function () {
+            if (!ApiClient.getToken()) {
+                showToast('Vui lòng đăng nhập để theo dõi truyện', false);
+                popup('login');
+                return;
+            }
 
-      if (!currentComicId) return;
+            if (!currentComicId) return;
 
-      ApiClient.post('/follows/comic/' + currentComicId, null, true).done(function (response) {
-        if (response.success && response.data) {
-          const isFollowing = response.data.isFollowing;
-          const followCount = response.data.followCount;
+            ApiClient.post('/follows/comic/' + currentComicId, null, true).done(function (response) {
+                if (response.success && response.data) {
+                    const isFollowing = response.data.isFollowing;
+                    const followCount = response.data.followCount;
 
-          $('#follow-count').text(followCount);
-          const $button = $('#follow-button');
-          if (isFollowing) {
-            $button.addClass('following').find('span').text('Hủy Theo Dõi');
-          } else {
-            $button.removeClass('following').find('span').text('Theo Dõi');
-          }
-          showToast(response.data.message || (isFollowing ? 'Đã theo dõi' : 'Đã hủy theo dõi'), true);
+                    $('#follow-count').text(followCount);
+                    const $button = $('#follow-button');
+                    if (isFollowing) {
+                        $button.addClass('following').find('span').text('Hủy Theo Dõi');
+                    } else {
+                        $button.removeClass('following').find('span').text('Theo Dõi');
+                    }
+                    showToast(response.data.message || (isFollowing ? 'Đã theo dõi' : 'Đã hủy theo dõi'), true);
+                }
+            }).fail(function (xhr) {
+                showToast('Không thể cập nhật trạng thái theo dõi', false);
+            });
+        });
+
+        function findList() {
+            const filter = $('.finchap_list').val().toLowerCase();
+            $('.list_chap li').each(function () {
+                const text = $(this).text().toLowerCase();
+                if (text.indexOf(filter) > -1) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
         }
-      }).fail(function (xhr) {
-        showToast('Không thể cập nhật trạng thái theo dõi', false);
-      });
-    });
 
-    function findList() {
-      const filter = $('.finchap_list').val().toLowerCase();
-      $('.list_chap li').each(function () {
-        const text = $(this).text().toLowerCase();
-        if (text.indexOf(filter) > -1) {
-          $(this).show();
-        } else {
-          $(this).hide();
+        function openComment() {
+            if (!ApiClient.getToken()) {
+                showToast('Vui lòng đăng nhập để bình luận', false);
+                popup('login');
+                return;
+            }
+            $('.comment-placeholder').addClass('hidden');
+            $('.mess-input').removeClass('hidden');
+            $('#content_comment').focus();
         }
-      });
-    }
 
-    function openComment() {
-      if (!ApiClient.getToken()) {
-        showToast('Vui lòng đăng nhập để bình luận', false);
-        popup('login');
-        return;
-      }
-      $('.comment-placeholder').addClass('hidden');
-      $('.mess-input').removeClass('hidden');
-      $('#content_comment').focus();
-    }
+        function sendComment(parentId) {
+            const content = parentId === 0 ? $('#content_comment').val() : $('#reply_content_' + parentId).val();
 
-    function sendComment(parentId) {
-      const content = parentId === 0 ? $('#content_comment').val() : $('#reply_content_' + parentId).val();
+            if (!content || content.trim().length === 0) {
+                showToast('Vui lòng nhập nội dung bình luận', false);
+                return;
+            }
 
-      if (!content || content.trim().length === 0) {
-        showToast('Vui lòng nhập nội dung bình luận', false);
-        return;
-      }
-
-      CommentsModule.submitComment(currentComicId, content, function () {
-        if (parentId === 0) {
-          $('#content_comment').val('');
-          $('.comment-placeholder').removeClass('hidden');
-          $('.mess-input').addClass('hidden');
-        } else {
-          $('.reply_' + parentId).remove();
+            CommentsModule.submitComment(currentComicId, content, function () {
+                if (parentId === 0) {
+                    $('#content_comment').val('');
+                    $('.comment-placeholder').removeClass('hidden');
+                    $('.mess-input').addClass('hidden');
+                } else {
+                    $('.reply_' + parentId).remove();
+                }
+                loadComments();
+            });
         }
-        loadComments();
-      });
-    }
 
-    function addReply(commentId) {
-      if (!ApiClient.getToken()) {
-        showToast('Vui lòng đăng nhập để trả lời', false);
-        popup('login');
-        return;
-      }
+        function addReply(commentId) {
+            if (!ApiClient.getToken()) {
+                showToast('Vui lòng đăng nhập để trả lời', false);
+                popup('login');
+                return;
+            }
 
-      if ($('.reply_' + commentId).length > 0) {
-        $('.reply_' + commentId).remove();
-        return;
-      }
+            if ($('.reply_' + commentId).length > 0) {
+                $('.reply_' + commentId).remove();
+                return;
+            }
 
-      const replyForm = `
+            const replyForm = `
                 <div class="form-comment reply-comment reply_${commentId}">
                     <div class="message-content">
                         <textarea class="textarea" placeholder="Trả lời bình luận" id="reply_content_${commentId}"></textarea>
@@ -400,8 +404,8 @@
                     </div>
                 </div>
             `;
-      $('.child_' + commentId).after(replyForm);
-    }
+            $('.child_' + commentId).after(replyForm);
+        }
 </script>
 </body>
 </html>

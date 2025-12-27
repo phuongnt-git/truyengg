@@ -1,0 +1,463 @@
+# Crawl Job GraphQL Schema
+# ===========================
+
+# ===== Scalar Types =====
+scalar DateTime
+scalar Long
+scalar UUID
+
+# ===== Enums =====
+enum CrawlType {
+    CATEGORY
+    COMIC
+    CHAPTER
+    IMAGE
+}
+
+enum CrawlStatus {
+    PENDING
+    RUNNING
+    PAUSED
+    COMPLETED
+    FAILED
+    CANCELLED
+}
+
+enum DownloadMode {
+    FULL
+    UPDATE
+    PARTIAL
+    NONE
+}
+
+enum MessageLevel {
+    INFO
+    WARN
+    ERROR
+}
+
+enum ImageStatus {
+    PENDING
+    DOWNLOADING
+    COMPLETED
+    FAILED
+    SKIPPED
+}
+
+enum CrawlJobSortField {
+    CREATED_AT
+    UPDATED_AT
+    STARTED_AT
+    COMPLETED_AT
+    TARGET_NAME
+    STATUS
+    TYPE
+    PERCENT
+    TOTAL_ITEMS
+    FAILED_ITEMS
+}
+
+enum SortDirection {
+    ASC
+    DESC
+}
+
+# ===== Filter Inputs =====
+input CrawlJobFilter {
+    types: [CrawlType!]
+    excludeTypes: [CrawlType!]
+    statuses: [CrawlStatus!]
+    excludeStatuses: [CrawlStatus!]
+    downloadModes: [DownloadMode!]
+    search: String
+    urlContains: String
+    urlStartsWith: String
+    createdAfter: DateTime
+    createdBefore: DateTime
+    startedAfter: DateTime
+    startedBefore: DateTime
+    completedAfter: DateTime
+    completedBefore: DateTime
+    percentMin: Float
+    percentMax: Float
+    totalItemsMin: Int
+    totalItemsMax: Int
+    failedItemsMin: Int
+    failedItemsMax: Int
+    rootOnly: Boolean
+    parentJobId: UUID
+    rootJobId: UUID
+    depth: Int
+    depthMin: Int
+    depthMax: Int
+    hasChildren: Boolean
+    retryCountMin: Int
+    retryCountMax: Int
+}
+
+input CrawlJobSort {
+    field: CrawlJobSortField!
+    direction: SortDirection!
+}
+
+input MessageFilter {
+    levels: [MessageLevel!]
+    search: String
+    timestampAfter: DateTime
+    timestampBefore: DateTime
+}
+
+# ===== Mutation Inputs =====
+input CreateCrawlJobInput {
+    type: CrawlType!
+    targetUrl: String!
+    targetSlug: String
+    targetName: String
+    downloadMode: DownloadMode
+    settings: CrawlSettingsInput
+}
+
+input CrawlSettingsInput {
+    parallelLimit: Int
+    imageQuality: Int
+    timeoutSeconds: Int
+    skipItems: [Int!]
+    redownloadItems: [Int!]
+    rangeStart: Int
+    rangeEnd: Int
+    customHeaders: String
+}
+
+input UpdateCrawlSettingsInput {
+    parallelLimit: Int
+    imageQuality: Int
+    timeoutSeconds: Int
+    customHeaders: String
+}
+
+input RetryImagesInput {
+    jobId: UUID!
+    indices: [Int!]!
+}
+
+# ===== Core Types =====
+type CrawlJob {
+    id: UUID!
+    type: CrawlType!
+    status: CrawlStatus!
+    targetUrl: String!
+    targetSlug: String
+    targetName: String
+    downloadMode: DownloadMode!
+    depth: Int!
+    contentId: Long
+    itemIndex: Int!
+
+    totalItems: Int!
+    completedItems: Int!
+    failedItems: Int!
+    skippedItems: Int!
+    percent: Float!
+    retryCount: Int!
+    errorMessage: String
+
+    parentJob: CrawlJob
+    rootJob: CrawlJob
+    hasChildren: Boolean!
+    childrenCount: Int!
+
+    progress: CrawlProgress
+    checkpoint: CrawlCheckpoint
+    settings: CrawlSettings
+    aggregatedStats: AggregatedStats
+
+    children(
+        first: Int
+        after: String
+        filter: CrawlJobFilter
+        sort: [CrawlJobSort!]
+    ): CrawlJobConnection!
+
+    messages(
+        first: Int
+        after: String
+        last: Int
+        before: String
+        filter: MessageFilter
+    ): MessageConnection!
+
+    failedItemsList: FailedItemsResult!
+    images: [ImageDownloadStatus!]
+
+    startedAt: DateTime
+    completedAt: DateTime
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+type CrawlProgress {
+    id: UUID!
+    itemIndex: Int!
+    itemName: String
+    itemUrl: String
+    totalItems: Int!
+    completedItems: Int!
+    failedItems: Int!
+    skippedItems: Int!
+    bytesDownloaded: Long!
+    percent: Int!
+    message: String
+    startedAt: DateTime
+    lastUpdateAt: DateTime!
+    estimatedRemainingSeconds: Int!
+}
+
+type CrawlCheckpoint {
+    id: UUID!
+    lastItemIndex: Int!
+    failedItemIndices: [Int!]
+    resumeCount: Int!
+    pausedAt: DateTime
+    resumedAt: DateTime
+    hasFailedItems: Boolean!
+}
+
+type CrawlSettings {
+    id: UUID!
+    parallelLimit: Int!
+    imageQuality: Int!
+    timeoutSeconds: Int!
+    skipItems: [Int!]
+    redownloadItems: [Int!]
+    rangeStart: Int!
+    rangeEnd: Int!
+    hasRange: Boolean!
+}
+
+type AggregatedStats {
+    totalChapters: Int!
+    totalImages: Int!
+    totalBytes: Long!
+    byStatus: StatusCounts!
+    byType: TypeCounts!
+    avgProgress: Float!
+}
+
+type StatusCounts {
+    pending: Int!
+    running: Int!
+    completed: Int!
+    failed: Int!
+    paused: Int!
+    cancelled: Int!
+}
+
+type TypeCounts {
+    category: Int!
+    comic: Int!
+    chapter: Int!
+    image: Int!
+}
+
+type ImageDownloadStatus {
+    index: Int!
+    originalUrl: String!
+    path: String
+    blurhash: String
+    status: ImageStatus!
+    size: Long
+    error: String
+}
+
+type FailedItemsResult {
+    totalCount: Int!
+    items: [FailedItem!]!
+}
+
+type FailedItem {
+    index: Int!
+    url: String
+    name: String
+    error: String
+    retryCount: Int!
+}
+
+type Message {
+    id: String!
+    timestamp: DateTime!
+    level: MessageLevel!
+    message: String!
+}
+
+# ===== Connection Types (Relay-style pagination) =====
+type CrawlJobConnection {
+    edges: [CrawlJobEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type CrawlJobEdge {
+    node: CrawlJob!
+    cursor: String!
+}
+
+type MessageConnection {
+    edges: [MessageEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type MessageEdge {
+    node: Message!
+    cursor: String!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+}
+
+# ===== Dashboard Stats =====
+type CrawlDashboardStats {
+    totalJobs: Int!
+    activeJobs: Int!
+    completedJobs: Int!
+    failedJobs: Int!
+    byType: TypeCounts!
+    byStatus: StatusCounts!
+    recentActivity: [CrawlJob!]!
+    queueDepth: Int!
+}
+
+type QueueStatus {
+    totalItems: Int!
+    pendingItems: Int!
+    processingItems: Int!
+    failedItems: Int!
+    itemsByType: TypeCounts!
+}
+
+# ===== Query Root =====
+type Query {
+    """Get a single crawl job by ID"""
+    crawlJob(id: UUID!): CrawlJob
+
+    """List crawl jobs with advanced filtering, searching, and sorting"""
+    crawlJobs(
+        first: Int
+        after: String
+        last: Int
+        before: String
+        filter: CrawlJobFilter
+        sort: [CrawlJobSort!]
+    ): CrawlJobConnection!
+
+    """Get dashboard statistics"""
+    crawlStats: CrawlDashboardStats!
+
+    """Get queue status for a job or global"""
+    queueStatus(jobId: UUID): QueueStatus!
+
+    """Search suggestions for autocomplete"""
+    searchSuggestions(query: String!, limit: Int): [String!]!
+}
+
+# ===== Mutation Root =====
+type Mutation {
+    """Create a new crawl job"""
+    createCrawlJob(input: CreateCrawlJobInput!): CrawlJob!
+
+    """Start a pending crawl job"""
+    startCrawlJob(id: UUID!): CrawlJob!
+
+    """Pause a running crawl job"""
+    pauseCrawlJob(id: UUID!): CrawlJob!
+
+    """Resume a paused crawl job"""
+    resumeCrawlJob(id: UUID!): CrawlJob!
+
+    """Retry a failed crawl job"""
+    retryCrawlJob(id: UUID!): CrawlJob!
+
+    """Cancel a crawl job"""
+    cancelCrawlJob(id: UUID!): CrawlJob!
+
+    """Delete a crawl job (soft delete)"""
+    deleteCrawlJob(id: UUID!, hard: Boolean): Boolean!
+
+    """Restore a soft-deleted crawl job"""
+    restoreCrawlJob(id: UUID!): CrawlJob!
+
+    """Update crawl job settings"""
+    updateCrawlSettings(id: UUID!, input: UpdateCrawlSettingsInput!): CrawlJob!
+
+    """Retry specific failed images"""
+    retryFailedImages(input: RetryImagesInput!): CrawlJob!
+
+    """Retry all failed items in a job"""
+    retryAllFailedItems(id: UUID!): CrawlJob!
+
+    """Skip specific failed items"""
+    skipFailedItems(id: UUID!, indices: [Int!]!): CrawlJob!
+}
+
+# ===== Subscription Root =====
+type Subscription {
+    """Subscribe to progress updates for a specific job"""
+    crawlProgress(jobId: UUID!): CrawlProgressUpdate!
+
+    """Subscribe to new messages for a specific job"""
+    crawlMessage(jobId: UUID!): Message!
+
+    """Subscribe to child job creation for a parent job"""
+    childJobCreated(parentJobId: UUID!): CrawlJob!
+
+    """Subscribe to image download progress for a job"""
+    imageProgress(jobId: UUID!): ImageDownloadStatus!
+
+    """Subscribe to all crawl events (status changes, completions, errors)"""
+    globalCrawlEvents: CrawlEvent!
+
+    """Subscribe to status changes for a specific job"""
+    jobStatusChanged(jobId: UUID!): CrawlJob!
+}
+
+# ===== Subscription Types =====
+type CrawlProgressUpdate {
+    jobId: UUID!
+    percent: Int!
+    itemIndex: Int!
+    itemName: String
+    totalItems: Int!
+    completedItems: Int!
+    failedItems: Int!
+    bytesDownloaded: Long!
+    message: String
+    estimatedRemainingSeconds: Int!
+}
+
+type CrawlEvent {
+    eventType: CrawlEventType!
+    jobId: UUID!
+    job: CrawlJob
+    message: String
+    timestamp: DateTime!
+}
+
+enum CrawlEventType {
+    JOB_CREATED
+    JOB_STARTED
+    JOB_PAUSED
+    JOB_RESUMED
+    JOB_COMPLETED
+    JOB_FAILED
+    JOB_CANCELLED
+    CHILD_CREATED
+    PROGRESS_UPDATE
+    MESSAGE_ADDED
+    IMAGE_DOWNLOADED
+    IMAGE_FAILED
+}
+

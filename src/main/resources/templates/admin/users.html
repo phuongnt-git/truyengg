@@ -1,189 +1,199 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="vi" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>TruyenGG - Quản lý người dùng</title>
     <link rel="stylesheet" th:href="@{/voler/css/bootstrap.css}">
     <link rel="stylesheet" th:href="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.css}">
     <link rel="stylesheet" th:href="@{/voler/css/app.css}">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link rel="shortcut icon" th:href="@{/voler/images/favicon.png}" type="image/png">
 </head>
 <body>
-    <div id="app">
-        <div id="sidebar" class='active'>
-            <th:block th:replace="~{admin/layouts/sidebar :: sidebar}"></th:block>
-        </div>
-        <div id="main">
-            <nav class="navbar navbar-header navbar-expand navbar-light">
-                <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
-                <button class="btn navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav d-flex align-items-center navbar-light ms-auto">
-                        <li class="dropdown">
-                            <a href="#" data-bs-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-                                <div class="avatar me-1">
-                                    <img th:src="@{/voler/images/avatar/avatar-s-1.png}" alt="Avatar" srcset="">
-                                </div>
-                                <div class="d-none d-md-block d-lg-inline-block">
-                                    <span sec:authentication="name">Admin</span>
-                                </div>
+<div id="app">
+    <div class='active' id="sidebar">
+        <th:block th:replace="~{admin/layouts/sidebar :: sidebar}"></th:block>
+    </div>
+    <div id="main">
+        <nav class="navbar navbar-header navbar-expand navbar-light">
+            <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
+            <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                    class="btn navbar-toggler"
+                    data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav d-flex align-items-center navbar-light ms-auto">
+                    <li class="dropdown">
+                        <a aria-expanded="false" class="nav-link dropdown-toggle nav-link-lg nav-link-user" data-bs-toggle="dropdown"
+                           href="#">
+                            <div class="avatar me-1">
+                                <img alt="Avatar" srcset="" th:src="@{/voler/images/avatar/avatar-s-1.png}">
+                            </div>
+                            <div class="d-none d-md-block d-lg-inline-block">
+                                <span sec:authentication="name">Admin</span>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" data-bs-target="#profileModal" data-bs-toggle="modal" href="#">
+                                <i data-feather="user"></i> Profile
                             </a>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" th:href="@{/}">
-                                    <i data-feather="home"></i> Home
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="javascript:void(0);" onclick="logout(); return false;">
-                                    <i data-feather="log-out"></i> Logout
-                                </a>
+                            <a class="dropdown-item" th:href="@{/}">
+                                <i data-feather="home"></i> Home
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="logout(); return false;">
+                                <i data-feather="log-out"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="main-content container-fluid">
+            <th:block
+                    th:replace="~{admin/fragments/page-header :: page-header('Quản lý người dùng', 'Quản lý tất cả người dùng trong hệ thống')}"></th:block>
+            <section class="section">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Danh sách người dùng</h4>
                             </div>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-            <div class="main-content container-fluid">
-                <th:block th:replace="~{admin/fragments/page-header :: page-header('Quản lý người dùng', 'Quản lý tất cả người dùng trong hệ thống')}"></th:block>
-                <section class="section">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h4 class="card-title">Danh sách người dùng</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-striped" id="usersTable">
-                                            <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Username</th>
-                                                    <th>Email</th>
-                                                    <th>Vai trò</th>
-                                                    <th>Ngày tạo</th>
-                                                    <th>Trạng thái</th>
-                                                    <th>Hành động</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="users-tbody">
-                                                <!-- Users will be loaded here -->
-                                            </tbody>
-                                        </table>
-                                    </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="usersTable">
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Username</th>
+                                            <th>Email</th>
+                                            <th>Vai trò</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Trạng thái</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="users-tbody">
+                                        <!-- Users will be loaded here -->
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
+        </div>
+        <footer>
+            <div class="footer clearfix mb-0 text-muted">
+                <div class="float-start">
+                    <p>2024 &copy; <a th:href="@{/}">TruyenGG</a></p>
+                </div>
+                <div class="float-end">
+                    <p>Crafted with <span class='text-danger'><i data-feather="heart"></i></span> by TruyenGG Team</p>
+                </div>
             </div>
-            <footer>
-                <div class="footer clearfix mb-0 text-muted">
-                    <div class="float-start">
-                        <p>2024 &copy; <a th:href="@{/}">TruyenGG</a></p>
+        </footer>
+    </div>
+</div>
+
+<!-- Edit Role Modal -->
+<div aria-hidden="true" aria-labelledby="editRoleModalLabel" class="modal fade" id="editRoleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRoleModalLabel">Cập nhật vai trò</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editRoleForm">
+                    <input id="edit_user_id" name="user_id" type="hidden">
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="edit_role">Vai trò</label>
+                        <select class="form-select" id="edit_role" name="role">
+                            <option value="USER">Người dùng</option>
+                            <option value="TRANSLATOR">Nhóm dịch</option>
+                            <option value="ADMIN">Quản trị viên</option>
+                        </select>
                     </div>
-                    <div class="float-end">
-                        <p>Crafted with <span class='text-danger'><i data-feather="heart"></i></span> by TruyenGG Team</p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Hủy</button>
+                <button class="btn btn-primary" id="saveRole" type="button">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ban User Modal -->
+<div aria-hidden="true" aria-labelledby="banUserModalLabel" class="modal fade" id="banUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="banUserModalLabel">Cấm người dùng</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="banUserForm">
+                    <input id="ban_user_id" name="user_id" type="hidden">
+                    <div class="form-group mb-3">
+                        <label class="form-label" for="ban_duration">Thời gian cấm</label>
+                        <select class="form-select" id="ban_duration" name="duration">
+                            <option value="1day">1 ngày</option>
+                            <option value="7days">7 ngày</option>
+                            <option value="30days">30 ngày</option>
+                            <option value="permanent">Vĩnh viễn</option>
+                        </select>
                     </div>
-                </div>
-            </footer>
-        </div>
-    </div>
-
-    <!-- Edit Role Modal -->
-    <div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editRoleModalLabel">Cập nhật vai trò</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editRoleForm">
-                        <input id="edit_user_id" name="user_id" type="hidden">
-                        <div class="form-group mb-3">
-                            <label for="edit_role" class="form-label">Vai trò</label>
-                            <select class="form-select" id="edit_role" name="role">
-                                <option value="USER">Người dùng</option>
-                                <option value="TRANSLATOR">Nhóm dịch</option>
-                                <option value="ADMIN">Quản trị viên</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" id="saveRole">Lưu</button>
-                </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Hủy</button>
+                <button class="btn btn-warning" id="saveBan" type="button">Cấm</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Ban User Modal -->
-    <div class="modal fade" id="banUserModal" tabindex="-1" aria-labelledby="banUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="banUserModalLabel">Cấm người dùng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="banUserForm">
-                        <input id="ban_user_id" name="user_id" type="hidden">
-                        <div class="form-group mb-3">
-                            <label for="ban_duration" class="form-label">Thời gian cấm</label>
-                            <select class="form-select" id="ban_duration" name="duration">
-                                <option value="1day">1 ngày</option>
-                                <option value="7days">7 ngày</option>
-                                <option value="30days">30 ngày</option>
-                                <option value="permanent">Vĩnh viễn</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-warning" id="saveBan">Cấm</button>
-                </div>
+<!-- Delete User Modal -->
+<div aria-hidden="true" aria-labelledby="deleteUserModalLabel" class="modal fade" id="deleteUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteUserModalLabel">Xóa người dùng</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác.</p>
+                <input id="delete_user_id" name="user_id" type="hidden">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Hủy</button>
+                <button class="btn btn-danger" id="confirmDelete" type="button">Xóa</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Delete User Modal -->
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteUserModalLabel">Xóa người dùng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác.</p>
-                    <input id="delete_user_id" name="user_id" type="hidden">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger" id="confirmDelete">Xóa</button>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- Profile Modal -->
+<th:block th:replace="~{admin/fragments/profile-modal :: profileModal}"></th:block>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script th:src="@{/voler/js/feather-icons/feather.min.js}"></script>
-    <script th:src="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
-    <script th:src="@{/voler/js/app.js}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script th:src="@{/js/admin-auth.js}"></script>
-    <script th:src="@{/js/admin/voler-init.js}"></script>
-    <script th:src="@{/js/api.js}"></script>
-    <script th:src="@{/js/utils.js}"></script>
-    <script th:src="@{/js/admin/users.js}"></script>
-    <script th:src="@{/voler/js/main.js}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/voler/js/feather-icons/feather.min.js}"></script>
+<script th:src="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:src="@{/voler/js/app.js}"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script th:src="@{/js/admin-auth.js}"></script>
+<script th:src="@{/js/admin/voler-init.js}"></script>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/passkey.js}"></script>
+<script th:src="@{/js/admin-profile.js}"></script>
+<script th:src="@{/js/utils.js}"></script>
+<script th:src="@{/js/admin/users.js}"></script>
+<script th:src="@{/voler/js/main.js}"></script>
 </body>
 </html>

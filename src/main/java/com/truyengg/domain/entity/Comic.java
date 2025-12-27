@@ -114,6 +114,12 @@ public class Comic {
   @Column(length = 500, unique = true)
   String source;
 
+  @Column(name = "cover_hash", length = 64)
+  String coverHash;
+
+  @Column(name = "cover_blurhash", length = 50)
+  String coverBlurhash;
+
   @JdbcTypeCode(SqlTypes.ARRAY)
   @Column(name = "alternative_names", columnDefinition = "TEXT[]")
   List<String> alternativeNames;

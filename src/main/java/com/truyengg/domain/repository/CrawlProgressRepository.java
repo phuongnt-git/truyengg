@@ -6,43 +6,37 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.UUID;
 
 @Repository
-public interface CrawlProgressRepository extends JpaRepository<CrawlProgress, Long> {
-
-  @Query("SELECT c FROM CrawlProgress c WHERE c.crawl.id = :crawlId")
-  Optional<CrawlProgress> findByCrawlId(UUID crawlId);
+public interface CrawlProgressRepository extends JpaRepository<CrawlProgress, UUID> {
 
   @Modifying
-  @Query("DELETE FROM CrawlProgress c WHERE c.crawl.id = :crawlId")
-  void deleteByCrawlId(UUID crawlId);
+  @Query("UPDATE CrawlProgress p SET p.deletedAt = :now WHERE p.id IN :jobIds")
+  void softDeleteByJobIds(Collection<UUID> jobIds, ZonedDateTime now);
+
+  @Modifying
+  @Query("UPDATE CrawlProgress p SET p.deletedAt = NULL WHERE p.id IN :jobIds")
+  void restoreByJobIds(Collection<UUID> jobIds);
 
   @Modifying
   @Query("""
-      UPDATE CrawlProgress c
-      SET c.currentChapter = :currentChapter,
-          c.totalChapters = :totalChapters,
-          c.downloadedImages = :downloadedImages,
-          c.totalImages = :totalImages,
-          c.currentMessage = :currentMessage,
-          c.messages = :messages,
-          c.lastUpdate = :lastUpdate,
-          c.elapsedSeconds = :elapsedSeconds
-      WHERE c.crawl.id = :crawlId
+      UPDATE CrawlProgress p
+      SET p.completedItems = p.completedItems + 1,
+          p.lastUpdateAt = :now,
+          p.percent = CASE WHEN p.totalItems > 0 THEN ((p.completedItems + 1) * 100 / p.totalItems) ELSE 0 END
+      WHERE p.id = :jobId
       """)
-  void updateProgress(
-      UUID crawlId,
-      Integer currentChapter,
-      Integer totalChapters,
-      Integer downloadedImages,
-      Integer totalImages,
-      String currentMessage,
-      List<String> messages,
-      java.time.ZonedDateTime lastUpdate,
-      Long elapsedSeconds
-  );
-}
+  void incrementCompletedItems(UUID jobId, ZonedDateTime now);
 
+  @Modifying
+  @Query("""
+      UPDATE CrawlProgress p
+      SET p.bytesDownloaded = p.bytesDownloaded + :bytes,
+          p.lastUpdateAt = :now
+      WHERE p.id = :jobId
+      """)
+  void addBytesDownloaded(UUID jobId, long bytes, ZonedDateTime now);
+}

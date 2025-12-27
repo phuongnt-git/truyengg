@@ -33,7 +33,7 @@ public class FollowController {
   public ResponseEntity<ApiResponse<Map<String, Object>>> toggleFollow(
       @PathVariable Long comicId,
       @AuthenticationPrincipal UserPrincipal userPrincipal) {
-    boolean isFollowing = followService.toggleFollow(userPrincipal.getId(), comicId);
+    boolean isFollowing = followService.toggleFollow(userPrincipal.id(), comicId);
     long followCount = followService.getFollowCount(comicId);
     return ResponseEntity.ok(ApiResponse.success(Map.of(
         "isFollowing", isFollowing,
@@ -47,7 +47,7 @@ public class FollowController {
   public ResponseEntity<ApiResponse<Map<String, Object>>> checkFollow(
       @PathVariable Long comicId,
       @AuthenticationPrincipal UserPrincipal userPrincipal) {
-    boolean isFollowing = followService.isFollowing(userPrincipal.getId(), comicId);
+    boolean isFollowing = followService.isFollowing(userPrincipal.id(), comicId);
     long followCount = followService.getFollowCount(comicId);
     return ResponseEntity.ok(ApiResponse.success(Map.of(
         "isFollowing", isFollowing,
@@ -60,7 +60,7 @@ public class FollowController {
   public ResponseEntity<ApiResponse<Page<ComicResponse>>> getMyFollows(
       @AuthenticationPrincipal UserPrincipal userPrincipal,
       @PageableDefault(size = 24) Pageable pageable) {
-    Page<ComicResponse> comics = followService.getFollowedComics(userPrincipal.getId(), pageable);
+    Page<ComicResponse> comics = followService.getFollowedComics(userPrincipal.id(), pageable);
     return ResponseEntity.ok(ApiResponse.success(comics));
   }
 }

@@ -43,7 +43,7 @@ public class CommentController {
   public ResponseEntity<ApiResponse<CommentResponse>> createComment(
       @Valid @RequestBody CommentRequest request,
       @AuthenticationPrincipal UserPrincipal userPrincipal) {
-    CommentResponse comment = commentService.createComment(userPrincipal.getId(), request);
+    CommentResponse comment = commentService.createComment(userPrincipal.id(), request);
     long totalComments = commentService.countCommentsByComicId(request.comicId());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ApiResponse.success("Bình luận đã được gửi", comment));
@@ -54,7 +54,7 @@ public class CommentController {
   public ResponseEntity<ApiResponse<Object>> deleteComment(
       @PathVariable Long commentId,
       @AuthenticationPrincipal UserPrincipal userPrincipal) {
-    commentService.deleteComment(commentId, userPrincipal.getId());
+    commentService.deleteComment(commentId, userPrincipal.id());
     return ResponseEntity.ok(ApiResponse.success("Bình luận đã được xóa"));
   }
 

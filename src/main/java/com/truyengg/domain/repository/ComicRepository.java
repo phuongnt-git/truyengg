@@ -22,6 +22,8 @@ public interface ComicRepository extends JpaRepository<Comic, Long>, JpaSpecific
 
   boolean existsBySource(String source);
 
+  Optional<Comic> findByCoverHash(String coverHash);
+
   @Query("SELECT COUNT(c) FROM Comic c WHERE c.isHot = true")
   long countHotComics();
 

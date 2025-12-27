@@ -2,7 +2,7 @@ package com.truyengg.controller.api;
 
 import com.truyengg.model.response.ApiResponse;
 import com.truyengg.model.response.ComicResponse;
-import com.truyengg.service.ComicService;
+import com.truyengg.service.comic.ComicService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -16,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.springframework.util.StringUtils.hasText;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Component
 @RequiredArgsConstructor
@@ -28,12 +29,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final TokenBlacklistService blacklistService;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+  protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                  @NonNull HttpServletResponse response,
+                                  @NonNull FilterChain filterChain)
       throws ServletException, IOException {
     try {
       var jwt = getJwtFromRequest(request);
 
-      if (hasText(jwt) && tokenProvider.validateToken(jwt) && tokenProvider.isAccessToken(jwt)) {
+      if (isNotBlank(jwt) && tokenProvider.validateToken(jwt) && tokenProvider.isAccessToken(jwt)) {
         if (blacklistService.isTokenBlacklisted(jwt)) {
           filterChain.doFilter(request, response);
           return;
@@ -57,14 +60,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private String getJwtFromRequest(HttpServletRequest request) {
     var bearerToken = request.getHeader("Authorization");
-    if (hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+    if (isNotBlank(bearerToken) && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7);
     }
 
     var cookies = request.getCookies();
     if (cookies != null) {
       for (var cookie : cookies) {
-        if ("access_token".equals(cookie.getName()) && hasText(cookie.getValue())) {
+        if ("access_token".equals(cookie.getName()) && isNotBlank(cookie.getValue())) {
           var token = cookie.getValue();
           if (token.startsWith("Bearer ")) {
             return token.substring(7);

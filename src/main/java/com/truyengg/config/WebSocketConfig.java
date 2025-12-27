@@ -1,6 +1,7 @@
 package com.truyengg.config;
 
 import com.truyengg.security.WebSocketAuthenticationInterceptor;
+import com.truyengg.security.qsc.HPKEWebSocketInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   private final WebSocketAuthenticationInterceptor authenticationInterceptor;
+  private final HPKEWebSocketInterceptor hpkeWebSocketInterceptor;
 
   @Override
   public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -49,7 +51,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void configureClientInboundChannel(ChannelRegistration registration) {
-    registration.interceptors(authenticationInterceptor);
+    registration.interceptors(authenticationInterceptor, hpkeWebSocketInterceptor);
   }
 
 }

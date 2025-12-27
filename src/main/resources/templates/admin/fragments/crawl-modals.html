@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Crawl Modals Fragment</title>
+</head>
+<body>
+
+<!-- Progress Modal -->
+<div class="modal fade" data-bs-backdrop="static" id="progressModal" tabindex="-1" th:fragment="progressModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="me-2" data-feather="activity"></i>
+                    <span id="progressModalTitle">Crawl Progress</span>
+                </h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Job Info -->
+                <div class="mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">Type</small>
+                            <div class="fw-bold" id="progressJobType">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Status</small>
+                            <div id="progressJobStatus">-</div>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">URL</small>
+                        <div class="text-break small" id="progressJobUrl">-</div>
+                    </div>
+                </div>
+
+                <!-- Main Progress Bar -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-bold">Overall Progress</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress" style="height: 24px;">
+                        <div aria-valuemax="100" aria-valuemin="0"
+                             aria-valuenow="0" class="progress-bar progress-bar-striped progress-bar-animated"
+                             id="progressBar" role="progressbar" style="width: 0%;">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted" id="progressItemCount">0/0 items</small>
+                        <small class="text-muted" id="progressBytesDownloaded">0 KB</small>
+                    </div>
+                </div>
+
+                <!-- Counters -->
+                <div class="row mb-4">
+                    <div class="col-3 text-center">
+                        <div class="p-3 bg-light rounded">
+                            <h4 class="text-success mb-0" id="progressCompleted">0</h4>
+                            <small class="text-muted">Completed</small>
+                        </div>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div class="p-3 bg-light rounded">
+                            <h4 class="text-danger mb-0" id="progressFailed">0</h4>
+                            <small class="text-muted">Failed</small>
+                        </div>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div class="p-3 bg-light rounded">
+                            <h4 class="text-warning mb-0" id="progressSkipped">0</h4>
+                            <small class="text-muted">Skipped</small>
+                        </div>
+                    </div>
+                    <div class="col-3 text-center">
+                        <div class="p-3 bg-light rounded">
+                            <h4 class="text-secondary mb-0" id="progressPending">0</h4>
+                            <small class="text-muted">Pending</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Item -->
+                <div class="mb-3">
+                    <small class="text-muted">Current Item</small>
+                    <div class="p-2 bg-light rounded" id="progressCurrentMessage">
+                        <span class="text-muted">Waiting...</span>
+                    </div>
+                </div>
+
+                <!-- Error Display -->
+                <div class="alert alert-danger d-none" id="progressErrorContainer">
+                    <strong>Last Error:</strong>
+                    <div id="progressLastError"></div>
+                </div>
+
+                <!-- Time Info -->
+                <div class="row small text-muted">
+                    <div class="col-md-4">
+                        <span>Started:</span> <span id="progressStartedAt">-</span>
+                    </div>
+                    <div class="col-md-4">
+                        <span>Updated:</span> <span id="progressUpdatedAt">-</span>
+                    </div>
+                    <div class="col-md-4">
+                        <span>ETA:</span> <span id="progressEta">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input id="progressJobId" type="hidden">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                <button class="btn btn-warning d-none" id="progressPauseBtn" onclick="CrawlModule.pauseFromModal()"
+                        type="button">
+                    <i class="me-1" data-feather="pause"></i> Pause
+                </button>
+                <button class="btn btn-info d-none" id="progressResumeBtn" onclick="CrawlModule.resumeFromModal()"
+                        type="button">
+                    <i class="me-1" data-feather="play"></i> Resume
+                </button>
+                <button class="btn btn-primary d-none" id="progressRetryBtn" onclick="CrawlModule.retryFromModal()"
+                        type="button">
+                    <i class="me-1" data-feather="refresh-cw"></i> Retry
+                </button>
+                <button class="btn btn-danger d-none" id="progressCancelBtn" onclick="CrawlModule.cancelFromModal()"
+                        type="button">
+                    <i class="me-1" data-feather="x"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" th:fragment="settingsModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="me-2" data-feather="settings"></i>
+                    Crawl Settings
+                </h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="settingsForm">
+                    <input id="settingsJobId" type="hidden">
+
+                    <!-- Basic Settings -->
+                    <h6 class="text-muted mb-3">Basic Settings</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Parallel Limit</label>
+                            <input class="form-control" id="settingsParallelLimit" max="10"
+                                   min="1" type="number" value="3">
+                            <small class="text-muted">Max concurrent downloads (1-10)</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Timeout (seconds)</label>
+                            <input class="form-control" id="settingsTimeout" max="300"
+                                   min="10" type="number" value="60">
+                            <small class="text-muted">Request timeout (10-300s)</small>
+                        </div>
+                    </div>
+
+                    <!-- Range Settings -->
+                    <h6 class="text-muted mb-3">Range Selection</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Start Index</label>
+                            <input class="form-control" id="settingsRangeStart" min="-1"
+                                   placeholder="-1 = from beginning" type="number" value="-1">
+                            <small class="text-muted">-1 means from the beginning</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">End Index</label>
+                            <input class="form-control" id="settingsRangeEnd" min="-1"
+                                   placeholder="-1 = to end" type="number" value="-1">
+                            <small class="text-muted">-1 means until the end</small>
+                        </div>
+                    </div>
+
+                    <!-- Image Settings -->
+                    <h6 class="text-muted mb-3">Image Processing</h6>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Image Quality</label>
+                            <input class="form-range" id="settingsImageQuality" max="100"
+                                   min="50" oninput="document.getElementById('imageQualityValue').textContent = this.value" type="range"
+                                   value="85">
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">50 (Low)</small>
+                                <small id="imageQualityValue">85</small>
+                                <small class="text-muted">100 (High)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Download Mode</label>
+                            <select class="form-select" id="settingsDownloadMode">
+                                <option value="FULL">Full - Download everything</option>
+                                <option value="UPDATE">Update - New items only</option>
+                                <option value="PARTIAL">Partial - Selected range</option>
+                                <option value="NONE">None - No downloads</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Skip/Redownload Items -->
+                    <h6 class="text-muted mb-3">Item Selection</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Skip Items (comma separated)</label>
+                            <input class="form-control" id="settingsSkipItems" placeholder="e.g., 1,5,10"
+                                   type="text">
+                            <small class="text-muted">Item indices to skip</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Redownload Items (comma separated)</label>
+                            <input class="form-control" id="settingsRedownloadItems" placeholder="e.g., 3,7,15"
+                                   type="text">
+                            <small class="text-muted">Item indices to force redownload</small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-primary" onclick="CrawlModule.saveSettings()" type="button">
+                    <i class="me-1" data-feather="save"></i> Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Duplicate Check Modal -->
+<div class="modal fade" id="duplicateModal" tabindex="-1" th:fragment="duplicateModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="me-2" data-feather="copy"></i>
+                    Duplicate Check
+                </h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Input Section -->
+                <div class="mb-4">
+                    <label class="form-label">URLs to Check (one per line)</label>
+                    <textarea class="form-control" id="duplicateCheckUrls" placeholder="https://example.com/comic-1&#10;https://example.com/comic-2"
+                              rows="5"></textarea>
+                </div>
+
+                <div class="d-flex gap-2 mb-4">
+                    <button class="btn btn-primary" onclick="CrawlModule.checkDuplicates()" type="button">
+                        <i class="me-1" data-feather="search"></i> Check Duplicates
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="document.getElementById('duplicateCheckUrls').value = ''"
+                            type="button">
+                        Clear
+                    </button>
+                </div>
+
+                <!-- Results Section -->
+                <div class="d-none" id="duplicateResults">
+                    <hr>
+                    <h6 class="mb-3">Results</h6>
+
+                    <!-- Summary -->
+                    <div class="row mb-3">
+                        <div class="col-4 text-center">
+                            <div class="p-2 bg-light rounded">
+                                <h5 class="mb-0" id="duplicateTotal">0</h5>
+                                <small class="text-muted">Total</small>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="p-2 bg-light rounded">
+                                <h5 class="text-warning mb-0" id="duplicateExisting">0</h5>
+                                <small class="text-muted">Existing</small>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="p-2 bg-light rounded">
+                                <h5 class="text-success mb-0" id="duplicateNew">0</h5>
+                                <small class="text-muted">New</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Results -->
+                    <div id="duplicateResultsList" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Results will be rendered here -->
+                    </div>
+
+                    <!-- Actions for new URLs -->
+                    <div class="mt-3 d-none" id="duplicateActions">
+                        <hr>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success" onclick="CrawlModule.crawlNewUrls()" type="button">
+                                <i class="me-1" data-feather="download"></i> Crawl New URLs
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="CrawlModule.crawlAllUrls()" type="button">
+                                <i class="me-1" data-feather="refresh-cw"></i> Crawl All (Update)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Crawl Modal (Enhanced) -->
+<div class="modal fade" id="createCrawlModal" tabindex="-1" th:fragment="createModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="me-2" data-feather="plus-circle"></i>
+                    Create New Crawl
+                </h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createCrawlForm">
+                    <!-- Step 1: Basic Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Crawl Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="createCrawlType" name="crawlType" onchange="CrawlModule.onCrawlTypeChange()"
+                                    required>
+                                <option value="CATEGORY">Category - Crawl all comics in category</option>
+                                <option selected value="COMIC">Comic - Crawl all chapters of a comic</option>
+                                <option value="CHAPTER">Chapter - Crawl all images in chapter</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Download Mode</label>
+                            <select class="form-select" id="createDownloadMode" name="downloadMode">
+                                <option value="FULL">Full - Download everything</option>
+                                <option value="UPDATE">Update - New items only</option>
+                                <option value="PARTIAL">Partial - Select range</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Target URL <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input class="form-control" id="createTargetUrl" name="targetUrl" placeholder="https://example.com/comic-name"
+                                   required type="url">
+                            <button class="btn btn-outline-secondary" onclick="CrawlModule.checkDuplicateOnCreate()"
+                                    type="button">
+                                <i data-feather="search"></i> Check
+                            </button>
+                        </div>
+                        <div class="alert alert-warning mt-2 d-none" id="createDuplicateWarning">
+                            <i class="me-1" data-feather="alert-triangle"></i>
+                            <span id="createDuplicateMessage"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Name (Optional)</label>
+                        <input class="form-control" id="createTargetName" name="targetName" placeholder="Comic/Chapter name"
+                               type="text">
+                    </div>
+
+                    <!-- Range Settings (shown for PARTIAL mode) -->
+                    <div class="row mb-3 d-none" id="createRangeSettings">
+                        <div class="col-md-6">
+                            <label class="form-label">Start Index</label>
+                            <input class="form-control" min="0" name="rangeStart"
+                                   placeholder="From beginning" type="number" value="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">End Index</label>
+                            <input class="form-control" min="-1" name="rangeEnd"
+                                   placeholder="-1 = until end" type="number" value="-1">
+                        </div>
+                    </div>
+
+                    <!-- Advanced Settings (collapsed) -->
+                    <div class="accordion mb-3" id="createAdvancedAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" data-bs-target="#createAdvancedSettings"
+                                        data-bs-toggle="collapse" type="button">
+                                    Advanced Settings
+                                </button>
+                            </h2>
+                            <div class="accordion-collapse collapse" id="createAdvancedSettings">
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Parallel Limit</label>
+                                            <input class="form-control" max="10" min="1"
+                                                   name="parallelLimit" type="number" value="3">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Image Quality</label>
+                                            <input class="form-control" max="100" min="50"
+                                                   name="imageQuality" type="number" value="85">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-primary" onclick="CrawlModule.createCrawl()" type="button">
+                    <i class="me-1" data-feather="download"></i> Create Crawl
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- All Modals Combined -->
+<th:block th:fragment="allModals">
+    <div th:replace="~{admin/fragments/crawl-modals :: progressModal}"></div>
+    <div th:replace="~{admin/fragments/crawl-modals :: settingsModal}"></div>
+    <div th:replace="~{admin/fragments/crawl-modals :: duplicateModal}"></div>
+    <div th:replace="~{admin/fragments/crawl-modals :: createModal}"></div>
+</th:block>
+
+</body>
+</html>
+

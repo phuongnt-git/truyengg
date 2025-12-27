@@ -6,7 +6,7 @@ import com.truyengg.domain.entity.User;
 import com.truyengg.domain.repository.ComicRepository;
 import com.truyengg.domain.repository.ReadingHistoryRepository;
 import com.truyengg.domain.repository.UserRepository;
-import com.truyengg.exception.ResourceNotFoundException;
+import com.truyengg.domain.exception.ResourceNotFoundException;
 import com.truyengg.model.mapper.ComicMapper;
 import com.truyengg.model.response.ComicResponse;
 import lombok.RequiredArgsConstructor;

@@ -1,292 +1,293 @@
 <!DOCTYPE html>
 <html lang="vi" translate="no"
       xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: head">
-  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-  <meta content="notranslate" name="google">
-  <title id="page-title">Thể Loại - TruyenGG</title>
-  <link href="https://st.truyengg.net/template/frontend/styles/style.css?v=1.9.4" rel="stylesheet" type="text/css">
-  <link href="https://st.truyengg.net/template/frontend/styles/dark_style.css?v=1.3.4" rel="stylesheet" type="text/css">
-  <link href="https://st.truyengg.net/template/frontend/icon/css/font-awesome.min.css?v=1.2.3" rel="stylesheet"
-        type="text/css">
-  <link rel="stylesheet" th:href="@{/css/pages/category.css}">
+<head th:replace="~{fragments/header :: head}">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <meta content="notranslate" name="google">
+    <title id="page-title">Thể Loại - TruyenGG</title>
+    <link href="https://st.truyengg.net/template/frontend/styles/style.css?v=1.9.4" rel="stylesheet" type="text/css">
+    <link href="https://st.truyengg.net/template/frontend/styles/dark_style.css?v=1.3.4" rel="stylesheet"
+          type="text/css">
+    <link href="https://st.truyengg.net/template/frontend/icon/css/font-awesome.min.css?v=1.2.3" rel="stylesheet"
+          type="text/css">
+    <link rel="stylesheet" th:href="@{/css/pages/category.css}">
 </head>
-<body class="dark-style" th:replace="fragments/header :: header-body">
+<body class="dark-style" th:replace="~{fragments/header :: header-body}">
 <div class="container container-background">
-  <section>
-    <div class="d-flex mb15">
-      <h1 class="title_cate mr-auto" id="category-title">Thể Loại</h1>
-    </div>
-    <div class="tags_detail" id="category-description">Đang tải...</div>
-    <section class="mb40 box-filter">
-      <div class="row mb-3">
-        <div class="col-md-2 col-3">
-          <div class="title_cate">Thể Loại</div>
+    <section>
+        <div class="d-flex mb15">
+            <h1 class="title_cate mr-auto" id="category-title">Thể Loại</h1>
         </div>
-        <div class="col-md-10 col-9">
-          <div class="d-flex list_genre">
-            <select class="custom-select" id="list-category">
-              <option value="">Đang tải...</option>
-            </select>
-          </div>
+        <div class="tags_detail" id="category-description">Đang tải...</div>
+        <section class="mb40 box-filter">
+            <div class="row mb-3">
+                <div class="col-md-2 col-3">
+                    <div class="title_cate">Thể Loại</div>
+                </div>
+                <div class="col-md-10 col-9">
+                    <div class="d-flex list_genre">
+                        <select class="custom-select" id="list-category">
+                            <option value="">Đang tải...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-2 col-3">
+                    <div class="title_cate">Trạng Thái</div>
+                </div>
+                <div class="col-md-10 col-9">
+                    <div class="d-flex">
+                        <a class="btn_short" href="javascript:void(0)" id="status-ongoing">Đang tiến hành</a>
+                        <a class="btn_short" href="javascript:void(0)" id="status-completed">Hoàn thành</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-2 col-3">
+                    <div class="title_cate">Quốc Gia</div>
+                </div>
+                <div class="col-md-10 col-9">
+                    <div class="d-flex">
+                        <a class="btn_short" href="javascript:void(0)" id="country-1" title="Trung Quốc">Trung Quốc</a>
+                        <a class="btn_short" href="javascript:void(0)" id="country-2" title="Hàn Quốc">Hàn Quốc</a>
+                        <a class="btn_short" href="javascript:void(0)" id="country-3" title="Nhật Bản">Nhật Bản</a>
+                        <a class="btn_short" href="javascript:void(0)" id="country-4" title="Việt Nam">Việt Nam</a>
+                        <a class="btn_short" href="javascript:void(0)" id="country-5" title="Mỹ">Mỹ</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 col-3">
+                    <div class="title_cate">Sắp Xếp</div>
+                </div>
+                <div class="col-md-10 col-9">
+                    <div class="d-flex list_genre">
+                        <select class="custom-select" id="category-sort">
+                            <option value="0">Ngày đăng giảm dần</option>
+                            <option value="1">Ngày đăng tăng dần</option>
+                            <option value="2">Ngày cập nhật giảm dần</option>
+                            <option value="3">Ngày cập nhật tăng dần</option>
+                            <option value="4">Lượt xem giảm dần</option>
+                            <option value="5">Lượt xem tăng dần</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="row list_item_home" id="comics-list">
+            <div class="col-12 text-center">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Đang tải...</span>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="row mb-3">
-        <div class="col-md-2 col-3">
-          <div class="title_cate">Trạng Thái</div>
-        </div>
-        <div class="col-md-10 col-9">
-          <div class="d-flex">
-            <a class="btn_short" href="javascript:void(0)" id="status-ongoing">Đang tiến hành</a>
-            <a class="btn_short" href="javascript:void(0)" id="status-completed">Hoàn thành</a>
-          </div>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <div class="col-md-2 col-3">
-          <div class="title_cate">Quốc Gia</div>
-        </div>
-        <div class="col-md-10 col-9">
-          <div class="d-flex">
-            <a class="btn_short" href="javascript:void(0)" id="country-1" title="Trung Quốc">Trung Quốc</a>
-            <a class="btn_short" href="javascript:void(0)" id="country-2" title="Hàn Quốc">Hàn Quốc</a>
-            <a class="btn_short" href="javascript:void(0)" id="country-3" title="Nhật Bản">Nhật Bản</a>
-            <a class="btn_short" href="javascript:void(0)" id="country-4" title="Việt Nam">Việt Nam</a>
-            <a class="btn_short" href="javascript:void(0)" id="country-5" title="Mỹ">Mỹ</a>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-2 col-3">
-          <div class="title_cate">Sắp Xếp</div>
-        </div>
-        <div class="col-md-10 col-9">
-          <div class="d-flex list_genre">
-            <select class="custom-select" id="category-sort">
-              <option value="0">Ngày đăng giảm dần</option>
-              <option value="1">Ngày đăng tăng dần</option>
-              <option value="2">Ngày cập nhật giảm dần</option>
-              <option value="3">Ngày cập nhật tăng dần</option>
-              <option value="4">Lượt xem giảm dần</option>
-              <option value="5">Lượt xem tăng dần</option>
-            </select>
-          </div>
-        </div>
-      </div>
+        <div class="pagination mt-4 mb20" id="pagination-container"></div>
     </section>
-    <div class="row list_item_home" id="comics-list">
-      <div class="col-12 text-center">
-        <div class="spinner-border" role="status">
-          <span class="sr-only">Đang tải...</span>
-        </div>
-      </div>
-    </div>
-    <div class="pagination mt-4 mb20" id="pagination-container"></div>
-  </section>
 </div>
 <a id="back-to-top"><i class="bi bi-chevron-double-up"></i></a>
-<footer th:replace="fragments/footer :: footer"></footer>
+<footer th:replace="~{fragments/footer :: footer}"></footer>
 <script th:src="@{/js/jquery.lazy.min.js}"></script>
 <script th:src="@{/js/app.js}"></script>
 <script th:src="@{/js/api.js}"></script>
 <script th:src="@{/js/utils.js}"></script>
 <script th:src="@{/js/comics.js}"></script>
 <script>
-  let currentPage = 0;
-  const pageSize = 24;
-  let currentSlug = '';
-  let categories = [];
-  let filters = {status: null, country: null, sort: '0'};
+    let currentPage = 0;
+    const pageSize = 24;
+    let currentSlug = '';
+    let categories = [];
+    let filters = {status: null, country: null, sort: '0'};
 
-  $(document).ready(function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    currentSlug = urlParams.get('slug') || 'action';
-    currentPage = parseInt(urlParams.get('page')) || 0;
-    filters.status = urlParams.get('status') || null;
-    filters.country = urlParams.get('country') || null;
-    filters.sort = urlParams.get('sort') || '0';
+    $(document).ready(function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        currentSlug = urlParams.get('slug') || 'action';
+        currentPage = parseInt(urlParams.get('page')) || 0;
+        filters.status = urlParams.get('status') || null;
+        filters.country = urlParams.get('country') || null;
+        filters.sort = urlParams.get('sort') || '0';
 
-    updateFilterUI();
-    loadCategories();
-    loadComics();
-    setupFilters();
+        updateFilterUI();
+        loadCategories();
+        loadComics();
+        setupFilters();
 
-    $(window).scroll(function () {
-      if ($(this).scrollTop() > 100) $('#back-to-top').fadeIn();
-      else $('#back-to-top').fadeOut();
-    });
-    $('#back-to-top').click(function () {
-      $('html, body').animate({scrollTop: 0}, 600);
-      return false;
-    });
-  });
-
-  function loadCategories() {
-    ApiClient.get('/categories', null, false).done(function (response) {
-      if (response.success && response.data && response.data.data && response.data.data.items) {
-        categories = response.data.data.items;
-        renderCategorySelect();
-        const currentCategory = categories.find(cat => cat.slug === currentSlug);
-        if (currentCategory) {
-          $('#category-title').text('Truyện Tranh ' + currentCategory.name);
-          $('#category-description').text(currentCategory.description || 'Thể loại này chưa có mô tả.');
-          document.getElementById('page-title').textContent = 'Truyện Tranh ' + currentCategory.name + ' - TruyenGG';
-        }
-      }
-    }).fail(function (xhr) {
-      console.error('Failed to load categories:', xhr);
-    });
-  }
-
-  function renderCategorySelect() {
-    const $select = $('#list-category');
-    $select.empty();
-    categories.forEach(function (category) {
-      const option = $('<option></option>')
-        .attr('value', '/the-loai?slug=' + category.slug)
-        .text(category.name);
-      if (category.slug === currentSlug) option.attr('selected', 'selected');
-      $select.append(option);
-    });
-    $select.on('change', function () {
-      window.location.href = $(this).val();
-    });
-  }
-
-  function updateFilterUI() {
-    if (filters.status === '0') {
-      $('#status-ongoing').addClass('active');
-      $('#status-completed').removeClass('active');
-    } else if (filters.status === '2') {
-      $('#status-completed').addClass('active');
-      $('#status-ongoing').removeClass('active');
-    } else {
-      $('#status-ongoing, #status-completed').removeClass('active');
-    }
-    $('.btn_short[id^="country-"]').removeClass('active');
-    if (filters.country) $('#country-' + filters.country).addClass('active');
-    $('#category-sort').val(filters.sort);
-  }
-
-  function setupFilters() {
-    $('#status-ongoing').on('click', function () {
-      filters.status = filters.status === '0' ? null : '0';
-      applyFilters();
-    });
-    $('#status-completed').on('click', function () {
-      filters.status = filters.status === '2' ? null : '2';
-      applyFilters();
-    });
-    $('.btn_short[id^="country-"]').on('click', function () {
-      const countryId = $(this).attr('id').replace('country-', '');
-      filters.country = filters.country === countryId ? null : countryId;
-      applyFilters();
-    });
-    $('#category-sort').on('change', function () {
-      filters.sort = $(this).val();
-      applyFilters();
-    });
-  }
-
-  function applyFilters() {
-    currentPage = 0;
-    updateFilterUI();
-    updateURL();
-    loadComics();
-  }
-
-  function updateURL() {
-    const params = new URLSearchParams();
-    params.set('slug', currentSlug);
-    params.set('page', currentPage);
-    if (filters.status) params.set('status', filters.status);
-    if (filters.country) params.set('country', filters.country);
-    if (filters.sort !== '0') params.set('sort', filters.sort);
-    window.history.pushState({}, '', '/the-loai?' + params.toString());
-  }
-
-  function loadComics() {
-    showLoading('#comics-list', 'Đang tải danh sách truyện...');
-    const params = {page: currentPage, size: pageSize};
-    if (filters.status) params.status = filters.status;
-    if (filters.country) params.country = filters.country;
-    if (filters.sort !== '0') params.sort = filters.sort;
-
-    ApiClient.get('/comics/category/' + currentSlug, params, false).done(function (response) {
-      if (response.success && response.data) {
-        const comics = response.data.content || [];
-        const $container = $('#comics-list');
-        $container.empty();
-        if (comics.length === 0) {
-          $container.html('<div class="col-12 text-center"><p>Không tìm thấy truyện cho trang ' + (currentPage + 1) + '!</p></div>');
-          $('#pagination-container').empty();
-          return;
-        }
-        comics.forEach(function (comic) {
-          const card = ComicsModule.renderComicCard(comic);
-          $container.append(card);
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 100) $('#back-to-top').fadeIn();
+            else $('#back-to-top').fadeOut();
         });
-        renderPagination(response.data);
-        if (typeof $.fn.lazy !== 'undefined') {
-          $container.find('.lazy-image').lazy({
-            effect: 'fadeIn',
-            effectTime: 300,
-            threshold: 0
-          });
-        }
-      } else {
-        showError('#comics-list', 'Không tìm thấy truyện', null);
-      }
-    }).fail(function (xhr) {
-      const errorMsg = handleApiError(xhr, 'Không thể tải danh sách truyện');
-      showError('#comics-list', errorMsg, xhr);
+        $('#back-to-top').click(function () {
+            $('html, body').animate({scrollTop: 0}, 600);
+            return false;
+        });
     });
-  }
 
-  function renderPagination(data) {
-    const totalPages = data.totalPages || 0;
-    const $container = $('#pagination-container');
-    $container.empty();
-    if (totalPages <= 1) return;
-    let paginationHtml = '';
-    if (currentPage > 0) {
-      const params = new URLSearchParams(window.location.search);
-      params.set('page', 0);
-      paginationHtml += '<a class="page-item" href="?' + params.toString() + '"><span aria-hidden="true">«</span></a>';
+    function loadCategories() {
+        ApiClient.get('/categories', null, false).done(function (response) {
+            if (response.success && response.data && response.data.data && response.data.data.items) {
+                categories = response.data.data.items;
+                renderCategorySelect();
+                const currentCategory = categories.find(cat => cat.slug === currentSlug);
+                if (currentCategory) {
+                    $('#category-title').text('Truyện Tranh ' + currentCategory.name);
+                    $('#category-description').text(currentCategory.description || 'Thể loại này chưa có mô tả.');
+                    document.getElementById('page-title').textContent = 'Truyện Tranh ' + currentCategory.name + ' - TruyenGG';
+                }
+            }
+        }).fail(function (xhr) {
+            console.error('Failed to load categories:', xhr);
+        });
     }
-    if (currentPage > 0) {
-      const params = new URLSearchParams(window.location.search);
-      params.set('page', currentPage - 1);
-      paginationHtml += '<a class="page-item" href="?' + params.toString() + '"><span aria-hidden="true">‹</span></a>';
+
+    function renderCategorySelect() {
+        const $select = $('#list-category');
+        $select.empty();
+        categories.forEach(function (category) {
+            const option = $('<option></option>')
+                .attr('value', '/the-loai?slug=' + category.slug)
+                .text(category.name);
+            if (category.slug === currentSlug) option.attr('selected', 'selected');
+            $select.append(option);
+        });
+        $select.on('change', function () {
+            window.location.href = $(this).val();
+        });
     }
-    const maxPages = 5;
-    const half = Math.floor(maxPages / 2);
-    let startPage = Math.max(0, currentPage - half);
-    let endPage = Math.min(totalPages - 1, startPage + maxPages - 1);
-    if (endPage - startPage + 1 < maxPages) {
-      startPage = Math.max(0, endPage - maxPages + 1);
+
+    function updateFilterUI() {
+        if (filters.status === '0') {
+            $('#status-ongoing').addClass('active');
+            $('#status-completed').removeClass('active');
+        } else if (filters.status === '2') {
+            $('#status-completed').addClass('active');
+            $('#status-ongoing').removeClass('active');
+        } else {
+            $('#status-ongoing, #status-completed').removeClass('active');
+        }
+        $('.btn_short[id^="country-"]').removeClass('active');
+        if (filters.country) $('#country-' + filters.country).addClass('active');
+        $('#category-sort').val(filters.sort);
     }
-    for (let i = startPage; i <= endPage; i++) {
-      const params = new URLSearchParams(window.location.search);
-      params.set('page', i);
-      if (i === currentPage) {
-        paginationHtml += '<a href="javascript:void(0)" class="page-item active">' + (i + 1) + '</a>';
-      } else {
-        paginationHtml += '<a class="page-item" href="?' + params.toString() + '">' + (i + 1) + '</a>';
-      }
+
+    function setupFilters() {
+        $('#status-ongoing').on('click', function () {
+            filters.status = filters.status === '0' ? null : '0';
+            applyFilters();
+        });
+        $('#status-completed').on('click', function () {
+            filters.status = filters.status === '2' ? null : '2';
+            applyFilters();
+        });
+        $('.btn_short[id^="country-"]').on('click', function () {
+            const countryId = $(this).attr('id').replace('country-', '');
+            filters.country = filters.country === countryId ? null : countryId;
+            applyFilters();
+        });
+        $('#category-sort').on('change', function () {
+            filters.sort = $(this).val();
+            applyFilters();
+        });
     }
-    if (currentPage < totalPages - 1) {
-      const params = new URLSearchParams(window.location.search);
-      params.set('page', currentPage + 1);
-      paginationHtml += '<a class="page-item" href="?' + params.toString() + '"><span aria-hidden="true">›</span></a>';
+
+    function applyFilters() {
+        currentPage = 0;
+        updateFilterUI();
+        updateURL();
+        loadComics();
     }
-    if (currentPage < totalPages - 1) {
-      const params = new URLSearchParams(window.location.search);
-      params.set('page', totalPages - 1);
-      paginationHtml += '<a class="page-item" href="?' + params.toString() + '"><span aria-hidden="true">»</span></a>';
+
+    function updateURL() {
+        const params = new URLSearchParams();
+        params.set('slug', currentSlug);
+        params.set('page', currentPage);
+        if (filters.status) params.set('status', filters.status);
+        if (filters.country) params.set('country', filters.country);
+        if (filters.sort !== '0') params.set('sort', filters.sort);
+        window.history.pushState({}, '', '/the-loai?' + params.toString());
     }
-    $container.html(paginationHtml);
-  }
+
+    function loadComics() {
+        showLoading('#comics-list', 'Đang tải danh sách truyện...');
+        const params = {page: currentPage, size: pageSize};
+        if (filters.status) params.status = filters.status;
+        if (filters.country) params.country = filters.country;
+        if (filters.sort !== '0') params.sort = filters.sort;
+
+        ApiClient.get('/comics/category/' + currentSlug, params, false).done(function (response) {
+            if (response.success && response.data) {
+                const comics = response.data.content || [];
+                const $container = $('#comics-list');
+                $container.empty();
+                if (comics.length === 0) {
+                    $container.html('<div class="col-12 text-center"><p>Không tìm thấy truyện cho trang ' + (currentPage + 1) + '!</p></div>');
+                    $('#pagination-container').empty();
+                    return;
+                }
+                comics.forEach(function (comic) {
+                    const card = ComicsModule.renderComicCard(comic);
+                    $container.append(card);
+                });
+                renderPagination(response.data);
+                if (typeof $.fn.lazy !== 'undefined') {
+                    $container.find('.lazy-image').lazy({
+                        effect: 'fadeIn',
+                        effectTime: 300,
+                        threshold: 0
+                    });
+                }
+            } else {
+                showError('#comics-list', 'Không tìm thấy truyện', null);
+            }
+        }).fail(function (xhr) {
+            const errorMsg = handleApiError(xhr, 'Không thể tải danh sách truyện');
+            showError('#comics-list', errorMsg, xhr);
+        });
+    }
+
+    function renderPagination(data) {
+        const totalPages = data.totalPages || 0;
+        const $container = $('#pagination-container');
+        $container.empty();
+        if (totalPages <= 1) return;
+        let paginationHtml = '';
+        if (currentPage > 0) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('page', 0);
+            paginationHtml += '<a class="page-item" href="?' + params.toString() + '"><span aria-hidden="true">«</span></a>';
+        }
+        if (currentPage > 0) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('page', currentPage - 1);
+            paginationHtml += '<a class="page-item" href="?' + params.toString() + '"><span aria-hidden="true">‹</span></a>';
+        }
+        const maxPages = 5;
+        const half = Math.floor(maxPages / 2);
+        let startPage = Math.max(0, currentPage - half);
+        let endPage = Math.min(totalPages - 1, startPage + maxPages - 1);
+        if (endPage - startPage + 1 < maxPages) {
+            startPage = Math.max(0, endPage - maxPages + 1);
+        }
+        for (let i = startPage; i <= endPage; i++) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('page', i);
+            if (i === currentPage) {
+                paginationHtml += '<a href="javascript:void(0)" class="page-item active">' + (i + 1) + '</a>';
+            } else {
+                paginationHtml += '<a class="page-item" href="?' + params.toString() + '">' + (i + 1) + '</a>';
+            }
+        }
+        if (currentPage < totalPages - 1) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('page', currentPage + 1);
+            paginationHtml += '<a class="page-item" href="?' + params.toString() + '"><span aria-hidden="true">›</span></a>';
+        }
+        if (currentPage < totalPages - 1) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('page', totalPages - 1);
+            paginationHtml += '<a class="page-item" href="?' + params.toString() + '"><span aria-hidden="true">»</span></a>';
+        }
+        $container.html(paginationHtml);
+    }
 </script>
 </body>
 </html>

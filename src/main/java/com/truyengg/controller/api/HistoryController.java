@@ -34,7 +34,7 @@ public class HistoryController {
       @RequestParam(required = false) Long chapterId,
       @RequestParam String chapterName,
       @AuthenticationPrincipal UserPrincipal userPrincipal) {
-    historyService.saveReadingHistory(userPrincipal.getId(), comicId, chapterId, chapterName);
+    historyService.saveReadingHistory(userPrincipal.id(), comicId, chapterId, chapterName);
     return ResponseEntity.ok(ApiResponse.success("Lịch sử đã được lưu"));
   }
 
@@ -42,14 +42,14 @@ public class HistoryController {
   public ResponseEntity<ApiResponse<Page<ComicResponse>>> getHistory(
       @AuthenticationPrincipal UserPrincipal userPrincipal,
       @PageableDefault(size = 24) Pageable pageable) {
-    Page<ComicResponse> history = historyService.getReadingHistory(userPrincipal.getId(), pageable);
+    Page<ComicResponse> history = historyService.getReadingHistory(userPrincipal.id(), pageable);
     return ResponseEntity.ok(ApiResponse.success(history));
   }
 
   @DeleteMapping
   public ResponseEntity<ApiResponse<Object>> clearHistory(
       @AuthenticationPrincipal UserPrincipal userPrincipal) {
-    historyService.clearHistory(userPrincipal.getId());
+    historyService.clearHistory(userPrincipal.id());
     return ResponseEntity.ok(ApiResponse.success("Lịch sử đã được xóa"));
   }
 }

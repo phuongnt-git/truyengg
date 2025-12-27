@@ -62,6 +62,9 @@ public class ChapterImage {
   @Builder.Default
   Boolean isVisible = true;
 
+  @Column(name = "blurhash", length = 50)
+  String blurhash;
+
   @Column(name = "deleted_at")
   ZonedDateTime deletedAt;
 

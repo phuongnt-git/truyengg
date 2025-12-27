@@ -46,7 +46,7 @@ public class ImageProxyController {
 
   @GetMapping("/{comicId}/{chapterId}/{imageName:.+}")
   @Operation(summary = "Proxy MinIO image", description = "Proxy image from MinIO to avoid CORS/403 issues")
-  @Cacheable(value = "imageCache", key = "#comicId + '/' + #chapterId + '/' + #imageName")
+  @Cacheable(value = "img:proxy#24h", key = "#comicId + '/' + #chapterId + '/' + #imageName")
   public ResponseEntity<Resource> proxyImage(
       @PathVariable String comicId,
       @PathVariable String chapterId,

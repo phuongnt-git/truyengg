@@ -46,7 +46,7 @@ public class OriginalImageProxyController {
 
   @GetMapping("/{encodedUrl:.+}")
   @Operation(summary = "Proxy original image", description = "Proxy original image with referer header to avoid CORS/403 issues")
-  @Cacheable(value = "originalImageCache", key = "#encodedUrl")
+  @Cacheable(value = "img:original#24h", key = "#encodedUrl")
   public ResponseEntity<Resource> proxyOriginalImage(
       @PathVariable String encodedUrl,
       @RequestParam(required = false) String referer,

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>TruyenGG - Crawl History</title>
+    <link rel="stylesheet" th:href="@{/voler/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+    <link rel="stylesheet" th:href="@{/voler/css/app.css}">
+    <link rel="shortcut icon" th:href="@{/voler/images/favicon.png}" type="image/png">
+    <style>
+        /* Status colors - essential custom CSS */
+        .badge-pending {
+            background-color: #6c757d !important;
+        }
+
+        .badge-queued {
+            background-color: #17a2b8 !important;
+        }
+
+        .badge-running {
+            background-color: #007bff !important;
+            animation: pulse 2s infinite;
+        }
+
+        .badge-paused {
+            background-color: #fd7e14 !important;
+        }
+
+        .badge-completed {
+            background-color: #28a745 !important;
+        }
+
+        .badge-failed {
+            background-color: #dc3545 !important;
+        }
+
+        .badge-cancelled {
+            background-color: #6c757d !important;
+        }
+
+        /* Type colors */
+        .badge-category {
+            background-color: rgba(25, 118, 210, 0.15) !important;
+            color: #1976d2 !important;
+        }
+
+        .badge-comic {
+            background-color: rgba(123, 31, 162, 0.15) !important;
+            color: #7b1fa2 !important;
+        }
+
+        .badge-chapter {
+            background-color: rgba(56, 142, 60, 0.15) !important;
+            color: #388e3c !important;
+        }
+
+        .badge-image {
+            background-color: rgba(245, 124, 0, 0.15) !important;
+            color: #f57c00 !important;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        /* View toggle buttons */
+        .btn-group-toggle .btn.active {
+            background-color: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        /* Stat dots */
+        .stat-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .stat-dot-running {
+            background-color: #007bff;
+        }
+
+        .stat-dot-queued {
+            background-color: #17a2b8;
+        }
+
+        .stat-dot-completed {
+            background-color: #28a745;
+        }
+
+        .stat-dot-failed {
+            background-color: #dc3545;
+        }
+
+        /* Card grid for card view */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Clickable table rows */
+        .table-hover tbody tr {
+            cursor: pointer;
+        }
+
+        /* Modal improvements */
+        .modal-xl {
+            max-width: 900px;
+        }
+
+        .log-container {
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: #6c757d;
+            margin-right: 0.5rem;
+        }
+
+        .log-info {
+            color: #17a2b8;
+        }
+
+        .log-warn {
+            color: #fd7e14;
+        }
+
+        .log-error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class='active' id="sidebar">
+        <th:block th:replace="~{admin/layouts/sidebar :: sidebar}"></th:block>
+    </div>
+    <div id="main">
+        <nav class="navbar navbar-header navbar-expand navbar-light">
+            <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
+            <button class="btn navbar-toggler" data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse"
+                    type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav d-flex align-items-center navbar-light ms-auto">
+                    <li class="dropdown">
+                        <a aria-expanded="false" class="nav-link dropdown-toggle nav-link-lg nav-link-user" data-bs-toggle="dropdown"
+                           href="#">
+                            <div class="avatar me-1">
+                                <img alt="Avatar" th:src="@{/voler/images/avatar/avatar-s-1.png}">
+                            </div>
+                            <div class="d-none d-md-block d-lg-inline-block">
+                                <span sec:authentication="name">Admin</span>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" data-bs-target="#profileModal" data-bs-toggle="modal" href="#">
+                                <i data-feather="user"></i> Profile
+                            </a>
+                            <a class="dropdown-item" th:href="@{/}"><i data-feather="home"></i> Home</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:void(0);" onclick="logout(); return false;">
+                                <i data-feather="log-out"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="main-content container-fluid">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-1"><i data-feather="clock"></i> Crawl History</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a th:href="@{/admin}">Admin</a></li>
+                            <li class="breadcrumb-item"><a th:href="@{/admin/crawl}">Crawl</a></li>
+                            <li class="breadcrumb-item active">History</li>
+                        </ol>
+                    </nav>
+                </div>
+                <a class="btn btn-primary" th:href="@{/admin/crawl}">
+                    <i data-feather="plus"></i> New Job
+                </a>
+            </div>
+
+            <!-- Filter Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-auto">
+                            <label class="form-label small text-muted mb-1">Status</label>
+                            <select class="form-select form-select-sm" id="filterStatus" style="width: 130px;">
+                                <option value="">All</option>
+                                <option value="RUNNING">Running</option>
+                                <option value="QUEUED">Queued</option>
+                                <option value="PAUSED">Paused</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="FAILED">Failed</option>
+                                <option value="CANCELLED">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label small text-muted mb-1">Type</label>
+                            <select class="form-select form-select-sm" id="filterType" style="width: 120px;">
+                                <option value="">All</option>
+                                <option value="CATEGORY">Category</option>
+                                <option value="COMIC">Comic</option>
+                                <option value="CHAPTER">Chapter</option>
+                                <option value="IMAGE">Image</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label small text-muted mb-1">From</label>
+                            <input class="form-control form-control-sm" id="filterDateFrom" style="width: 140px;"
+                                   type="date">
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label small text-muted mb-1">To</label>
+                            <input class="form-control form-control-sm" id="filterDateTo" style="width: 140px;"
+                                   type="date">
+                        </div>
+                        <div class="col">
+                            <label class="form-label small text-muted mb-1">Search</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text"><i data-feather="search"
+                                                                  style="width:14px;height:14px;"></i></span>
+                                <input class="form-control" id="searchInput" placeholder="Search by name or URL..."
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="btn-group btn-group-sm btn-group-toggle">
+                                <button class="btn btn-outline-secondary active" id="btnTableView" title="Table View">
+                                    <i data-feather="list" style="width:14px;height:14px;"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" id="btnCardView" title="Card View">
+                                    <i data-feather="grid" style="width:14px;height:14px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="row g-3 mb-4" id="statsSummary">
+                <div class="col-auto">
+                    <div class="card card-body py-2 px-3 d-flex flex-row align-items-center gap-2">
+                        <span class="stat-dot stat-dot-running"></span>
+                        <span class="small">Running:</span>
+                        <strong id="countRunning">0</strong>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="card card-body py-2 px-3 d-flex flex-row align-items-center gap-2">
+                        <span class="stat-dot stat-dot-queued"></span>
+                        <span class="small">Queued:</span>
+                        <strong id="countQueued">0</strong>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="card card-body py-2 px-3 d-flex flex-row align-items-center gap-2">
+                        <span class="stat-dot stat-dot-completed"></span>
+                        <span class="small">Completed:</span>
+                        <strong id="countCompleted">0</strong>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="card card-body py-2 px-3 d-flex flex-row align-items-center gap-2">
+                        <span class="stat-dot stat-dot-failed"></span>
+                        <span class="small">Failed:</span>
+                        <strong id="countFailed">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table View -->
+            <div class="card" id="tableView">
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th style="width: 100px;">Status</th>
+                            <th style="width: 100px;">Type</th>
+                            <th>Name / URL</th>
+                            <th style="width: 140px;">Progress</th>
+                            <th style="width: 150px;">Created</th>
+                            <th style="width: 80px;">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        <!-- Rows rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Card View (hidden by default) -->
+            <div class="cards-grid" id="cardView" style="display: none;">
+                <!-- Cards rendered by JS -->
+            </div>
+
+            <!-- Loading State -->
+            <div class="card" id="loadingState" style="display: none;">
+                <div class="card-body text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <div class="mt-3 text-muted">Loading crawl jobs...</div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="card" id="emptyState" style="display: none;">
+                <div class="card-body text-center py-5">
+                    <i class="text-muted mb-3" data-feather="inbox" style="width: 64px; height: 64px;"></i>
+                    <h5>No Crawl Jobs Found</h5>
+                    <p class="text-muted">No crawl jobs match your current filters.</p>
+                    <a class="btn btn-primary" th:href="@{/admin/crawl}">
+                        <i data-feather="plus"></i> Create New Job
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="card mt-3" id="paginationContainer">
+                <div class="card-body py-2 d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">
+                            Showing <span id="showingStart">0</span>-<span id="showingEnd">0</span> of <span
+                                id="totalCount">0</span> jobs
+                        </span>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" id="prevPage">
+                                <a class="page-link" href="#" onclick="prevPage(); return false;">
+                                    <i data-feather="chevron-left" style="width:14px;height:14px;"></i>
+                                </a>
+                            </li>
+                            <li class="page-item" id="nextPage">
+                                <a class="page-link" href="#" onclick="nextPage(); return false;">
+                                    <i data-feather="chevron-right" style="width:14px;height:14px;"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Job Detail Modal -->
+<div aria-hidden="true" aria-labelledby="jobDetailModalLabel" class="modal fade" id="jobDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-1" id="modalJobTitle">Job Details</h5>
+                    <div class="d-flex gap-2 align-items-center">
+                        <span class="badge" id="modalJobStatus">RUNNING</span>
+                        <span class="badge" id="modalJobType">COMIC</span>
+                        <small class="text-muted" id="modalJobId"></small>
+                    </div>
+                </div>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Job Info -->
+                <div class="mb-4">
+                    <div class="text-muted small mb-2" id="modalJobUrl"></div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-primary" id="modalProgressBar" style="width: 0%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between small">
+                        <span><strong id="modalPercent">0</strong>% complete</span>
+                        <span><span id="modalCompleted">0</span>/<span id="modalTotal">0</span> items</span>
+                        <span class="text-danger" id="modalFailedCount">0 failed</span>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs" id="modalTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-target="#pane-overview" data-bs-toggle="tab"
+                                id="tab-overview" type="button">
+                            <i data-feather="info" style="width:14px;height:14px;"></i> Overview
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-target="#pane-logs" data-bs-toggle="tab" id="tab-logs"
+                                type="button">
+                            <i data-feather="file-text" style="width:14px;height:14px;"></i> Logs
+                            <span class="badge bg-secondary ms-1" id="modalLogsCount">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-target="#pane-failed" data-bs-toggle="tab" id="tab-failed"
+                                type="button">
+                            <i data-feather="alert-triangle" style="width:14px;height:14px;"></i> Failed
+                            <span class="badge bg-danger ms-1" id="modalFailedBadge">0</span>
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content border border-top-0 rounded-bottom p-3" id="modalTabContent">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane fade show active" id="pane-overview" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-muted" style="width:120px;">Created</td>
+                                        <td id="modalCreated">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Started</td>
+                                        <td id="modalStarted">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Completed</td>
+                                        <td id="modalCompletedAt">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Download Mode</td>
+                                        <td id="modalMode">-</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-muted" style="width:120px;">Completed Items</td>
+                                        <td class="text-success" id="modalStatCompleted">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Failed Items</td>
+                                        <td class="text-danger" id="modalStatFailed">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Skipped Items</td>
+                                        <td class="text-warning" id="modalStatSkipped">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Total Items</td>
+                                        <td id="modalStatTotal">0</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="alert alert-danger mt-3" id="modalErrorMessage" style="display: none;"></div>
+                    </div>
+                    <!-- Logs Tab -->
+                    <div class="tab-pane fade" id="pane-logs" role="tabpanel">
+                        <div class="log-container bg-light rounded p-2" id="modalLogsContainer">
+                            <div class="text-muted text-center py-3">No logs available</div>
+                        </div>
+                    </div>
+                    <!-- Failed Tab -->
+                    <div class="tab-pane fade" id="pane-failed" role="tabpanel">
+                        <div id="modalFailedList">
+                            <div class="text-muted text-center py-3">No failed items</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="me-auto" id="modalActions">
+                    <!-- Dynamic action buttons -->
+                </div>
+                <a class="btn btn-outline-primary" href="#" id="modalGoToManager">
+                    <i data-feather="external-link" style="width:14px;height:14px;"></i> Open in Manager
+                </a>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/voler/js/feather-icons/feather.min.js}"></script>
+<script th:src="@{/voler/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+<script th:src="@{/voler/js/app.js}"></script>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/passkey.js}"></script>
+<script th:src="@{/js/admin-profile.js}"></script>
+<script th:src="@{/js/admin-auth.js}"></script>
+<script th:src="@{/js/admin/voler-init.js}"></script>
+<script th:src="@{/js/admin/crawl-history.js}" type="module"></script>
+<script th:src="@{/voler/js/main.js}"></script>
+</body>
+</html>

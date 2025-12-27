@@ -1,12 +1,7 @@
 package com.truyengg.service.crawl;
 
-import com.truyengg.model.dto.ChapterCrawlProcessingParams;
-import com.truyengg.model.dto.ImageProcessResult;
-import com.truyengg.model.dto.ImageProcessingContext;
-import com.truyengg.model.dto.ProcessedImage;
-import com.truyengg.model.response.ChapterCrawlProgress;
-import com.truyengg.service.ImageCompressionService;
-import com.truyengg.service.MinioService;
+import com.truyengg.service.image.ImageService;
+import com.truyengg.service.storage.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
@@ -17,25 +12,30 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import static com.truyengg.domain.enums.ChapterCrawlStatus.DOWNLOADING;
-import static com.truyengg.service.crawl.CrawlConstants.ATTR_DATA_ORIGINAL;
-import static com.truyengg.service.crawl.CrawlConstants.ATTR_DATA_SRC;
-import static com.truyengg.service.crawl.CrawlConstants.ATTR_SRC;
-import static com.truyengg.service.crawl.CrawlConstants.PREFIX_DATA_URI;
-import static com.truyengg.service.crawl.CrawlConstants.PROTOCOL_HTTPS;
+import static com.truyengg.domain.constant.AppConstants.ATTR_DATA_ORIGINAL;
+import static com.truyengg.domain.constant.AppConstants.ATTR_DATA_SRC;
+import static com.truyengg.domain.constant.AppConstants.ATTR_SRC;
+import static com.truyengg.domain.constant.AppConstants.PREFIX_DATA_URI;
+import static com.truyengg.domain.constant.AppConstants.PROTOCOL_HTTPS;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+/**
+ * Image processing utilities for crawling.
+ * Handles URL normalization, extraction from HTML, and upload to storage.
+ */
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class CrawlImageProcessor {
 
-  private final MinioService minioService;
-  private final CrawlHttpClient crawlHttpClient;
-  private final ImageCompressionService imageCompressionService;
-  private final ProgressMessagePublisher progressMessagePublisher;
+  private final ImageStorageService imageStorageService;
+  private final ImageService imageService;
 
+  /**
+   * Normalize image URL to absolute URL.
+   */
   public String normalizeImageUrl(String imgUrl, String domain) {
     if (imgUrl.startsWith("//")) {
       return PROTOCOL_HTTPS + imgUrl;
@@ -45,6 +45,9 @@ public class CrawlImageProcessor {
     return imgUrl;
   }
 
+  /**
+   * Extract image URLs from HTML document.
+   */
   public List<String> extractImageUrlsFromHtml(Document doc, String domain) {
     var imageUrls = new ArrayList<String>();
 
@@ -64,6 +67,23 @@ public class CrawlImageProcessor {
     return cleanImageUrls(imageUrls);
   }
 
+  /**
+   * Process and upload an image to storage.
+   * Returns the storage path and blurhash in the result.
+   */
+  public ImageUploadResult processAndUpload(byte[] imageBytes, String comicSlug, String chapterId, String fileName) {
+    var compressionResult = imageService.compressAndConvertImage(imageBytes, "image/jpeg");
+    var compressedBytes = compressionResult.compressedBytes();
+    var contentType = compressionResult.contentType();
+    var blurhash = compressionResult.blurhash();
+    var finalFileName = updateFileNameWithExtension(fileName, contentType);
+
+    imageStorageService.uploadImage(comicSlug, chapterId, finalFileName, compressedBytes, contentType);
+    var path = imageStorageService.getImagePath(comicSlug, chapterId, finalFileName);
+
+    return new ImageUploadResult(path, blurhash);
+  }
+
   private boolean extractFromPrimarySelector(Document doc, List<String> imageUrls) {
     var imgElements = doc.select("div.page-chapter img[" + ATTR_DATA_ORIGINAL + "]");
     for (var img : imgElements) {
@@ -74,6 +94,8 @@ public class CrawlImageProcessor {
     }
     return !imageUrls.isEmpty();
   }
+
+  // ===== Private methods =====
 
   private boolean extractFromSecondarySelector(Document doc, List<String> imageUrls) {
     var imgElements = doc.select("div.page-chapter img[" + ATTR_SRC + "]");
@@ -138,52 +160,13 @@ public class CrawlImageProcessor {
   }
 
   private boolean isInvalidUrl(String url) {
-    return url == null || url.isEmpty() ||
+    return isBlank(url) ||
         url.contains("logo") || url.contains("icon") || url.contains("avatar") ||
         url.contains("banner") || url.contains("ad");
   }
 
-  /**
-   * Process a single image: download and upload to MinIO
-   * Updates chapterCrawlProgress in params but does not call updateProgress (caller should do that)
-   *
-   * @return ImageProcessResult containing success status, file size, and request/error counts
-   */
-  public ImageProcessResult processImageWithProgress(
-      ImageProcessingContext context,
-      ChapterCrawlProcessingParams params,
-      List<String> imagePaths) {
-    var imageBytes = crawlHttpClient.downloadImage(context.imageUrl(), context.headers());
-    if (imageBytes == null || imageBytes.length == 0) {
-      return new ImageProcessResult(0, 0L, 1, 1);
-    }
-
-    try {
-      var processedImage = processAndUploadImage(imageBytes, context, imagePaths);
-      updateProgress(context, params);
-      return new ImageProcessResult(1, processedImage.fileSizeBytes(), 1, 0);
-    } catch (Exception e) {
-      log.error("Failed to upload image to MinIO: {}", context.fileName(), e);
-      progressMessagePublisher.publishMessage(params.crawlId(), "Error uploading image " + context.fileName() + ": " + e.getMessage());
-      return new ImageProcessResult(0, 0L, 1, 1);
-    }
-  }
-
-  private ProcessedImage processAndUploadImage(byte[] imageBytes, ImageProcessingContext context, List<String> imagePaths) {
-    var compressionResult = imageCompressionService.compressAndConvertImage(imageBytes, "image/jpeg");
-    var compressedBytes = compressionResult.compressedBytes();
-    var contentType = compressionResult.contentType();
-    var fileName = updateFileNameWithExtension(context.fileName(), contentType);
-
-    minioService.uploadImage(context.comicId(), context.chapterId(), fileName, compressedBytes, contentType);
-    var imagePath = minioService.getImagePath(context.comicId(), context.chapterId(), fileName);
-    imagePaths.add(imagePath);
-
-    return new ProcessedImage(fileName, compressionResult.compressedSize());
-  }
-
   private String updateFileNameWithExtension(String fileName, String contentType) {
-    var fileExtension = imageCompressionService.getFileExtensionForContentType(contentType);
+    var fileExtension = imageService.getFileExtensionForContentType(contentType);
     var lastDotIndex = fileName.lastIndexOf('.');
     if (lastDotIndex > 0) {
       return fileName.substring(0, lastDotIndex) + fileExtension;
@@ -191,16 +174,9 @@ public class CrawlImageProcessor {
     return fileName + fileExtension;
   }
 
-  private void updateProgress(ImageProcessingContext context, ChapterCrawlProcessingParams params) {
-    var newDownloadedCount = context.currentDownloadedCount() + 1;
-    var currentChapter = context.chapterIndex() + 1;
-    progressMessagePublisher.publishMessage(params.crawlId(), String.format("Downloaded image %d/%d of chapter %d: %s",
-        newDownloadedCount, context.totalImages(), currentChapter, context.imageUrl()));
-
-    params.chapterProgress().put(params.chapterKey(), new ChapterCrawlProgress(
-        context.chapterIndex(), params.url(), newDownloadedCount, context.totalImages(), DOWNLOADING
-    ));
+  /**
+   * Result of image upload containing path and blurhash.
+   */
+  public record ImageUploadResult(String path, String blurhash) {
   }
-
 }
-

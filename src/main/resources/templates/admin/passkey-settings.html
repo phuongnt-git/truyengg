@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Passkey Settings - TruyenGG Admin</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}">
+    <style>
+        :root {
+            --bg-primary: #1a1d21;
+            --bg-secondary: #212529;
+            --bg-card: #2a2d32;
+            --text-primary: #e0e0e0;
+            --text-secondary: #999;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #3a3d42;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            padding: 40px 20px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--border);
+            padding: 20px 24px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .passkey-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .passkey-item:hover {
+            background-color: #343a40;
+        }
+
+        .passkey-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .passkey-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .passkey-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .passkey-details h5 {
+            margin: 0 0 4px 0;
+            font-weight: 500;
+        }
+
+        .passkey-details p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .passkey-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .passkey-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .passkey-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            color: var(--text-primary);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-icon.btn-danger:hover {
+            background-color: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+
+        .btn-add-passkey {
+            background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-add-passkey:hover {
+            background: linear-gradient(135deg, var(--accent-hover) 0%, #7c3aed 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h4 {
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .alert-info-custom {
+            background-color: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            border-radius: 8px;
+        }
+
+        .badge-backup {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
+
+        .modal-content {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+        }
+
+        .modal-header {
+            border-bottom-color: var(--border);
+        }
+
+        .modal-footer {
+            border-top-color: var(--border);
+        }
+
+        .form-control {
+            background-color: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            background-color: var(--bg-secondary);
+            border-color: var(--accent);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+
+        #passkey-not-supported {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a class="back-link" th:href="@{/admin/dashboard}">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <div class="page-header">
+        <h1><i class="bi bi-fingerprint me-2"></i>Passkey Settings</h1>
+        <p>Manage your passkeys for secure, passwordless authentication</p>
+    </div>
+
+    <!-- WebAuthn Not Supported Alert -->
+    <div class="alert alert-warning" id="passkey-not-supported">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Passkeys are not supported</strong> in this browser. Please use a modern browser like Chrome, Firefox,
+        Safari, or Edge.
+    </div>
+
+    <!-- Info Alert -->
+    <div class="alert alert-info-custom mb-4">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>What is a Passkey?</strong> Passkeys are a secure, phishing-resistant replacement for passwords. They
+        use biometric authentication (fingerprint, face recognition) or security keys.
+    </div>
+
+    <!-- Passkeys Card -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Your Passkeys</h5>
+            <button class="btn btn-primary btn-add-passkey" id="add-passkey-btn">
+                <i class="bi bi-plus-lg"></i>
+                Add Passkey
+            </button>
+        </div>
+        <div class="card-body">
+            <!-- Loading State -->
+            <div class="text-center py-4" id="loading-state">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading passkeys...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <i class="bi bi-key"></i>
+                <h4>No Passkeys Registered</h4>
+                <p>Add a passkey to enable secure, passwordless login to your admin account.</p>
+                <button class="btn btn-primary btn-add-passkey" onclick="$('#add-passkey-btn').click()">
+                    <i class="bi bi-plus-lg"></i>
+                    Add Your First Passkey
+                </button>
+            </div>
+
+            <!-- Passkeys List -->
+            <div id="passkeys-list" style="display: none;">
+                <!-- Passkey items will be inserted here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Passkey Modal -->
+<div class="modal fade" id="addPasskeyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-fingerprint me-2"></i>Add New Passkey</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="device-name">Device Name</label>
+                    <input class="form-control" id="device-name" placeholder="e.g., MacBook Pro, iPhone 15" type="text">
+                    <div class="form-text text-muted">A friendly name to identify this passkey</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-primary" id="confirm-add-passkey" type="button">
+                    <i class="bi bi-fingerprint me-1"></i>Register Passkey
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rename Passkey Modal -->
+<div class="modal fade" id="renamePasskeyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil me-2"></i>Rename Passkey</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="new-device-name">New Device Name</label>
+                    <input class="form-control" id="new-device-name" placeholder="Enter new name" type="text">
+                </div>
+                <input id="rename-passkey-id" type="hidden">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-primary" id="confirm-rename-passkey" type="button">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deletePasskeyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-trash me-2 text-danger"></i>Delete Passkey</h5>
+                <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this passkey? You will no longer be able to use it to sign in.</p>
+                <p class="text-muted mb-0"><strong>Device:</strong> <span id="delete-device-name"></span></p>
+                <input id="delete-passkey-id" type="hidden">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete-passkey" type="button">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/passkey.js}"></script>
+<script>
+    $(document).ready(function () {
+        // Check WebAuthn support
+        if (!PasskeyClient.isSupported()) {
+            $('#passkey-not-supported').show();
+            $('#add-passkey-btn').prop('disabled', true);
+            $('#loading-state').hide();
+            return;
+        }
+
+        loadPasskeys();
+    });
+
+    function loadPasskeys() {
+        $('#loading-state').show();
+        $('#empty-state').hide();
+        $('#passkeys-list').hide();
+
+        PasskeyClient.listPasskeys()
+            .then(function (passkeys) {
+                $('#loading-state').hide();
+
+                if (!passkeys || passkeys.length === 0) {
+                    $('#empty-state').show();
+                } else {
+                    renderPasskeys(passkeys);
+                    $('#passkeys-list').show();
+                }
+            })
+            .catch(function (error) {
+                console.error('Failed to load passkeys:', error);
+                $('#loading-state').hide();
+                showToast('Failed to load passkeys', 'error');
+            });
+    }
+
+    function renderPasskeys(passkeys) {
+        const container = $('#passkeys-list');
+        container.empty();
+
+        passkeys.forEach(function (passkey) {
+            const lastUsed = passkey.lastUsedAt
+                ? new Date(passkey.lastUsedAt).toLocaleDateString('vi-VN', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+                : 'Never';
+
+            const createdAt = new Date(passkey.createdAt).toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            const backupBadge = passkey.backupEligible
+                ? (passkey.backupState
+                    ? '<span class="badge bg-success badge-backup"><i class="bi bi-cloud-check me-1"></i>Synced</span>'
+                    : '<span class="badge bg-warning badge-backup"><i class="bi bi-cloud me-1"></i>Backup eligible</span>')
+                : '';
+
+            const html = `
+        <div class="passkey-item" data-id="${passkey.id}">
+          <div class="passkey-info">
+            <div class="passkey-icon">
+              <i class="bi bi-key-fill"></i>
+            </div>
+            <div class="passkey-details">
+              <h5>${escapeHtml(passkey.deviceName)} ${backupBadge}</h5>
+              <div class="passkey-meta">
+                <span><i class="bi bi-clock"></i> Last used: ${lastUsed}</span>
+                <span><i class="bi bi-calendar"></i> Created: ${createdAt}</span>
+              </div>
+            </div>
+          </div>
+          <div class="passkey-actions">
+            <button class="btn btn-icon" onclick="openRenameModal('${passkey.id}', '${escapeHtml(passkey.deviceName)}')" title="Rename">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-icon btn-danger" onclick="openDeleteModal('${passkey.id}', '${escapeHtml(passkey.deviceName)}')" title="Delete">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+            container.append(html);
+        });
+    }
+
+    // Add Passkey
+    $('#add-passkey-btn').on('click', function () {
+        $('#device-name').val('');
+        new bootstrap.Modal('#addPasskeyModal').show();
+    });
+
+    $('#confirm-add-passkey').on('click', async function () {
+        const deviceName = $('#device-name').val().trim();
+        if (!deviceName) {
+            showToast('Please enter a device name', 'error');
+            return;
+        }
+
+        const $btn = $(this);
+        $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Registering...');
+
+        try {
+            await PasskeyClient.register(deviceName);
+            bootstrap.Modal.getInstance('#addPasskeyModal').hide();
+            showToast('Passkey registered successfully!', 'success');
+            loadPasskeys();
+        } catch (error) {
+            console.error('Registration failed:', error);
+            showToast(error.message || 'Failed to register passkey', 'error');
+        } finally {
+            $btn.prop('disabled', false).html('<i class="bi bi-fingerprint me-1"></i>Register Passkey');
+        }
+    });
+
+    // Rename Passkey
+    function openRenameModal(id, currentName) {
+        $('#rename-passkey-id').val(id);
+        $('#new-device-name').val(currentName);
+        new bootstrap.Modal('#renamePasskeyModal').show();
+    }
+
+    $('#confirm-rename-passkey').on('click', async function () {
+        const id = $('#rename-passkey-id').val();
+        const newName = $('#new-device-name').val().trim();
+
+        if (!newName) {
+            showToast('Please enter a name', 'error');
+            return;
+        }
+
+        const $btn = $(this);
+        $btn.prop('disabled', true).text('Saving...');
+
+        try {
+            await PasskeyClient.renamePasskey(id, newName);
+            bootstrap.Modal.getInstance('#renamePasskeyModal').hide();
+            showToast('Passkey renamed successfully!', 'success');
+            loadPasskeys();
+        } catch (error) {
+            console.error('Rename failed:', error);
+            showToast(error.message || 'Failed to rename passkey', 'error');
+        } finally {
+            $btn.prop('disabled', false).text('Save');
+        }
+    });
+
+    // Delete Passkey
+    function openDeleteModal(id, deviceName) {
+        $('#delete-passkey-id').val(id);
+        $('#delete-device-name').text(deviceName);
+        new bootstrap.Modal('#deletePasskeyModal').show();
+    }
+
+    $('#confirm-delete-passkey').on('click', async function () {
+        const id = $('#delete-passkey-id').val();
+
+        const $btn = $(this);
+        $btn.prop('disabled', true).text('Deleting...');
+
+        try {
+            await PasskeyClient.deletePasskey(id);
+            bootstrap.Modal.getInstance('#deletePasskeyModal').hide();
+            showToast('Passkey deleted successfully!', 'success');
+            loadPasskeys();
+        } catch (error) {
+            console.error('Delete failed:', error);
+            showToast(error.message || 'Failed to delete passkey', 'error');
+        } finally {
+            $btn.prop('disabled', false).text('Delete');
+        }
+    });
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showToast(message, type) {
+        // Simple toast implementation
+        const toastHtml = `
+      <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+        <div class="toast show align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'}" role="alert">
+          <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+      </div>
+    `;
+        const $toast = $(toastHtml);
+        $('body').append($toast);
+        setTimeout(function () {
+            $toast.fadeOut(300, function () {
+                $(this).remove();
+            });
+        }, 3000);
+    }
+</script>
+</body>
+</html>
+

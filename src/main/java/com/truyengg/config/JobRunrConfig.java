@@ -5,10 +5,12 @@ import org.jobrunr.storage.StorageProvider;
 import org.jobrunr.storage.sql.postgres.PostgresStorageProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.sql.DataSource;
 
 @Configuration
+@EnableScheduling
 public class JobRunrConfig {
 
   @Bean
